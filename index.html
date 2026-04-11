@@ -561,6 +561,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   <div class="action-bar" id="action-bar-main">
     <button class="action-btn primary" id="check-btn" onclick="checkStep()">Check Answer</button>
     <button class="action-btn ghost" id="reset-btn" onclick="resetStep()">Reset</button>
+    <button class="action-btn ghost" id="skip-btn" onclick="skipRfiQuiz()" style="display:none">Skip</button>
     <div class="score-chip" id="score-chip" style="display:none"></div>
   </div>
   <div class="action-bar" id="action-bar-extra" style="margin-top:0.5rem"></div>
@@ -1541,6 +1542,7 @@ function startRfiQuiz(pos) {
   clearExtraButtons();
   buildGrid();
   hideInlineStepStats();
+  updateMainActionButtons();
   renderChipStacks(`${pos}_RFI_rfi`);
   showScreen('screen-quiz');
 }
@@ -1611,6 +1613,7 @@ function applyVsOpen3betUI() {
   document.getElementById('result-panel').classList.remove('show');
   setModeUI(currentMode);
   hideInlineStepStats();
+  updateMainActionButtons();
 }
 
 // ═══════════════════════════════════════
@@ -1677,6 +1680,7 @@ function applyDefenseUI() {
   document.getElementById('result-panel').classList.remove('show');
   setModeUI(currentMode);
   hideInlineStepStats();
+  updateMainActionButtons();
 }
 
 // ═══════════════════════════════════════
@@ -1706,6 +1710,7 @@ function applyFiveBetUI() {
   document.getElementById('result-panel').classList.remove('show');
   renderChipStacks(`${heroPos}_${oppPos}_fivebet`);
   showInlineStepStats(`${heroPos}_${oppPos}_fivebet`);
+  updateMainActionButtons();
 }
 
 // ═══════════════════════════════════════
@@ -1768,6 +1773,7 @@ function startMWQuiz(sc) {
   applyMWCellUI();
   setModeUI(currentMode);
   hideInlineStepStats();
+  updateMainActionButtons();
   showScreen('screen-quiz');
 }
 
@@ -2010,6 +2016,7 @@ function checkRfi() {
   document.getElementById('check-btn').textContent = 'Practice vs 3-Bet →';
   document.getElementById('check-btn').onclick = () => { buildOpponentRow(heroPos); showScreen('screen-opponent'); document.getElementById('check-btn').onclick = checkStep; };
   document.getElementById('reset-btn').style.display = 'none';
+  updateMainActionButtons();
   addExtraBtn('Try Again', () => startRfiQuiz(heroPos));
 }
 
@@ -2280,6 +2287,19 @@ function resetStep() {
 }
 
 function clearExtraButtons() { document.getElementById('action-bar-extra').innerHTML = ''; }
+
+function updateMainActionButtons() {
+  const skipBtn = document.getElementById('skip-btn');
+  if (!skipBtn) return;
+  skipBtn.style.display = quizPath === 'rfi' && quizPhase === 'rfi' ? 'inline-block' : 'none';
+}
+
+function skipRfiQuiz() {
+  if (quizPath !== 'rfi' || quizPhase !== 'rfi' || !heroPos) return;
+  clearExtraButtons();
+  buildOpponentRow(heroPos);
+  showScreen('screen-opponent');
+}
 
 async function showInlineStepStats(quizName) {
   const statsEl = document.getElementById('step-inline-stats');

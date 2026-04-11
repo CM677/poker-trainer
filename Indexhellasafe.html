@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preflop Range Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e12; --surface: #17171e; --surface2: #1f1f2a; --surface3: #272733;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --gold: #e8c84a; --gold-dim: rgba(232,200,74,0.15); --gold-glow: rgba(232,200,74,0.4);
+  --cream: #f0ead8; --muted: rgba(240,234,216,0.45); --muted2: rgba(240,234,216,0.2);
+  --red: #e85070; --red-bg: rgba(232,80,112,0.18);
+  --seablue: #2196F3; --seablue-bg: rgba(33,150,243,0.18);
+  --fadedgold: rgba(232,200,74,0.35); --fadedgold-bg: rgba(232,200,74,0.12);
+  --fadedseablue: rgba(33,150,243,0.35); --fadedseablue-bg: rgba(33,150,243,0.12);
+  --orange: #e8673a; --orange-bg: rgba(232,103,58,0.18);
+  --purpleblue: #9370DB; --purpleblue-bg: rgba(147,112,219,0.18);
+  --green: #52c97a; --green-bg: rgba(82,201,122,0.18);
+  --teal: #38d9b0; --teal-bg: rgba(56,217,176,0.18);
+  --faded: rgba(240,234,216,0.08); --faded-border: rgba(240,234,216,0.04);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--cream); min-height:100vh; overflow-x:hidden; }
+body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+.screen { display:none; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; }
+#screen-position { align-items:center; justify-content:center; padding:3rem 1rem; }
+#screen-home { position:relative; }
+#screen-home, #screen-rfi-position, #screen-vsopen-position { align-items:center; justify-content:center; padding:3rem 1rem; }
+.logo-area { text-align:center; margin-bottom:3.5rem; }
+.logo-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,8vw,6rem); letter-spacing:6px; color:var(--gold); line-height:1; text-shadow:0 0 60px var(--gold-glow); }
+.logo-sub { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:0.6rem; }
+.position-label { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; text-align:center; margin-bottom:1.5rem; }
+.overall-stats { display:flex; justify-content:center; gap:3rem; margin-bottom:2rem; }
+.overall-stat { text-align:center; }
+.overall-stat-label { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:0.3rem; }
+.overall-stat-value { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:2px; line-height:1; }
+.overall-stat-value.best { color:var(--gold); }
+.overall-stat-value.avg { color:var(--seablue); }
+.position-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; width:100%; max-width:1200px; }
+.position-grid .pos-btn { flex:0 0 calc(20% - 0.85rem); min-width:150px; max-width:220px; }
+.path-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; max-width:840px; }
+.path-grid .pos-btn { flex:0 0 calc(33.33% - 1rem); min-width:180px; max-width:260px; }
+.pos-btn { background:var(--surface); border:1px solid var(--border2); border-radius:14px; padding:1.6rem 1rem; cursor:pointer; transition:all 0.2s ease; text-align:center; position:relative; overflow:hidden; }
+.pos-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--gold-dim),transparent); opacity:0; transition:opacity 0.2s; }
+.pos-btn:hover::before { opacity:1; }
+.pos-btn:hover { border-color:var(--gold); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.4),0 0 0 1px var(--gold); }
+.pos-btn:active { transform:translateY(-1px); }
+.pos-acronym { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; color:var(--gold); line-height:1; }
+.pos-name { font-size:0.65rem; color:var(--muted); letter-spacing:1px; margin-top:0.4rem; font-family:'DM Mono',monospace; }
+.pos-stats { font-size:0.75rem; color:var(--muted); margin-top:0.6rem; font-family:'DM Mono',monospace; line-height:1.6; }
+.pos-stats .stat-best { color:var(--gold); font-weight:600; font-size:0.85rem; }
+.pos-stats .stat-avg { color:var(--seablue); font-weight:600; font-size:0.85rem; }
+#screen-opponent { align-items:center; justify-content:center; padding:3rem 1rem; }
+#screen-opener { align-items:center; justify-content:center; padding:3rem 1rem; }
+.back-btn { position:absolute; top:1.5rem; left:1.5rem; background:none; border:1px solid var(--border2); color:var(--muted); font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:2px; padding:0.6rem 1.2rem; border-radius:8px; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+.back-btn:hover { color:var(--cream); background:var(--surface2); }
+.hero-scenario { text-align:center; margin-bottom:1.5rem; }
+.hero-pos { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,7vw,5rem); color:var(--gold); letter-spacing:4px; line-height:1; }
+.hero-sub { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:3px; color:var(--muted); margin-top:0.5rem; text-transform:uppercase; }
+.opponent-row { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; width:100%; max-width:1200px; }
+.opponent-row .opp-btn { flex:0 0 calc(20% - 0.85rem); min-width:150px; max-width:220px; }
+.opp-btn { background:var(--surface); border:1px solid var(--border2); border-radius:14px; padding:1.6rem 1rem; cursor:pointer; transition:all 0.2s ease; text-align:center; position:relative; overflow:hidden; }
+.opp-btn:before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--gold-dim),transparent); opacity:0; transition:opacity 0.2s; }
+.opp-btn:hover:before { opacity:1; }
+.opp-btn:hover { border-color:var(--gold); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.4),0 0 0 1px var(--gold); }
+.opp-btn:active { transform:translateY(-1px); }
+.opp-btn-pos { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; color:var(--gold); line-height:1; display:block; }
+.opp-btn-name { font-size:0.65rem; color:var(--muted); letter-spacing:1px; margin-top:0.4rem; font-family:'DM Mono',monospace; display:block; }
+.opp-btn-stats { font-size:0.75rem; color:var(--muted); margin-top:0.6rem; font-family:'DM Mono',monospace; line-height:1.6; }
+.opp-btn-stats .stat-best { color:var(--gold); font-weight:600; font-size:0.85rem; }
+.opp-btn-stats .stat-avg { color:var(--seablue); font-weight:600; font-size:0.85rem; }
+#screen-quiz { padding:1.5rem; align-items:stretch; }
+.quiz-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; gap:1rem; flex-wrap:wrap; }
+.quiz-scenario-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.4rem,3vw,2rem); letter-spacing:3px; color:var(--gold); flex:1; text-align:center; }
+.step-badges { display:flex; gap:0.5rem; }
+.step-badge { width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border2); display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted); transition:all 0.3s; }
+.step-badge.active { border-color:var(--gold); background:var(--gold-dim); color:var(--gold); }
+.step-badge.done { border-color:var(--seablue); background:var(--seablue-bg); color:var(--seablue); }
+.step-header { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.2rem 1.5rem; margin-bottom:1.5rem; }
+.step-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+.step-header-text { flex:1; min-width:0; }
+.step-inline-stats { flex-shrink:0; display:flex; gap:1.2rem; align-items:center; padding:0.4rem 0.8rem; background:var(--surface2); border:1px solid var(--border2); border-radius:10px; }
+.step-inline-stat { text-align:center; }
+.step-inline-stat-label { font-family:'DM Mono',monospace; font-size:0.55rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:0.15rem; }
+.step-inline-stat-value { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:1px; line-height:1; }
+.step-inline-stat-value.best { color:var(--gold); }
+.step-inline-stat-value.avg { color:var(--seablue); }
+.step-number { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:0.3rem; }
+.step-title { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:2px; color:var(--cream); line-height:1.1; }
+.chip-stacks { display:flex; gap:1.5rem; margin-left:2rem; align-items:flex-end; }
+.chip-stack { display:flex; flex-direction:column; align-items:center; gap:0.3rem; }
+.chip-stack-label { font-family:'DM Mono',monospace; font-size:0.55rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
+.chip-stack-amount { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; letter-spacing:1px; margin-bottom:0.2rem; }
+.chip-stack-amount.raise { color:var(--gold); }
+.chip-stack-amount.pot { color:var(--seablue); }
+.chip-visual { display:flex; flex-direction:column-reverse; gap:2px; align-items:center; min-height:30px; }
+.chip { width:28px; height:6px; border-radius:14px; border:1px solid rgba(255,255,255,0.2); position:relative; }
+.chip.raise { background:linear-gradient(180deg, #e8c84a 0%, #c9a838 100%); box-shadow:0 1px 3px rgba(232,200,74,0.4); }
+.chip.pot { background:linear-gradient(180deg, #2196F3 0%, #1976D2 100%); box-shadow:0 1px 3px rgba(33,150,243,0.4); }
+.chip::after { content:''; position:absolute; top:1px; left:50%; transform:translateX(-50%); width:16px; height:2px; background:rgba(255,255,255,0.3); border-radius:1px; }
+.step-instruction { font-size:0.82rem; color:var(--muted); margin-top:0.4rem; line-height:1.5; }
+.mode-toggle { display:flex; gap:0.5rem; margin-bottom:1.2rem; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.35rem; width:fit-content; }
+.mode-btn { padding:0.6rem 1.4rem; border-radius:8px; border:none; background:none; cursor:pointer; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:1px; color:var(--muted); transition:all 0.2s; text-transform:uppercase; }
+.mode-btn.active-fourbet { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold); }
+.mode-btn.active-call { background:var(--seablue-bg); color:var(--seablue); border:1px solid var(--seablue); }
+.grid-wrap { overflow-x:auto; margin-bottom:1.2rem; }
+.range-grid { display:grid; grid-template-columns:repeat(13,1fr); gap:3px; max-width:650px; margin:0 auto; user-select:none; touch-action:none; }
+.hcell { aspect-ratio:1; border-radius:5px; display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-weight:500; font-size:clamp(0.55rem,1.1vw,0.78rem); cursor:crosshair; transition:all 0.15s ease; user-select:none; position:relative; border:1.5px solid transparent; background:var(--surface2); color:var(--cream); }
+.hcell.out-of-range { background:var(--faded); color:var(--muted2); border-color:var(--faded-border); cursor:not-allowed; opacity:0.4; }
+.hcell:not(.out-of-range):not(.result-correct-4bet):not(.result-correct-call):not(.result-correct):not(.result-incorrect):not(.result-wrong-call):not(.result-wrong-4bet):not(.result-missed):not(.result-missed-4bet):not(.result-missed-call):hover { transform:scale(1.1); z-index:10; border-color:var(--gold); box-shadow:0 4px 16px rgba(0,0,0,0.4); }
+.hcell.sel-4bet { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); }
+.hcell.sel-call { background:var(--seablue-bg); border-color:var(--seablue); color:var(--seablue); }
+.hcell.sel-4bet::after,.hcell.sel-call::after { content:''; position:absolute; bottom:3px; right:3px; width:5px; height:5px; border-radius:50%; }
+.hcell.sel-4bet::after { background:var(--gold); }
+.hcell.sel-call::after { background:var(--seablue); }
+.hcell.result-correct-4bet { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); }
+.hcell.result-correct-call { background:var(--seablue-bg); border-color:var(--seablue); color:var(--seablue); }
+.hcell.result-correct { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); }
+.hcell.result-incorrect { background:var(--red-bg); border-color:var(--red); color:var(--red); }
+.hcell.result-wrong-call { background:var(--orange-bg); border-color:var(--orange); color:var(--orange); }
+.hcell.result-wrong-4bet { background:var(--purpleblue-bg); border-color:var(--purpleblue); color:var(--purpleblue); }
+.hcell.result-missed { background:transparent; border-color:var(--fadedgold); color:var(--fadedgold); border-style:dashed; }
+.hcell.result-missed-4bet { background:var(--fadedgold-bg); border-color:var(--fadedgold); color:var(--fadedgold); border-style:dashed; }
+.hcell.result-missed-call { background:var(--fadedseablue-bg); border-color:var(--fadedseablue); color:var(--fadedseablue); border-style:dashed; }
+.hcell.five-bet-selected { background:var(--seablue-bg); border-color:var(--seablue); color:var(--seablue); }
+.legend { display:flex; gap:1rem 1.5rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+.legend-item { display:flex; align-items:center; gap:0.4rem; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:1px; color:var(--muted); }
+.legend-dot { width:10px; height:10px; border-radius:3px; border:1.5px solid; }
+.legend-dot.fourbet { background:var(--gold-dim); border-color:var(--gold); }
+.legend-dot.call { background:var(--seablue-bg); border-color:var(--seablue); }
+.legend-dot.correct-4bet { background:var(--gold-dim); border-color:var(--gold); }
+.legend-dot.correct-call { background:var(--seablue-bg); border-color:var(--seablue); }
+.legend-dot.incorrect { background:var(--red-bg); border-color:var(--red); }
+.legend-dot.wrong-call { background:var(--orange-bg); border-color:var(--orange); }
+.legend-dot.wrong-4bet { background:var(--purpleblue-bg); border-color:var(--purpleblue); }
+.legend-dot.missed { background:transparent; border-color:var(--fadedgold); border-style:dashed; }
+.legend-dot.missed-4bet { background:var(--fadedgold-bg); border-color:var(--fadedgold); border-style:dashed; }
+.legend-dot.missed-call { background:var(--fadedseablue-bg); border-color:var(--fadedseablue); border-style:dashed; }
+.legend-dot.faded { background:var(--faded); border-color:var(--faded-border); opacity:0.4; }
+.action-bar { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
+.action-btn { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; padding:0.85rem 1.8rem; border-radius:10px; border:none; cursor:pointer; transition:all 0.2s; }
+.action-btn.primary { background:var(--gold); color:#0e0e12; font-weight:700; }
+.action-btn.primary:hover { background:#f0d860; box-shadow:0 6px 24px var(--gold-glow); transform:translateY(-2px); }
+.action-btn.primary:disabled { opacity:0.3; cursor:not-allowed; transform:none; box-shadow:none; }
+.action-btn.ghost { background:none; color:var(--muted); border:1px solid var(--border2); }
+.action-btn.ghost:hover { color:var(--cream); background:var(--surface2); }
+.score-chip { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:1px; padding:0.7rem 1.2rem; border-radius:8px; background:var(--surface2); color:var(--muted); border:1px solid var(--border); }
+.result-panel { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem 1.5rem; margin-top:1rem; animation:fadeUp 0.4s ease-out; display:none; }
+.result-panel.show { display:block; }
+.result-stats { display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+.stat { display:flex; flex-direction:column; gap:0.2rem; }
+.stat-val { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; line-height:1; }
+.stat-val.green { color:var(--green); } .stat-val.teal { color:var(--teal); } .stat-val.red { color:var(--red); } .stat-val.orange { color:var(--orange); } .stat-val.gold { color:var(--gold); }
+.stat-label { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+.result-message { font-size:0.9rem; color:var(--muted); line-height:1.5; border-top:1px solid var(--border); padding-top:0.8rem; margin-top:0.5rem; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+.hcell.pop { animation:pop 0.25s ease-out; }
+@media(max-width:520px) { .hcell{font-size:0.5rem;border-radius:3px} .range-grid{gap:2px} #screen-quiz{padding:1rem} .chip-stacks{display:none!important} .topbar-logo{height:24px} }
+@media(max-width:900px) { .chip-stacks{gap:1rem;margin-left:1rem} .chip{width:24px;height:5px} }
+@media(max-width:600px) { .step-header-top{flex-wrap:wrap} .chip-stacks{margin-left:0;margin-top:1rem;width:100%;justify-content:center} }
+@media(max-width:900px) { .position-grid .pos-btn{flex:0 0 calc(33.33% - 0.7rem)} .opponent-row .opp-btn{flex:0 0 calc(33.33% - 0.7rem)} }
+@media(max-width:600px) { .position-grid .pos-btn{flex:0 0 calc(50% - 0.5rem)} .overall-stats{gap:1.5rem} .overall-stat-value{font-size:2rem} .opponent-row .opp-btn{flex:0 0 calc(50% - 0.5rem)} }
+/* ═══════════════════════════════════════════════════
+   HAND TRAINER STYLES
+   ═══════════════════════════════════════════════════ */
+#screen-trainer { flex-direction:column; background:#0a0f18; position:relative; overflow:hidden; }
+.ht-info-bar { background:#1a2535; border-bottom:2px solid #2a3a55; padding:0; height:44px; flex-shrink:0; display:flex; align-items:stretch; overflow-x:auto; white-space:nowrap; scrollbar-width:none; }
+.ht-info-bar::-webkit-scrollbar { display:none; }
+.ht-info-seg { display:inline-flex; align-items:center; gap:0.5rem; padding:0 1.2rem; border-right:1px solid rgba(255,255,255,0.12); font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.12em; color:rgba(245,240,232,0.85); flex-shrink:0; }
+.ht-info-seg:last-child { border-right:none; }
+.ht-info-seg.ht-fold .value { color:#e74c3c; }
+.ht-info-seg.ht-call .value { color:#3498db; }
+.ht-info-seg.ht-raise .value { color:#d4af37; }
+.ht-table-area { flex:1; display:flex; align-items:center; justify-content:center; padding:0.3rem 0.5rem; min-height:0; }
+.ht-table-wrap { position:relative; width:min(780px,98vw); aspect-ratio:1520/870; }
+.ht-table-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 8px 40px rgba(0,0,0,0.7)); }
+.ht-seat { position:absolute; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); z-index:5; }
+.ht-pos-chip { position:relative; width:52px; height:52px; flex-shrink:0; }
+.ht-pos-chip img { width:100%; height:100%; object-fit:contain; }
+.ht-pos-chip-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1.05rem; letter-spacing:0.05em; color:#f5f0e8; text-shadow:0 1px 4px rgba(0,0,0,0.9); }
+.ht-pos-chip.ht-hero .ht-pos-chip-label { color:#d4af37; }
+.ht-card { border-radius:5px; position:relative; overflow:hidden; flex-shrink:0; box-shadow:0 3px 10px rgba(0,0,0,0.6); }
+.ht-card img.ht-card-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+.ht-card .ht-card-face { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:2; }
+.ht-card .ht-card-rank { font-family:'Bebas Neue',sans-serif; line-height:1; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,0.85); letter-spacing:0; }
+.ht-seat-cards { display:flex; gap:3px; position:absolute; }
+.ht-seat-cards .ht-card { width:28px; height:40px; }
+.ht-seat-cards .ht-card .ht-card-rank { font-size:0.9rem; }
+.ht-hero-cards .ht-card { width:54px; height:76px; box-shadow:0 4px 18px rgba(0,0,0,0.7); }
+.ht-hero-cards .ht-card .ht-card-rank { font-size:2rem; }
+.ht-cards-above { bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); }
+.ht-cards-below { top:calc(100% + 6px);    left:50%; transform:translateX(-50%); }
+.ht-cards-left  { right:calc(100% + 6px);  top:50%;  transform:translateY(-50%); }
+.ht-cards-right { left:calc(100% + 6px);   top:50%;  transform:translateY(-50%); }
+.ht-seat.ht-folded .ht-seat-cards { opacity:0.18; }
+.ht-seat.ht-folded .ht-pos-chip { opacity:0.28; }
+.ht-community { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); display:flex; gap:5px; z-index:3; }
+.ht-community .ht-card { width:34px; height:48px; }
+.ht-bet-chip { position:absolute; display:flex; align-items:center; justify-content:center; width:38px; height:38px; transform:translate(-50%,-50%); z-index:6; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6)); }
+.ht-bet-chip img { width:100%; height:100%; object-fit:contain; }
+.ht-bet-chip .ht-chip-val { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:0.82rem; color:#000; font-weight:700; }
+.ht-pot-display { position:absolute; top:31%; left:50%; transform:translate(-50%,-50%); z-index:4; }
+.ht-pot-img-wrap { position:relative; }
+.ht-pot-display img { width:50px; display:block; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+.ht-pot-overlay { position:absolute; top:0; left:0; width:100%; height:52%; display:flex; align-items:center; justify-content:center; }
+.ht-pot-amount { font-family:'Bebas Neue',sans-serif; font-size:1.05rem; color:#000; font-weight:700; }
+.ht-action-bar { flex-shrink:0; display:flex; gap:0.8rem; padding:0.8rem 1.5rem; background:#0a0f18; border-top:2px solid #1a2535; justify-content:center; }
+.ht-action-btn { flex:0 1 180px; padding:0.85rem 0; border:none; border-radius:8px; font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:0.12em; cursor:pointer; transition:filter 0.12s; }
+.ht-action-btn:hover { filter:brightness(1.2); }
+.ht-action-btn:active { filter:brightness(0.9); }
+.ht-btn-fold  { background:#c0392b; color:#fff; box-shadow:0 3px 10px rgba(192,57,43,0.4); }
+.ht-btn-call  { background:#1565c0; color:#fff; box-shadow:0 3px 10px rgba(21,101,192,0.4); }
+.ht-btn-raise { background:#d4a017; color:#1a1000; box-shadow:0 3px 10px rgba(212,160,23,0.4); }
+.ht-btn-allin { background:#e91e8c; color:#fff; box-shadow:0 3px 10px rgba(233,30,140,0.4); }
+.ht-action-btn.hidden { display:none; }
+.ht-result-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:200; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.ht-result-overlay.show { opacity:1; pointer-events:all; }
+.ht-result-card { background:#1e2f42; border:1.5px solid rgba(255,255,255,0.1); border-radius:16px; padding:2rem 2.5rem; min-width:300px; max-width:420px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.6); transform:scale(0.9); transition:transform 0.2s; }
+.ht-result-overlay.show .ht-result-card { transform:scale(1); }
+.ht-result-icon { font-size:3rem; margin-bottom:0.5rem; line-height:1; }
+.ht-result-verdict { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.08em; margin-bottom:0.4rem; }
+.ht-result-verdict.correct { color:#27ae60; } .ht-result-verdict.wrong { color:#e74c3c; }
+.ht-result-detail { font-size:0.9rem; color:rgba(245,240,232,0.6); line-height:1.5; margin-bottom:1.4rem; }
+.ht-result-hand { display:flex; gap:4px; justify-content:center; margin-bottom:1rem; }
+.ht-result-action { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.06em; margin-bottom:0.3rem; }
+.ht-result-action.fold { color:#c0392b; } .ht-result-action.call { color:#1565c0; }
+.ht-result-action.raise { color:#d4a017; } .ht-result-action.shove { color:#e91e8c; }
+.ht-result-correct { font-size:0.8rem; color:rgba(245,240,232,0.5); margin-bottom:1.2rem; }
+.ht-result-correct strong { color:#d4af37; }
+.ht-result-next { width:100%; padding:0.9rem; background:#d4af37; color:#1a1000; border:none; border-radius:8px; font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.1em; cursor:pointer; }
+.ht-result-next:hover { background:#f0d060; }
+.ht-stats { position:absolute; top:52px; right:1rem; display:flex; gap:0.8rem; z-index:10; }
+.ht-stat-pill { background:rgba(15,25,35,0.88); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.25rem 0.8rem; font-family:'DM Mono',monospace; font-size:0.72rem; display:flex; gap:0.4rem; align-items:center; color:#f5f0e8; }
+.ht-stat-pill .sl { color:rgba(212,175,55,0.6); }
+.ht-back-btn { position:absolute; top:52px; left:1rem; background:none; border:1px solid rgba(255,255,255,0.15); color:rgba(245,240,232,0.5); font-family:'Bebas Neue',sans-serif; font-size:0.85rem; letter-spacing:0.06em; padding:0.3rem 0.8rem; border-radius:20px; cursor:pointer; transition:all 0.15s; z-index:10; }
+.ht-back-btn:hover { color:#f5f0e8; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 0: QUIZ PATH CHOOSER -->
+<div id="screen-home" class="screen active">
+  <!-- Auth Panel — home screen only -->
+  <div style="position:absolute; top:1rem; right:1rem; z-index:10; background:var(--surface); border:1px solid var(--border2); border-radius:12px; padding:1rem; max-width:280px; font-family:'DM Sans',sans-serif;">
+    <div id="authForm">
+      <input type="email" id="authEmail" placeholder="Email" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--cream); font-family:'DM Sans',sans-serif;">
+      <input type="password" id="authPassword" placeholder="Password" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--cream); font-family:'DM Sans',sans-serif;">
+      <button onclick="signUp()" style="padding:0.5rem 1rem; background:var(--gold); border:none; border-radius:6px; color:#0e0e12; cursor:pointer; margin-right:0.5rem; margin-bottom:0.5rem; font-family:'DM Mono',monospace; text-transform:uppercase; font-size:0.7rem;">Sign Up</button>
+      <button onclick="login()" style="padding:0.5rem 1rem; background:var(--gold); border:none; border-radius:6px; color:#0e0e12; cursor:pointer; font-family:'DM Mono',monospace; text-transform:uppercase; font-size:0.7rem;">Login</button>
+    </div>
+    <div id="userInfo" style="display:none; color:var(--cream);">
+      <p id="userEmail" style="font-size:0.75rem; margin-bottom:0.5rem; font-family:'DM Mono',monospace; color:var(--muted);"></p>
+      <button onclick="logout()" style="padding:0.5rem 1rem; background:var(--red); border:none; border-radius:6px; color:var(--cream); cursor:pointer; font-family:'DM Mono',monospace; text-transform:uppercase; font-size:0.7rem;">Logout</button>
+      <div id="statsDisplay" style="font-size:0.7rem; color:var(--muted); margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); font-family:'DM Mono',monospace;"></div>
+    </div>
+  </div>
+  <div class="logo-area">
+    <div class="logo-title">PREFLOP</div>
+    <div class="logo-sub">Range Trainer · 6-Max NLHE · 100bb</div>
+  </div>
+  <div class="position-label">Choose Quiz Type</div>
+  <div class="path-grid">
+    <button class="pos-btn" onclick="showScreen('screen-rfi-position')">
+      <div class="pos-acronym">RFI</div>
+      <div class="pos-name">Raise First In</div>
+    </button>
+    <button class="pos-btn" onclick="showScreen('screen-vsopen-position')">
+      <div class="pos-acronym">vs OPEN</div>
+      <div class="pos-name">Facing an Open</div>
+    </button>
+    <button class="pos-btn" onclick="startHandTrainer()">
+      <div class="pos-acronym">🃏</div>
+      <div class="pos-name">Hand Trainer</div>
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 1A: RFI POSITION PICKER -->
+<div id="screen-rfi-position" class="screen">
+  <button class="back-btn" onclick="showScreen('screen-home')">← Back</button>
+  <div class="logo-area">
+    <div class="logo-title">RFI QUIZ</div>
+    <div class="logo-sub">Select your position</div>
+  </div>
+  <div class="overall-stats">
+    <div class="overall-stat">
+      <div class="overall-stat-label">Personal Best</div>
+      <div class="overall-stat-value best" id="rfi-overall-best">0%</div>
+    </div>
+    <div class="overall-stat">
+      <div class="overall-stat-label">Average Score</div>
+      <div class="overall-stat-value avg" id="rfi-overall-avg">0%</div>
+    </div>
+  </div>
+  <div class="position-grid">
+    <button class="pos-btn" onclick="selectHero('UTG')" data-quiz-type="rfi" data-position="UTG">
+      <div class="pos-acronym">UTG</div>
+      <div class="pos-name">Under the Gun</div>
+      <div class="pos-stats" id="stats-UTG-rfi"></div>
+    </button>
+    <button class="pos-btn" onclick="selectHero('HJ')" data-quiz-type="rfi" data-position="HJ">
+      <div class="pos-acronym">HJ</div>
+      <div class="pos-name">Hijack</div>
+      <div class="pos-stats" id="stats-HJ-rfi"></div>
+    </button>
+    <button class="pos-btn" onclick="selectHero('CO')" data-quiz-type="rfi" data-position="CO">
+      <div class="pos-acronym">CO</div>
+      <div class="pos-name">Cutoff</div>
+      <div class="pos-stats" id="stats-CO-rfi"></div>
+    </button>
+    <button class="pos-btn" onclick="selectHero('BTN')" data-quiz-type="rfi" data-position="BTN">
+      <div class="pos-acronym">BTN</div>
+      <div class="pos-name">Button</div>
+      <div class="pos-stats" id="stats-BTN-rfi"></div>
+    </button>
+    <button class="pos-btn" onclick="selectHero('SB')" data-quiz-type="rfi" data-position="SB">
+      <div class="pos-acronym">SB</div>
+      <div class="pos-name">Small Blind</div>
+      <div class="pos-stats" id="stats-SB-rfi"></div>
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 1B: VS OPEN POSITION PICKER -->
+<div id="screen-vsopen-position" class="screen">
+  <button class="back-btn" onclick="showScreen('screen-home')">← Back</button>
+  <div class="logo-area">
+    <div class="logo-title">VS OPEN QUIZ</div>
+    <div class="logo-sub">Select your position</div>
+  </div>
+  <div class="overall-stats">
+    <div class="overall-stat">
+      <div class="overall-stat-label">Personal Best</div>
+      <div class="overall-stat-value best" id="vsopen-overall-best">0%</div>
+    </div>
+    <div class="overall-stat">
+      <div class="overall-stat-label">Average Score</div>
+      <div class="overall-stat-value avg" id="vsopen-overall-avg">0%</div>
+    </div>
+  </div>
+  <div class="position-grid">
+    <button class="pos-btn" onclick="selectVsOpenHero('HJ')" data-quiz-type="vsopen" data-position="HJ">
+      <div class="pos-acronym">HJ</div>
+      <div class="pos-name">Hijack</div>
+      <div class="pos-stats" id="stats-HJ-vsopen"></div>
+    </button>
+    <button class="pos-btn" onclick="selectVsOpenHero('CO')" data-quiz-type="vsopen" data-position="CO">
+      <div class="pos-acronym">CO</div>
+      <div class="pos-name">Cutoff</div>
+      <div class="pos-stats" id="stats-CO-vsopen"></div>
+    </button>
+    <button class="pos-btn" onclick="selectVsOpenHero('BTN')" data-quiz-type="vsopen" data-position="BTN">
+      <div class="pos-acronym">BTN</div>
+      <div class="pos-name">Button</div>
+      <div class="pos-stats" id="stats-BTN-vsopen"></div>
+    </button>
+    <button class="pos-btn" onclick="selectVsOpenHero('SB')" data-quiz-type="vsopen" data-position="SB">
+      <div class="pos-acronym">SB</div>
+      <div class="pos-name">Small Blind</div>
+      <div class="pos-stats" id="stats-SB-vsopen"></div>
+    </button>
+    <button class="pos-btn" onclick="selectVsOpenHero('BB')" data-quiz-type="vsopen" data-position="BB">
+      <div class="pos-acronym">BB</div>
+      <div class="pos-name">Big Blind</div>
+      <div class="pos-stats" id="stats-BB-vsopen"></div>
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 2: OPPONENT (for RFI path - 3bet scenarios) -->
+<div id="screen-opponent" class="screen">
+  <button class="back-btn" onclick="goBackToRfiPosition()">← Back</button>
+  <div class="hero-scenario">
+    <div id="opp-hero-label" class="hero-pos">UTG</div>
+    <div class="hero-sub">Facing a 3-bet from...</div>
+  </div>
+  <div class="overall-stats">
+    <div class="overall-stat">
+      <div class="overall-stat-label">Personal Best</div>
+      <div class="overall-stat-value best" id="opponent-overall-best">0%</div>
+    </div>
+    <div class="overall-stat">
+      <div class="overall-stat-label">Average Score</div>
+      <div class="overall-stat-value avg" id="opponent-overall-avg">0%</div>
+    </div>
+  </div>
+  <div class="opponent-row" id="opponent-row"></div>
+</div>
+
+<!-- SCREEN 2B: OPENER PICKER (for vs Open path) -->
+<div id="screen-opener" class="screen">
+  <button class="back-btn" onclick="goBackToVsOpenPosition()">← Back</button>
+  <div class="hero-scenario">
+    <div id="opener-hero-label" class="hero-pos">HJ</div>
+    <div class="hero-sub">Facing an open from...</div>
+  </div>
+  <div class="overall-stats">
+    <div class="overall-stat">
+      <div class="overall-stat-label">Personal Best</div>
+      <div class="overall-stat-value best" id="opener-overall-best">0%</div>
+    </div>
+    <div class="overall-stat">
+      <div class="overall-stat-label">Average Score</div>
+      <div class="overall-stat-value avg" id="opener-overall-avg">0%</div>
+    </div>
+  </div>
+  <div class="opponent-row" id="opener-row"></div>
+</div>
+
+<!-- SCREEN 3: QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-topbar">
+    <button class="back-btn" style="position:relative;top:auto;left:auto;" onclick="quizGoBack()">← Back</button>
+    <div id="quiz-scenario-title" class="quiz-scenario-title">UTG RFI</div>
+    <div class="step-badges">
+      <div class="step-badge active" id="badge1">1</div>
+      <div class="step-badge" id="badge2">2</div>
+    </div>
+  </div>
+  <div class="step-header">
+    <div class="step-header-top">
+      <div class="step-header-text">
+        <div id="step-number-label" class="step-number">RFI Quiz</div>
+        <div id="step-title-main" class="step-title">UTG — Raise First In</div>
+        <div id="step-instruction-text" class="step-instruction">Select every hand you would open-raise.</div>
+      </div>
+      <div id="chip-stacks-container" class="chip-stacks"></div>
+      <div id="step-inline-stats" class="step-inline-stats" style="display:none;">
+        <div class="step-inline-stat">
+          <div class="step-inline-stat-label">Best</div>
+          <div class="step-inline-stat-value best" id="step-inline-best">—</div>
+        </div>
+        <div class="step-inline-stat">
+          <div class="step-inline-stat-label">Avg</div>
+          <div class="step-inline-stat-value avg" id="step-inline-avg">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="mode-toggle-wrap" class="mode-toggle">
+    <button id="btn-mode-4bet" class="mode-btn active-fourbet" onclick="setMode('4bet')">4-Bet</button>
+    <button id="btn-mode-call" class="mode-btn" onclick="setMode('call')">Call</button>
+  </div>
+  <div id="legend-normal" class="legend">
+    <div class="legend-item"><div class="legend-dot fourbet"></div><span id="legend-raise-label">Open Raise</span></div>
+    <div class="legend-item" id="legend-call-item"><div class="legend-dot call"></div><span>Call</span></div>
+    <div class="legend-item"><div class="legend-dot faded"></div><span id="legend-faded-label">Fold</span></div>
+  </div>
+  <div id="legend-result" class="legend" style="display:none">
+    <div class="legend-item"><div class="legend-dot correct-4bet"></div><span id="legend-result-raise">Correct Raise</span></div>
+    <div class="legend-item" id="legend-result-call-item"><div class="legend-dot correct-call"></div><span>Correct Call</span></div>
+    <div class="legend-item" id="legend-result-wrong-action-item">
+      <div class="legend-dot wrong-call"></div><span>Called (should 4-bet)</span>
+    </div>
+    <div class="legend-item" id="legend-result-wrong-4bet-item">
+      <div class="legend-dot wrong-4bet"></div><span>4-bet (should call)</span>
+    </div>
+    <div class="legend-item"><div class="legend-dot incorrect"></div><span>Wrong Hand</span></div>
+    <div class="legend-item" id="legend-result-missed-4bet"><div class="legend-dot missed-4bet"></div><span>Missed 4-Bet</span></div>
+    <div class="legend-item" id="legend-result-missed-call"><div class="legend-dot missed-call"></div><span>Missed Call</span></div>
+    <div class="legend-item" id="legend-result-missed-single"><div class="legend-dot missed"></div><span>Missed</span></div>
+    <div class="legend-item"><div class="legend-dot faded"></div><span id="legend-result-faded">Fold</span></div>
+  </div>
+  <div id="legend-fivebet" class="legend" style="display:none">
+    <div class="legend-item"><div class="legend-dot correct-4bet"></div><span>Correct Call</span></div>
+    <div class="legend-item"><div class="legend-dot incorrect"></div><span>Incorrect</span></div>
+    <div class="legend-item"><div class="legend-dot missed"></div><span>Missed</span></div>
+    <div class="legend-item"><div class="legend-dot faded"></div><span>Not in 4-Bet Range</span></div>
+  </div>
+  <div class="grid-wrap"><div class="range-grid" id="rangeGrid"></div></div>
+  <div class="action-bar" id="action-bar-main">
+    <button class="action-btn primary" id="check-btn" onclick="checkStep()">Check Answer</button>
+    <button class="action-btn ghost" id="reset-btn" onclick="resetStep()">Reset</button>
+    <div class="score-chip" id="score-chip" style="display:none"></div>
+  </div>
+  <div class="action-bar" id="action-bar-extra" style="margin-top:0.5rem"></div>
+  <div class="result-panel" id="result-panel">
+    <div class="result-stats" id="result-stats"></div>
+    <div class="result-message" id="result-message"></div>
+  </div>
+</div>
+
+<!-- Load Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ══════════════════════════════════════════════════════
+// SUPABASE CONFIGURATION v2.0
+// ══════════════════════════════════════════════════════
+
+const SUPABASE_URL = "https://oyxgwfuodnqmtnleaqss.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95eGd3ZnVvZG5xbXRubGVhcXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MTA0NjgsImV4cCI6MjA4NzA4NjQ2OH0.uw-TxhCGp71eiNT4S7uxFT0CyYOoZWHkPeaKxgOBlnI";
+
+// Check if Supabase SDK loaded — if not, app still works, just no score saving
+let supabaseClient = null;
+if (typeof window.supabase === 'undefined') {
+  console.warn("Supabase SDK not loaded — scores won't be saved.");
+} else {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log("Supabase initialized:", SUPABASE_URL);
+}
+
+// ══════════════════════════════════════════════════════
+// CHIP STACK DATA (Raise Size & Pot Size in BB)
+// ══════════════════════════════════════════════════════
+
+const CHIP_DATA = {
+  // RFI
+  'UTG_RFI_rfi': { raise: 2.5, pot: 1.5 },
+  'HJ_RFI_rfi':  { raise: 2.5, pot: 1.5 },
+  'CO_RFI_rfi':  { raise: 2.5, pot: 1.5 },
+  'BTN_RFI_rfi': { raise: 2.5, pot: 1.5 },
+  'SB_RFI_rfi':  { raise: 3,   pot: 1.5 },
+  // vs Open (3-bet scenarios)
+  'HJ_UTG_vsopen-3bet': { raise: 8,   pot: 4 },
+  'CO_UTG_vsopen-3bet': { raise: 8,   pot: 4 },
+  'CO_HJ_vsopen-3bet':  { raise: 8,   pot: 4 },
+  'BTN_UTG_vsopen-3bet':{ raise: 8,   pot: 4 },
+  'BTN_HJ_vsopen-3bet': { raise: 8,   pot: 4 },
+  'BTN_CO_vsopen-3bet': { raise: 8,   pot: 4 },
+  'SB_UTG_vsopen-3bet': { raise: 10,  pot: 4 },
+  'SB_HJ_vsopen-3bet':  { raise: 10,  pot: 4 },
+  'SB_CO_vsopen-3bet':  { raise: 10,  pot: 4 },
+  'SB_BTN_vsopen-3bet': { raise: 10,  pot: 4 },
+  'BB_UTG_vsopen-3bet': { raise: 10,  pot: 4 },
+  'BB_HJ_vsopen-3bet':  { raise: 10,  pot: 4 },
+  'BB_CO_vsopen-3bet':  { raise: 10,  pot: 4 },
+  'BB_BTN_vsopen-3bet': { raise: 10,  pot: 4 },
+  'BB_SB_vsopen-3bet':  { raise: 9.5, pot: 4 },
+  // 3-bet Defense (4-bet scenarios)
+  'UTG_HJ_defense': { raise: 20,   pot: 12   },
+  'UTG_CO_defense': { raise: 20,   pot: 12   },
+  'UTG_BTN_defense':{ raise: 20,   pot: 12   },
+  'UTG_SB_defense': { raise: 22.5, pot: 13.5 },
+  'UTG_BB_defense': { raise: 22.5, pot: 13.5 },
+  'HJ_CO_defense':  { raise: 20,   pot: 12   },
+  'HJ_BTN_defense': { raise: 20,   pot: 12   },
+  'HJ_SB_defense':  { raise: 22.5, pot: 13.5 },
+  'HJ_BB_defense':  { raise: 22.5, pot: 13.5 },
+  'CO_BTN_defense': { raise: 20,   pot: 12   },
+  'CO_SB_defense':  { raise: 22.5, pot: 13.5 },
+  'CO_BB_defense':  { raise: 22.5, pot: 13.5 },
+  'BTN_SB_defense': { raise: 22.5, pot: 13.5 },
+  'BTN_BB_defense': { raise: 22.5, pot: 13.5 },
+  'SB_BB_defense':  { raise: 24,   pot: 12.5 },
+  // vs Open 4-bet (5-bet scenarios)
+  'HJ_UTG_vsopen4bet': { raise: 100, pot: 29.5 },
+  'CO_UTG_vsopen4bet': { raise: 100, pot: 29.5 },
+  'CO_HJ_vsopen4bet':  { raise: 100, pot: 29.5 },
+  'BTN_UTG_vsopen4bet':{ raise: 100, pot: 29.5 },
+  'BTN_HJ_vsopen4bet': { raise: 100, pot: 29.5 },
+  'BTN_CO_vsopen4bet': { raise: 100, pot: 29.5 },
+  'SB_UTG_vsopen4bet': { raise: 100, pot: 33.5 },
+  'SB_HJ_vsopen4bet':  { raise: 100, pot: 33.5 },
+  'SB_CO_vsopen4bet':  { raise: 100, pot: 33.5 },
+  'SB_BTN_vsopen4bet': { raise: 100, pot: 33.5 },
+  'BB_UTG_vsopen4bet': { raise: 100, pot: 33.5 },
+  'BB_HJ_vsopen4bet':  { raise: 100, pot: 33.5 },
+  'BB_CO_vsopen4bet':  { raise: 100, pot: 33.5 },
+  'BB_BTN_vsopen4bet': { raise: 100, pot: 33.5 },
+  'BB_SB_vsopen4bet':  { raise: 100, pot: 33.5 },
+  // 5-bet Shove Defense
+  'UTG_HJ_fivebet': { pot: 121.5 },
+  'UTG_CO_fivebet': { pot: 121.5 },
+  'UTG_BTN_fivebet':{ pot: 121.5 },
+  'UTG_SB_fivebet': { pot: 123.5 },
+  'UTG_BB_fivebet': { pot: 123.5 },
+  'HJ_CO_fivebet':  { pot: 121.5 },
+  'HJ_BTN_fivebet': { pot: 121.5 },
+  'HJ_SB_fivebet':  { pot: 123.5 },
+  'HJ_BB_fivebet':  { pot: 123.5 },
+  'CO_BTN_fivebet': { pot: 121.5 },
+  'CO_SB_fivebet':  { pot: 123.5 },
+  'CO_BB_fivebet':  { pot: 123.5 },
+  'BTN_SB_fivebet': { pot: 123.5 },
+  'BTN_BB_fivebet': { pot: 123.5 },
+  'SB_BB_fivebet':  { pot: 124   }
+};
+
+function renderChipStacks(quizName) {
+  const container = document.getElementById('chip-stacks-container');
+  const data = CHIP_DATA[quizName];
+  if (!data) { container.style.display = 'none'; return; }
+  container.style.display = 'flex';
+  container.innerHTML = '';
+  if (data.raise !== undefined) container.appendChild(createChipStack(data.raise, 'raise', 'Raise'));
+  container.appendChild(createChipStack(data.pot, 'pot', 'Pot'));
+}
+
+function createChipStack(amount, type, label) {
+  const stack = document.createElement('div');
+  stack.className = 'chip-stack';
+  const amountEl = document.createElement('div');
+  amountEl.className = `chip-stack-amount ${type}`;
+  amountEl.textContent = `${amount}BB`;
+  stack.appendChild(amountEl);
+  const visual = document.createElement('div');
+  visual.className = 'chip-visual';
+  let chipCount;
+  if (amount <= 10)       chipCount = Math.ceil(amount / 2);
+  else if (amount <= 30)  chipCount = 5 + Math.ceil((amount - 10) / 5);
+  else                    chipCount = 9 + Math.ceil((amount - 30) / 20);
+  chipCount = Math.min(chipCount, 15);
+  for (let i = 0; i < chipCount; i++) {
+    const chip = document.createElement('div');
+    chip.className = `chip ${type}`;
+    visual.appendChild(chip);
+  }
+  stack.appendChild(visual);
+  const labelEl = document.createElement('div');
+  labelEl.className = 'chip-stack-label';
+  labelEl.textContent = label;
+  stack.appendChild(labelEl);
+  return stack;
+}
+
+// ══════════════════════════════════════════════════════
+// AUTH FUNCTIONS
+// ══════════════════════════════════════════════════════
+
+async function signUp() {
+  console.log("Sign up button clicked");
+  
+  const email = document.getElementById("authEmail").value;
+  const password = document.getElementById("authPassword").value;
+  
+  console.log("Email:", email);
+  console.log("Password length:", password.length);
+  
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+  
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters");
+    return;
+  }
+  
+  try {
+    console.log("Attempting signup...");
+  if (!supabaseClient) { alert("Score saving unavailable — Supabase not loaded."); return; }
+    const { data, error } = await supabaseClient.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        emailRedirectTo: window.location.origin
+      }
+    });
+    
+    console.log("Signup response:", data, error);
+    
+    if (error) {
+      console.error("Signup error:", error);
+      alert("Error: " + error.message);
+    } else {
+      console.log("Signup successful:", data);
+      alert("Success! Check your email to confirm signup (check spam folder too)");
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    alert("Unexpected error: " + err.message);
+  }
+}
+
+async function login() {
+  console.log("Login button clicked");
+  
+  const email = document.getElementById("authEmail").value;
+  const password = document.getElementById("authPassword").value;
+  
+  console.log("Email:", email);
+  
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+  
+  try {
+    console.log("Attempting login...");
+  if (!supabaseClient) { alert("Score saving unavailable — Supabase not loaded."); return; }
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    
+    console.log("Login response:", data, error);
+    
+    if (error) {
+      console.error("Login error:", error);
+      alert("Error: " + error.message);
+    } else {
+      console.log("Login successful:", data);
+      updateAuthUI();
+      alert("Logged in successfully!");
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    alert("Unexpected error: " + err.message);
+  }
+}
+
+async function logout() {
+  if (supabaseClient) await supabaseClient.auth.signOut();
+  updateAuthUI();
+  document.getElementById("statsDisplay").innerHTML = "";
+}
+
+async function updateAuthUI() {
+  if (!supabaseClient) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  
+  if (user) {
+    document.getElementById("authForm").style.display = "none";
+    document.getElementById("userInfo").style.display = "block";
+    document.getElementById("userEmail").textContent = user.email;
+  } else {
+    document.getElementById("authForm").style.display = "block";
+    document.getElementById("userInfo").style.display = "none";
+  }
+}
+
+// Check auth on page load
+updateAuthUI();
+
+// Handle auth callback from email confirmation
+if (supabaseClient) supabaseClient.auth.onAuthStateChange((event, session) => {
+  console.log('Auth state changed:', event, session);
+  
+  if (event === 'SIGNED_IN') {
+    console.log('User signed in:', session.user.email);
+    updateAuthUI();
+    
+    // Clear the hash from URL for cleaner look
+    if (window.location.hash) {
+      history.replaceState(null, null, window.location.pathname);
+    }
+  } else if (event === 'SIGNED_OUT') {
+    console.log('User signed out');
+    updateAuthUI();
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// QUIZ TRACKING FUNCTIONS
+// ══════════════════════════════════════════════════════
+
+async function saveQuizResult(quizName, score) {
+  if (!supabaseClient) return;
+  const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+  
+  console.log("User check:", user ? user.email : "Not logged in", userError);
+  
+  if (!user) {
+    console.error("❌ SAVE FAILED: Not logged in");
+    alert("You must be logged in to save scores!");
+    return;
+  }
+  
+  console.log("User ID:", user.id);
+  console.log("Attempting to insert into quiz_attempts table...");
+  
+  const { data, error } = await supabaseClient
+    .from("quiz_attempts")
+    .insert([{
+      user_id: user.id,
+      quiz_name: quizName,
+      score: score
+    }])
+    .select();
+  
+  if (error) {
+    console.error("❌ SAVE FAILED:", error);
+    console.error("Error details:", JSON.stringify(error, null, 2));
+  } else {
+    console.log("✅ SAVE SUCCESS!", data);
+    // Refresh stats on whichever screens are relevant
+    await showStatsForQuiz(quizName);
+  }
+}
+
+async function fetchStats(quizName) {
+  if (!supabaseClient) return [];
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return [];
+  
+  const { data, error } = await supabaseClient
+    .from("quiz_attempts")
+    .select("score, created_at")
+    .eq("user_id", user.id)
+    .eq("quiz_name", quizName)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error("Error fetching stats:", error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+function calculateStats(attempts) {
+  if (!attempts || attempts.length === 0) {
+    return { average: 0, personalBest: 0, total: 0 };
+  }
+  
+  const scores = attempts.map(a => a.score);
+  const personalBest = Math.max(...scores);
+  const average = (scores.reduce((sum, s) => sum + s, 0) / scores.length).toFixed(1);
+  
+  return { average, personalBest, total: scores.length };
+}
+
+async function showStatsForQuiz(quizName) {
+  const attempts = await fetchStats(quizName);
+  const stats = calculateStats(attempts);
+  
+  document.getElementById("statsDisplay").innerHTML = `
+    <div style="margin-top:0.5rem;">
+      <div style="font-weight:600; margin-bottom:0.3rem; color:var(--gold); font-size:0.65rem;">${quizName}</div>
+      <div>Attempts: ${stats.total}</div>
+      <div>Average: ${stats.average}%</div>
+      <div>Best: ${stats.personalBest}%</div>
+    </div>
+  `;
+}
+
+// Load stats for a specific quiz (not position aggregate)
+async function loadQuizButtonStats(quizName, elementId) {
+  if (!supabaseClient) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  
+  // Default values
+  let bestScore = 0;
+  let avgScore = 0;
+  
+  if (user) {
+    const attempts = await fetchStats(quizName);
+    console.log(`  Found ${attempts.length} attempts for ${quizName}`);
+    
+    if (attempts && attempts.length > 0) {
+      const stats = calculateStats(attempts);
+      bestScore = stats.personalBest;
+      avgScore = parseInt(stats.average);
+      console.log(`  Stats: Best=${bestScore}%, Avg=${avgScore}%`);
+    }
+  }
+  
+  // Update the element
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.innerHTML = `
+      <div>Best: <span class="stat-best">${bestScore}%</span></div>
+      <div>Avg: <span class="stat-avg">${avgScore}%</span></div>
+    `;
+  } else {
+    console.warn(`  Element ${elementId} not found!`);
+  }
+}
+
+// Load overall stats for a specific hero position + quiz category
+// If bestElementId === avgElementId, writes compact Best/Avg into a single element
+async function loadOverallPositionStats(heroPos, category, bestElementId, avgElementId) {
+  if (!supabaseClient) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  
+  let bestScore = 0;
+  let avgScore = 0;
+  
+  if (user) {
+    const { data, error } = await supabaseClient
+      .from("quiz_attempts")
+      .select("score, quiz_name")
+      .eq("user_id", user.id);
+    
+    if (!error && data && data.length > 0) {
+      const filteredData = data.filter(a => {
+        const name = a.quiz_name || '';
+        return name.startsWith(heroPos + '_') && name.endsWith('_' + category);
+      });
+      
+      if (filteredData.length > 0) {
+        const scores = filteredData.map(a => a.score);
+        bestScore = Math.max(...scores);
+        avgScore = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+      }
+    }
+  }
+  
+  if (bestElementId === avgElementId) {
+    // Single element mode: write compact html (used for position buttons)
+    const el = document.getElementById(bestElementId);
+    if (el) {
+      el.innerHTML = `<div>Best: <span class="stat-best">${bestScore}%</span></div><div>Avg: <span class="stat-avg">${avgScore}%</span></div>`;
+    }
+  } else {
+    document.getElementById(bestElementId).textContent = `${bestScore}%`;
+    document.getElementById(avgElementId).textContent = `${avgScore}%`;
+  }
+}
+
+// Load overall stats for entire quiz category (all positions combined)
+async function loadOverallCategoryStats(category, bestElementId, avgElementId) {
+  if (!supabaseClient) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  
+  let bestScore = 0;
+  let avgScore = 0;
+  
+  if (user) {
+    const { data, error } = await supabaseClient
+      .from("quiz_attempts")
+      .select("score, quiz_name")
+      .eq("user_id", user.id);
+    
+    if (!error && data && data.length > 0) {
+      // Filter by category
+      let filteredData = [];
+      
+      if (category === 'rfi') {
+        // Only RFI quizzes: "UTG_RFI", "HJ_RFI", etc
+        filteredData = data.filter(a => {
+          const name = a.quiz_name || '';
+          return name.endsWith('_rfi') || name.match(/^[A-Z]+_RFI$/i);
+        });
+      } else if (category === 'rfi-defense') {
+        // All defense quizzes: "UTG_HJ_defense", "CO_BTN_defense"
+        filteredData = data.filter(a => {
+          const name = a.quiz_name || '';
+          return name.includes('_defense');
+        });
+      } else if (category === 'rfi-5bet') {
+        // All 5bet quizzes
+        filteredData = data.filter(a => {
+          const name = a.quiz_name || '';
+          return name.includes('_fivebet');
+        });
+      } else if (category === 'vsopen-3bet') {
+        filteredData = data.filter(a => {
+          const name = a.quiz_name || '';
+          return name.includes('_vsopen-3bet');
+        });
+      } else if (category === 'vsopen-4bet') {
+        filteredData = data.filter(a => {
+          const name = a.quiz_name || '';
+          return name.includes('_vsopen4bet') || name.includes('_vsopen-4bet');
+        });
+      }
+      
+      if (filteredData.length > 0) {
+        const scores = filteredData.map(a => a.score);
+        bestScore = Math.max(...scores);
+        avgScore = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+      }
+    }
+  }
+  
+  document.getElementById(bestElementId).textContent = `${bestScore}%`;
+  document.getElementById(avgElementId).textContent = `${avgScore}%`;
+}
+
+// Load all RFI position stats
+async function loadRFIStats() {
+  console.log("Loading RFI stats...");
+  
+  // Overall RFI category stats
+  await loadOverallCategoryStats('rfi', 'rfi-overall-best', 'rfi-overall-avg');
+  
+  // Individual position RFI quiz stats — names are like "UTG_RFI_rfi"
+  const positions = ['UTG', 'HJ', 'CO', 'BTN', 'SB'];
+  for (const pos of positions) {
+    await loadQuizButtonStats(`${pos}_RFI_rfi`, `stats-${pos}-rfi`);
+  }
+}
+
+// Load all vs Open position stats  
+async function loadVsOpenStats() {
+  console.log("Loading vs Open stats...");
+  
+  // Overall vs Open category stats (3-bet step) across ALL positions
+  await loadOverallCategoryStats('vsopen-3bet', 'vsopen-overall-best', 'vsopen-overall-avg');
+  
+  // For each position button, show the best/avg across ALL that position's matchups
+  const positions = ['HJ', 'CO', 'BTN', 'SB', 'BB'];
+  for (const pos of positions) {
+    await loadOverallPositionStats(pos, 'vsopen-3bet', `stats-${pos}-vsopen`, `stats-${pos}-vsopen`);
+  }
+}
+
+// Load opponent screen stats (RFI defense quizzes)
+async function loadOpponentScreenStats() {
+  console.log("Loading opponent screen stats...");
+  
+  const heroPos = document.getElementById('opp-hero-label').textContent;
+  
+  // Overall defense stats for this SPECIFIC hero position
+  await loadOverallPositionStats(heroPos, 'defense', 'opponent-overall-best', 'opponent-overall-avg');
+  
+  // Individual matchup stats
+  const opponents = OPPONENTS[heroPos] || [];
+  for (const opp of opponents) {
+    const quizName = `${heroPos}_${opp}_defense`;
+    await loadQuizButtonStats(quizName, `stats-${heroPos}-${opp}-defense`);
+  }
+}
+
+// Load opener screen stats (vs Open quizzes)
+async function loadOpenerScreenStats() {
+  console.log("Loading opener screen stats...");
+  
+  const heroPos = document.getElementById('opener-hero-label').textContent;
+  
+  // Overall vs open stats for this SPECIFIC hero position
+  await loadOverallPositionStats(heroPos, 'vsopen-3bet', 'opener-overall-best', 'opener-overall-avg');
+  
+  // Individual matchup stats  
+  const openers = {
+    HJ: ['UTG'],
+    CO: ['UTG','HJ'],
+    BTN: ['UTG','HJ','CO'],
+    SB: ['UTG','HJ','CO','BTN'],
+    BB: ['UTG','HJ','CO','BTN','SB']
+  };
+  
+  const matchups = openers[heroPos] || [];
+  for (const opener of matchups) {
+    const quizName = `${heroPos}_${opener}_vsopen-3bet`;
+    await loadQuizButtonStats(quizName, `stats-${heroPos}-${opener}-vsopen`);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// MAIN QUIZ CODE STARTS HERE
+// ══════════════════════════════════════════════════════
+
+const RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+const ALL_HANDS = [];
+for (let i=0;i<13;i++) for (let j=0;j<13;j++) {
+  if (i===j) ALL_HANDS.push(RANKS[i]+RANKS[j]);
+  else if (i<j) ALL_HANDS.push(RANKS[i]+RANKS[j]+'s');
+  else ALL_HANDS.push(RANKS[j]+RANKS[i]+'o');
+}
+
+// ═══════════════════════════════════════
+//  RANGES
+// ═══════════════════════════════════════
+const RFI = {
+  UTG: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K6s','K7s','K8s','K9s','KTs','KJs','KQs','QTs','QJs','ATo','AJo','AQo','AKo','KJo','KQo','JTs','T9s','65s']),
+  HJ:  new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q9s','QTs','QJs','A9o','ATo','AJo','AQo','AKo','KTo','KJo','KQo','QTo','QJo','J9s','JTs','T8s','T9s','65s']),
+  CO:  new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K3s','K4s','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q6s','Q7s','Q8s','Q9s','QTs','QJs','A8o','A9o','ATo','AJo','AQo','AKo','KTo','KJo','KQo','QTo','QJo','JTo','J8s','J9s','JTs','T8s','T9s','98s','87s','76s','65s','54s','A5o']),
+  BTN: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K2s','K3s','K4s','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q2s','Q3s','Q4s','Q5s','Q6s','Q7s','Q8s','Q9s','QTs','QJs','A2o','A3o','A4o','A5o','A6o','A7o','A8o','A9o','ATo','AJo','AQo','AKo','K7o','K8o','K9o','KTo','KJo','KQo','Q9o','QTo','QJo','J9o','JTo','T9o','J4s','J5s','J6s','J7s','J8s','J9s','JTs','T6s','T7s','T8s','T9s','96s','97s','98s','86s','87s','75s','76s','65s','54s']),
+  SB:  new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K2s','K3s','K4s','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q2s','Q3s','Q4s','Q5s','Q6s','Q7s','Q8s','Q9s','QTs','QJs','A2o','A3o','A4o','A5o','A6o','A7o','A8o','A9o','ATo','AJo','AQo','AKo','K7o','K8o','K9o','KTo','KJo','KQo','Q9o','QTo','QJo','J9o','JTo','T9o','J4s','J5s','J6s','J7s','J8s','J9s','JTs','T6s','T7s','T8s','T9s','96s','97s','98s','85s','86s','87s','75s','76s','64s','65s','53s','54s']),
+  BB:  new Set([]) // BB has no RFI (always faces a raise or posts)
+};
+
+// 3-bet ranges: positions that only 3bet (no call) use empty call set
+// Positions that have both use separate 4bet/call sets
+const DEFENSE = {
+  // HJ facing opens (only 3bet range, no calling range specified)
+  'HJ_UTG': { '4bet': new Set(['AA','KK','QQ','JJ','TT','99','ATs','AJs','AQs','AKs','KTs','KJs','KQs','AQo','AKo','65s','A4s','A5s']), 'call': new Set([]) },
+  // CO facing opens
+  'CO_UTG': { '4bet': new Set(['AA','KK','QQ','JJ','TT','99','88','ATs','AJs','AQs','AKs','KTs','KJs','KQs','AQo','AKo','65s','A4s','A5s']), 'call': new Set([]) },
+  'CO_HJ': { '4bet': new Set(['AA','KK','QQ','JJ','TT','99','88','ATs','AJs','AQs','AKs','KTs','KJs','KQs','AQo','AKo','KQo','QJs','65s','A3s','A4s','A5s']), 'call': new Set([]) },
+  // BTN facing opens
+  'BTN_UTG': { '4bet': new Set(['AA','KK','QQ','AKs','AKo','KQo','QJs','JTs','T9s','K9s','KTs','A8s','A3s','A4s','A5s','65s']), 'call': new Set(['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','QTs','AQo']) },
+  'BTN_HJ': { '4bet': new Set(['AA','KK','QQ','AKs','AKo','KQo','QJs','JTs','T9s','K9s','KTs','A3s','A4s','A5s','A6s','A7s','A8s','65s','76s','AJo']), 'call': new Set(['JJ','TT','99','88','77','66','AQs','AJs','ATs','A9s','QTs','AQo']) },
+  'BTN_CO': { '4bet': new Set(['AA','KK','QQ','AKs','AKo','KQo','QJs','J9s','JTs','T9s','K8s','K9s','A2s','A3s','A5s','A6s','A7s','65s','76s','AJo','ATo','Q9s']), 'call': new Set(['JJ','TT','99','88','77','66','55','AQs','AJs','ATs','A9s','A8s','QTs','AQo','A4s']) },
+  // SB facing opens (only 3bet range)
+  'SB_UTG': { '4bet': new Set(['AA','KK','QQ','JJ','TT','ATs','AJs','AQs','AKs','KTs','KJs','KQs','QJs','AKo','A5s','65s']), 'call': new Set([]) },
+  'SB_HJ': { '4bet': new Set(['AA','KK','QQ','JJ','TT','99','ATs','AJs','AQs','AKs','KTs','KJs','KQs','QJs','AKo','JTs','A4s','A5s','65s']), 'call': new Set([]) },
+  'SB_CO': { '4bet': new Set(['AA','KK','QQ','JJ','TT','99','88','ATs','AJs','AQs','AKs','KTs','KJs','KQs','QTs','QJs','AQo','AKo','JTs','A4s','A5s','65s']), 'call': new Set([]) },
+  'SB_BTN': { '4bet': new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K9s','KTs','KJs','KQs','QTs','QJs','AJo','AQo','AKo','JTs','A4s','A5s','65s','KQo','T9s']), 'call': new Set([]) },
+  // BB facing opens
+  'BB_UTG': { '4bet': new Set(['AA','KK','QQ','QJs','K7s','A5s','A4s','A3s','65s','AKs','AKo']), 'call': new Set(['JJ','TT','99','88','77','66','55','44','33','22','AQs','AJs','ATs','A9s','A8s','A7s','A6s','KQs','KJs','KTs','K9s','K8s','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','64s','54s','53s','AJo','AQo','KQo','A2s']) },
+  'BB_HJ': { '4bet': new Set(['AA','KK','QQ','QTs','QJs','KJs','KQs','JTs','T9s','K7s','A5s','A4s','A3s','65s','AKs','AKo']), 'call': new Set(['JJ','TT','99','88','77','66','55','44','33','22','AQs','AJs','ATs','A9s','A8s','A7s','A6s','KTs','K9s','K8s','Q9s','J9s','J8s','T8s','T7s','98s','97s','87s','86s','76s','75s','64s','54s','53s','ATo','AJo','AQo','KJo','KQo','K5s','K6s','43s','QJo','A2s']) },
+  'BB_CO': { '4bet': new Set(['AA','KK','QQ','JJ','AQs','Q9s','QTs','QJs','KTs','KJs','KQs','J9s','JTs','T9s','K7s','A5s','A4s','A3s','65s','AKs','AKo','76s']), 'call': new Set(['TT','99','88','77','66','55','44','33','22','AJs','ATs','A9s','A8s','A7s','A6s','K9s','K8s','JTs','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','75s','64s','54s','53s','ATo','AJo','AQo','KTo','KJo','KQo','K2s','K3s','K4s','K5s','K6s','QTo','QJo','JTo','Q8s','Q6s','Q7s','A2s']) },
+  'BB_BTN': { '4bet': new Set(['AA','KK','QQ','JJ','TT','KQs','QJs','J8s','J9s','JTs','T7s','T8s','T9s','A5s','65s','AKs','AQo','AKo','76s','54s','98s','A5o']), 'call': new Set(['99','88','77','66','55','44','33','22','AQs','AJs','ATs','A9s','A8s','A7s','A6s','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','J7s','J6s','J5s','J4s','T6s','97s','96s','87s','86s','85s','75s','74s','64s','63s','53s','43s','A6o','A7o','A8o','A9o','ATo','AJo','K9o','KTo','KJo','KQo','QTo','QJo','JTo','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','Q2s','A2s','A3s','A4s','T9o']) },
+  'BB_SB': { '4bet': new Set(['AA','KK','QQ','JJ','TT','AQs','KQs','J8s','J9s','JTs','T9s','A5s','65s','AKs','AQo','AKo','76s','54s','98s','A3o','A4o','A5o','A6o','K8o','K9o','J9o','T8o','J5s','J4s','J3s','J2s','T5s','T4s']), 'call': new Set(['99','88','77','66','55','44','33','22','AJs','ATs','A9s','A8s','A7s','A6s','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','J9s','J8s','J7s','J6s','T8s','T7s','T6s','97s','96s','95s','87s','86s','85s','75s','74s','64s','63s','53s','52s','43s','AJo','ATo','A9o','A8o','A7o','A6o','KQo','KJo','KTo','K9o','QJo','QTo','Q9o','JTo','QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','Q2s','A4s','A3s','A2s','T9o','98o']) },
+  // UTG 3bet defense (hero is UTG, facing 3bet)
+  'UTG_HJ': { '4bet': new Set(['AA','KK','AKs','AKo','AJs','KQs','A5s']), 'call': new Set(['QQ','JJ','99','88','77','66','AQs','JTs','65s']) },
+  'UTG_CO': { '4bet': new Set(['AA','KK','AKs','AKo','AJs','KQs','A5s']), 'call': new Set(['QQ','JJ','99','88','77','66','AQs','JTs','65s','KJs','ATs']) },
+  'UTG_BTN': { '4bet': new Set(['AA','KK','AKs','AKo','AJs','A5s']), 'call': new Set(['QQ','JJ','TT','99','88','77','66','55','AQs','JTs','65s','KJs','KQs','ATs','QJs']) },
+  'UTG_SB': { '4bet': new Set(['AA','KK','AKo','A4s']), 'call': new Set(['QQ','JJ','TT','99','88','77','66','AQs','JTs','65s','KJs','KQs','ATs','QJs','AKs','AJs','A5s']) },
+  'UTG_BB': { '4bet': new Set(['AA','KK','AKo','A4s']), 'call': new Set(['QQ','JJ','TT','99','88','77','66','AQs','JTs','65s','KJs','KQs','ATs','QJs','AKs','AJs','A5s','A9s']) },
+  // HJ 3bet defense
+  'HJ_CO': { '4bet': new Set(['AA','KK','QQ','KJs','KQs','AKs','AKo','AJs','A5s']), 'call': new Set(['AQs','ATs','JTs','JJ','TT','99','88','55','65s']) },
+  'HJ_BTN': { '4bet': new Set(['AA','KK','QQ','KJs','KTs','AKs','AKo','A5s']), 'call': new Set(['AQs','AJs','ATs','A9s','JTs','JJ','TT','99','88','77','66','55','65s','KQs','T9s']) },
+  'HJ_SB': { '4bet': new Set(['AA','KK','KJs','KTs','A4s']), 'call': new Set(['AQs','AJs','ATs','JTs','QQ','JJ','TT','99','88','77','55','65s','KQs','T9s','AKs','AKo','A5s']) },
+  'HJ_BB': { '4bet': new Set(['AA','KK','KTs','A3s']), 'call': new Set(['AQs','AJs','ATs','A9s','JTs','QQ','JJ','TT','99','88','77','66','55','65s','KQs','T9s','AKs','AKo','A5s','A4s','QTs','KTs']) },
+  // CO 3bet defense
+  'CO_BTN': { '4bet': new Set(['AA','KK','QQ','AKs','AQo','AKo','KTs','KJs','ATs','JTs','A4s']), 'call': new Set(['JJ','TT','99','88','77','66','55','44','AJs','AQs','A9s','A5s','KQs','T9s','65s','QJs','QTs']) },
+  'CO_SB': { '4bet': new Set(['AA','KK','AKo','K9s','A4s']), 'call': new Set(['JJ','TT','99','88','77','55','ATs','AJs','AQs','AKs','A5s','KTs','KJs','KQs','T9s','65s','QTs','QJs','J9s','JTs','AQo']) },
+  'CO_BB': { '4bet': new Set(['AA','KK','AKo','K9s','A7s','A2s']), 'call': new Set(['JJ','TT','99','88','77','66','55','A8s','A9s','ATs','AJs','AQs','AKs','A5s','A4s','A3s','KTs','KJs','KQs','T9s','65s','QTs','QJs','JTs','AQo','76s']) },
+  // BTN 3bet defense
+  'BTN_SB': { '4bet': new Set(['AA','KK','QQ','AJs','A7s','A3s','K9s','AKo','AJo']), 'call': new Set(['JJ','TT','99','88','77','66','55','44','A8s','A9s','ATs','AJs','AQs','AKs','A4s','A5s','KTs','KJs','KQs','QTs','QJs','J9s','JTs','T8s','T9s','98s','87s','76s','65s','54s','KQo','AQo']) },
+  'BTN_BB': { '4bet': new Set(['AA','KK','QQ','AJs','A2s','K7s','K6s','AKo','AJo']), 'call': new Set(['JJ','TT','99','88','77','66','55','44','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K8s','K9s','KTs','KJs','KQs','Q9s','QTs','QJs','J8s','J9s','JTs','T8s','T9s','98s','87s','76s','65s','54s','KQo','AQo']) },
+  // SB 3bet defense
+  'SB_BB': { '4bet': new Set(['AA','KK','QQ','JJ','AKo','AQo','AJo','ATo','AKs','A6s','A3s','A2s','K5s']), 'call': new Set(['TT','99','88','77','66','55','44','AQs','AJs','ATs','A9s','A8s','A7s','A5s','A4s','K8s','K9s','KTs','KJs','KQs','Q9s','QTs','QJs','J8s','J9s','JTs','T8s','T9s','76s','65s','54s']) },
+};
+
+// 5-bet shove defense: hero 4-bet, villain shoves — what do we call with?
+const FIVEBET_CALL = {
+  'UTG_HJ': new Set(['AA','KK','AKs']),
+  'UTG_CO': new Set(['AA','KK','AKs']),
+  'UTG_BTN': new Set(['AA','KK','AKs']),
+  'UTG_SB': new Set(['AA','KK']),
+  'UTG_BB': new Set(['AA','KK']),
+  'HJ_CO': new Set(['AA','KK','AKs','AKo']),
+  'HJ_BTN': new Set(['AA','KK','AKs','AKo']),
+  'HJ_SB': new Set(['AA','KK']),
+  'HJ_BB': new Set(['AA','KK']),
+  'CO_BTN': new Set(['AA','KK','QQ','AKs','AKo']),
+  'CO_SB': new Set(['AA','KK','AKo']),
+  'CO_BB': new Set(['AA','KK','AKo']),
+  'BTN_SB': new Set(['AA','KK','QQ','AKo']),
+  'BTN_BB': new Set(['AA','KK','QQ','AKo']),
+  'SB_BB': new Set(['AA','KK','QQ','JJ','AKo','AKs']),
+};
+
+// vs Open 5-bet shove ranges: hero 3-bets, villain 4-bets, hero shoves
+const VSOPEN_5BET_SHOVE = {
+  'HJ_UTG': new Set(['KK','AKo']),
+  'CO_UTG': new Set(['KK','AKo']),
+  'CO_HJ':  new Set(['KK','AKo']),
+  'BTN_UTG': new Set(['KK','AKo']),
+  'BTN_HJ': new Set(['KK','AKo']),
+  'BTN_CO': new Set(['KK','AKo']),
+  'SB_UTG': new Set(['AA','KK','AKo']),
+  'SB_HJ':  new Set(['AA','KK','AKo']),
+  'SB_CO':  new Set(['AA','KK','AKo','A5s']),
+  'SB_BTN': new Set(['AA','KK','QQ','AKo','AKs','A5s']),
+  'BB_UTG': new Set(['AA','A5s']),
+  'BB_HJ':  new Set(['AA','KK','AKo']),
+  'BB_CO':  new Set(['AA','KK','AKo','JJ']),
+  'BB_BTN': new Set(['KK','QQ','JJ','AKo','A5s']),
+  'BB_SB':  new Set(['KK','QQ','JJ','AKo','A5s','KQs']),
+};
+
+// vs Open 5-bet call ranges: hero 3-bets, villain 4-bets, hero calls
+const VSOPEN_5BET_CALL = {
+  'HJ_UTG': new Set(['AA','ATs','AJs','AQs','AKs','QQ','JJ','99','65s']),
+  'CO_UTG': new Set(['AA','ATs','AJs','AQs','AKs','QQ','JJ','99','65s','KQs']),
+  'CO_HJ':  new Set(['AA','ATs','AJs','AQs','AKs','QQ','JJ','99','65s','KQs','A5s']),
+  'BTN_UTG': new Set(['AA','AKs','QQ','T9s','65s','A5s']),
+  'BTN_HJ': new Set(['AA','AKs','QQ','T9s','65s','A5s','76s']),
+  'BTN_CO': new Set(['AA','AKs','QQ','T9s','65s','A5s','76s','J9s']),
+  'SB_UTG': new Set(['AKs','AJs','QQ','65s']),
+  'SB_HJ':  new Set(['AJs','AQs','AKs','QQ','JJ','99','65s']),
+  'SB_CO':  new Set(['AJs','AQs','AKs','QQ','JJ','99','88','65s','JTs']),
+  'SB_BTN': new Set(['ATs','AJs','AQs','AKs','JJ','TT','99','88','65s','JTs','66','T9s','QTs','KQs','AQo']),
+  'BB_UTG': new Set(['AKs','KK','QQ','65s']),
+  'BB_HJ':  new Set(['AKs','QQ','65s','T9s']),
+  'BB_CO':  new Set(['AKs','QQ','65s','T9s','JTs','AQs']),
+  'BB_BTN': new Set(['AKs','65s','T9s','JTs','76s','TT','AQo','KQs','AQs','AA']),
+  'BB_SB':  new Set(['AA','AKs','AQs','65s','T9s','JTs','76s','TT','AQo','KQs','98s','54s']),
+};
+
+// Positions that OPEN and can face a 3bet: only these have defense scenarios
+const OPPONENTS = {
+  UTG: ['HJ','CO','BTN','SB','BB'],
+  HJ:  ['CO','BTN','SB','BB'],
+  CO:  ['BTN','SB','BB'],
+  BTN: ['SB','BB'],
+  SB:  ['BB'],
+  BB:  [] // BB never RFI in 6max
+};
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+let heroPos = null, oppPos = null, scenarioKey = null;
+let quizPath = null;  // 'rfi' | 'vsopen'
+let quizPhase = 'rfi'; // 'rfi' | 'defense' | 'fivebet' | 'vsopen-3bet' | 'vsopen-4bet'
+let currentMode = '4bet';
+let selRfi = new Set(), sel4bet = new Set(), selCall = new Set(), selFiveBet = new Set();
+let sel3bet = new Set(), selVs4bet = new Set(), sel5betShove = new Set(); // for vs Open path
+let stepChecked = false;
+
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+function showScreen(id) { 
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); 
+  document.getElementById(id).classList.add('active'); 
+  window.scrollTo(0,0); 
+  
+  // Load stats when showing position picker screens
+  if (id === 'screen-rfi-position') {
+    loadRFIStats();
+  } else if (id === 'screen-vsopen-position') {
+    loadVsOpenStats();
+  } else if (id === 'screen-opponent') {
+    loadOpponentScreenStats();
+  } else if (id === 'screen-opener') {
+    loadOpenerScreenStats();
+  }
+}
+
+// RFI path
+function selectHero(pos) { quizPath = 'rfi'; heroPos = pos; startRfiQuiz(pos); }
+function goBackToRfiPosition() { showScreen('screen-rfi-position'); }
+
+// vs Open path
+function selectVsOpenHero(pos) { quizPath = 'vsopen'; heroPos = pos; buildOpenerRow(pos); showScreen('screen-opener'); }
+function goBackToVsOpenPosition() { showScreen('screen-vsopen-position'); }
+
+function quizGoBack() {
+  clearExtraButtons();
+  if (quizPath === 'rfi') {
+    if (quizPhase === 'rfi') showScreen('screen-rfi-position');
+    else { buildOpponentRow(heroPos); showScreen('screen-opponent'); }
+  } else if (quizPath === 'vsopen') {
+    buildOpenerRow(heroPos); showScreen('screen-opener');
+  }
+}
+function fullName(p) { return {UTG:'Under the Gun',HJ:'Hijack',CO:'Cutoff',BTN:'Button',SB:'Small Blind',BB:'Big Blind'}[p]||p; }
+
+function buildOpponentRow(pos) {
+  const row = document.getElementById('opponent-row');
+  row.innerHTML = '';
+  document.getElementById('opp-hero-label').textContent = pos;
+  (OPPONENTS[pos]||[]).forEach(opp => {
+    const btn = document.createElement('button');
+    btn.className = 'opp-btn';
+    const statsId = `stats-${pos}-${opp}-defense`;
+    btn.innerHTML = `
+      <div class="opp-btn-pos">${opp}</div>
+      <div class="opp-btn-name">${fullName(opp)}</div>
+      <div class="opp-btn-stats" id="${statsId}"></div>
+    `;
+    btn.onclick = () => startDefenseScenario(pos, opp);
+    row.appendChild(btn);
+  });
+}
+
+function buildOpenerRow(pos) {
+  const row = document.getElementById('opener-row');
+  row.innerHTML = '';
+  document.getElementById('opener-hero-label').textContent = pos;
+  // vs Open: HJ faces UTG, CO faces UTG/HJ, BTN faces UTG/HJ/CO, SB faces UTG/HJ/CO/BTN, BB faces all
+  const openers = {
+    HJ: ['UTG'],
+    CO: ['UTG','HJ'],
+    BTN: ['UTG','HJ','CO'],
+    SB: ['UTG','HJ','CO','BTN'],
+    BB: ['UTG','HJ','CO','BTN','SB']
+  };
+  (openers[pos]||[]).forEach(opener => {
+    const btn = document.createElement('button');
+    btn.className = 'opp-btn';
+    const statsId = `stats-${pos}-${opener}-vsopen`;
+    btn.innerHTML = `
+      <div class="opp-btn-pos">${opener}</div>
+      <div class="opp-btn-name">${fullName(opener)}</div>
+      <div class="opp-btn-stats" id="${statsId}"></div>
+    `;
+    btn.onclick = () => startVsOpenScenario(pos, opener);
+    row.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════
+//  PHASE: RFI
+// ═══════════════════════════════════════
+function startRfiQuiz(pos) {
+  heroPos = pos; quizPhase = 'rfi'; selRfi.clear(); stepChecked = false; currentMode = '4bet';
+  document.getElementById('quiz-scenario-title').textContent = `${pos} RFI`;
+  document.getElementById('step-number-label').textContent = 'RFI Quiz';
+  document.getElementById('step-title-main').textContent = `${pos} — Raise First In`;
+  document.getElementById('step-instruction-text').textContent = 'Select every hand you would open-raise when folded to.';
+  document.getElementById('mode-toggle-wrap').style.display = 'none';
+  document.getElementById('legend-raise-label').textContent = 'Open Raise';
+  document.getElementById('legend-call-item').style.display = 'none';
+  document.getElementById('legend-faded-label').textContent = 'Fold';
+  document.getElementById('legend-normal').style.display = 'flex';
+  document.getElementById('legend-result').style.display = 'none';
+  document.getElementById('legend-fivebet').style.display = 'none';
+  document.getElementById('badge1').className = 'step-badge active';
+  document.getElementById('badge2').className = 'step-badge';
+  document.getElementById('check-btn').textContent = 'Check Answer';
+  document.getElementById('check-btn').disabled = false;
+  document.getElementById('check-btn').onclick = checkStep;
+  document.getElementById('reset-btn').style.display = 'inline-block';
+  document.getElementById('score-chip').style.display = 'none';
+  document.getElementById('result-panel').classList.remove('show');
+  clearExtraButtons();
+  buildGrid();
+  hideInlineStepStats();
+  renderChipStacks(`${pos}_RFI_rfi`);
+  showScreen('screen-quiz');
+}
+
+// ═══════════════════════════════════════
+//  PHASE: vs OPEN (3-bet vs open, then vs 4-bet)
+// ═══════════════════════════════════════
+function startVsOpenScenario(hero, opener) {
+  heroPos = hero; oppPos = opener; scenarioKey = hero+'_'+opener;
+  quizPhase = 'vsopen-3bet'; currentMode = '4bet'; // '4bet' mode = 3-bet, 'call' mode = call
+  sel3bet.clear(); selCall.clear(); stepChecked = false;
+  
+  document.getElementById('quiz-scenario-title').textContent = `${hero} vs ${opener} Open`;
+  buildGrid(); applyVsOpen3betUI();
+  renderChipStacks(`${hero}_${opener}_vsopen-3bet`);
+  showScreen('screen-quiz');
+}
+
+function applyVsOpen3betUI() {
+  const def = DEFENSE[scenarioKey];
+  const hasCallRange = def && def['call'].size > 0;
+  
+  document.querySelectorAll('.hcell').forEach(c => {
+    c.className = 'hcell';
+    // All hands are selectable for vs open (no RFI constraint)
+    if (sel3bet.has(c.dataset.hand)) c.classList.add('sel-4bet');
+    else if (selCall.has(c.dataset.hand)) c.classList.add('sel-call');
+  });
+
+  document.getElementById('step-number-label').textContent = 'Step 1 of 2';
+  document.getElementById('step-title-main').textContent = `${heroPos} Faces an Open from ${oppPos}`;
+  document.getElementById('step-instruction-text').textContent = 'Select your 3-bet hands, then switch to Call mode for your calling hands.';
+
+  document.getElementById('mode-toggle-wrap').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('btn-mode-4bet').textContent = '3-Bet';
+  document.getElementById('btn-mode-call').textContent = 'Call';
+  
+  document.getElementById('legend-raise-label').textContent = '3-Bet';
+  document.getElementById('legend-call-item').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('legend-faded-label').textContent = 'Fold';
+  document.getElementById('legend-result-raise').textContent = 'Correct 3-Bet';
+  document.getElementById('legend-result-call-item').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('legend-result-wrong-action-item').style.display = hasCallRange ? 'flex' : 'none';
+  if (hasCallRange) {
+    document.querySelector('#legend-result-wrong-action-item span').textContent = 'Called (should 3-bet)';
+  }
+  document.getElementById('legend-result-wrong-4bet-item').style.display = hasCallRange ? 'flex' : 'none';
+  if (hasCallRange) {
+    document.querySelector('#legend-result-wrong-4bet-item span').textContent = '3-bet (should call)';
+  }
+  document.getElementById('legend-result-missed-4bet').style.display = 'flex';
+  document.querySelector('#legend-result-missed-4bet span').textContent = 'Missed 3-Bet';
+  document.getElementById('legend-result-missed-call').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('legend-result-missed-single').style.display = 'none';
+  document.getElementById('legend-result-faded').textContent = 'Fold';
+  document.getElementById('legend-normal').style.display = 'flex';
+  document.getElementById('legend-result').style.display = 'none';
+  document.getElementById('legend-fivebet').style.display = 'none';
+
+  document.getElementById('badge1').className = 'step-badge active';
+  document.getElementById('badge2').className = 'step-badge';
+
+  document.getElementById('check-btn').textContent = 'Check Answer';
+  document.getElementById('check-btn').disabled = false;
+  document.getElementById('check-btn').onclick = checkStep;
+  document.getElementById('reset-btn').style.display = 'inline-block';
+  document.getElementById('score-chip').style.display = 'none';
+  document.getElementById('result-panel').classList.remove('show');
+  setModeUI(currentMode);
+  hideInlineStepStats();
+}
+
+// ═══════════════════════════════════════
+//  PHASE: 3-BET DEFENSE
+// ═══════════════════════════════════════
+function startDefenseScenario(hero, opp) {
+  heroPos = hero; oppPos = opp; scenarioKey = hero+'_'+opp;
+  quizPhase = 'defense'; currentMode = '4bet';
+  sel4bet.clear(); selCall.clear(); stepChecked = false;
+  document.getElementById('quiz-scenario-title').textContent = `${hero} vs ${opp} 3-Bet`;
+  clearExtraButtons(); buildGrid(); applyDefenseUI();
+  renderChipStacks(`${hero}_${opp}_defense`);
+  showScreen('screen-quiz');
+}
+
+function applyDefenseUI() {
+  const rfiSet = RFI[heroPos];
+  const def = DEFENSE[scenarioKey];
+  const hasCallRange = def && def['call'].size > 0;
+  document.querySelectorAll('.hcell').forEach(c => {
+    const h = c.dataset.hand; c.className = 'hcell';
+    if (rfiSet && !rfiSet.has(h)) c.classList.add('out-of-range');
+    if (sel4bet.has(h)) c.classList.add('sel-4bet');
+    else if (selCall.has(h)) c.classList.add('sel-call');
+  });
+  document.getElementById('step-number-label').textContent = 'Step 1 of 2';
+  document.getElementById('step-title-main').textContent = `${heroPos} Faces a 3-Bet from ${oppPos}`;
+  const instrParts = ['Select your 4-bet hands.'];
+  if (hasCallRange) instrParts.push('Then switch to Call mode for calling hands.');
+  instrParts.push('Faded hands are outside your RFI range.');
+  document.getElementById('step-instruction-text').textContent = instrParts.join(' ');
+  document.getElementById('mode-toggle-wrap').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('btn-mode-4bet').textContent = '4-Bet';
+  document.getElementById('btn-mode-call').textContent = 'Call';
+  
+  document.getElementById('legend-raise-label').textContent = '4-Bet';
+  document.getElementById('legend-call-item').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('legend-faded-label').textContent = 'Not in RFI';
+  document.getElementById('legend-result-raise').textContent = 'Correct 4-Bet';
+  document.getElementById('legend-result-call-item').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('legend-result-wrong-action-item').style.display = hasCallRange ? 'flex' : 'none';
+  if (hasCallRange) {
+    document.querySelector('#legend-result-wrong-action-item span').textContent = 'Called (should 4-bet)';
+  }
+  document.getElementById('legend-result-wrong-4bet-item').style.display = hasCallRange ? 'flex' : 'none';
+  if (hasCallRange) {
+    document.querySelector('#legend-result-wrong-4bet-item span').textContent = '4-bet (should call)';
+  }
+  document.getElementById('legend-result-missed-4bet').style.display = 'flex';
+  document.querySelector('#legend-result-missed-4bet span').textContent = 'Missed 4-Bet';
+  document.getElementById('legend-result-missed-call').style.display = hasCallRange ? 'flex' : 'none';
+  document.getElementById('legend-result-missed-single').style.display = 'none';
+  document.getElementById('legend-result-faded').textContent = 'Not in RFI';
+  document.getElementById('legend-normal').style.display = 'flex';
+  document.getElementById('legend-result').style.display = 'none';
+  document.getElementById('legend-fivebet').style.display = 'none';
+  document.getElementById('badge1').className = 'step-badge active';
+  document.getElementById('badge2').className = 'step-badge';
+  document.getElementById('check-btn').textContent = 'Check Answer';
+  document.getElementById('check-btn').disabled = false;
+  document.getElementById('check-btn').onclick = checkStep;
+  document.getElementById('reset-btn').style.display = 'inline-block';
+  document.getElementById('score-chip').style.display = 'none';
+  document.getElementById('result-panel').classList.remove('show');
+  setModeUI(currentMode);
+  hideInlineStepStats();
+}
+
+// ═══════════════════════════════════════
+//  PHASE: 5-BET SHOVE
+// ═══════════════════════════════════════
+function applyFiveBetUI() {
+  quizPhase = 'fivebet'; selFiveBet.clear(); stepChecked = false;
+  const correct4bet = DEFENSE[scenarioKey]['4bet'];
+  document.querySelectorAll('.hcell').forEach(c => {
+    c.className = 'hcell';
+    if (!correct4bet.has(c.dataset.hand)) c.classList.add('out-of-range');
+  });
+  document.getElementById('step-number-label').textContent = 'Step 2 of 2';
+  document.getElementById('step-title-main').textContent = `${oppPos} 5-Bet Shoves — Call or Fold?`;
+  document.getElementById('step-instruction-text').textContent = `You 4-bet, ${oppPos} shoves all-in. Only your 4-bet hands are active. Select every hand you call with.`;
+  document.getElementById('mode-toggle-wrap').style.display = 'none';
+  document.getElementById('legend-normal').style.display = 'none';
+  document.getElementById('legend-result').style.display = 'none';
+  document.getElementById('legend-fivebet').style.display = 'flex';
+  document.getElementById('badge1').className = 'step-badge done';
+  document.getElementById('badge2').className = 'step-badge active';
+  document.getElementById('check-btn').textContent = 'Check Answer';
+  document.getElementById('check-btn').disabled = false;
+  document.getElementById('check-btn').onclick = checkStep;
+  document.getElementById('reset-btn').style.display = 'inline-block';
+  document.getElementById('score-chip').style.display = 'none';
+  document.getElementById('result-panel').classList.remove('show');
+  renderChipStacks(`${heroPos}_${oppPos}_fivebet`);
+  showInlineStepStats(`${heroPos}_${oppPos}_fivebet`);
+}
+
+// ═══════════════════════════════════════
+//  GRID
+// ═══════════════════════════════════════
+// ═══════════════════════════════════════
+//  DRAG-TO-PAINT
+// ═══════════════════════════════════════
+let isDragging = false;
+let dragAction = null;   // 'add' | 'remove'
+let lastDraggedHand = null;
+
+function buildGrid() {
+  const grid = document.getElementById('rangeGrid'); grid.innerHTML = '';
+  ALL_HANDS.forEach(h => {
+    const c = document.createElement('div');
+    c.className = 'hcell'; c.textContent = h; c.dataset.hand = h;
+
+    // Mouse events
+    c.addEventListener('mousedown', e => { e.preventDefault(); startDrag(h, c); });
+    c.addEventListener('mouseenter', () => { if (isDragging) continueDrag(h, c); });
+
+    // Touch events
+    c.addEventListener('touchstart', e => { e.preventDefault(); const t = e.touches[0]; startDrag(h, c); }, {passive:false});
+
+    grid.appendChild(c);
+  });
+
+  // Touch move handled on grid container (cells can't receive touchenter)
+  grid.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    if (el && el.classList.contains('hcell') && el.dataset.hand !== lastDraggedHand) {
+      continueDrag(el.dataset.hand, el);
+    }
+  }, {passive:false});
+}
+
+// End drag on mouseup anywhere
+document.addEventListener('mouseup', () => { isDragging = false; dragAction = null; lastDraggedHand = null; });
+document.addEventListener('touchend', () => { isDragging = false; dragAction = null; lastDraggedHand = null; });
+
+function startDrag(hand, cell) {
+  if (stepChecked) return;
+  isDragging = true;
+  lastDraggedHand = hand;
+  // Determine action based on current state of first cell touched
+  dragAction = isSelected(hand) ? 'remove' : 'add';
+  applyDrag(hand, cell);
+}
+
+function continueDrag(hand, cell) {
+  if (!isDragging || stepChecked) return;
+  if (hand === lastDraggedHand) return;
+  lastDraggedHand = hand;
+  applyDrag(hand, cell);
+}
+
+function isSelected(hand) {
+  if (quizPhase === 'rfi') return selRfi.has(hand);
+  if (quizPhase === 'defense') return sel4bet.has(hand) || selCall.has(hand);
+  if (quizPhase === 'vsopen-3bet') return sel3bet.has(hand) || selCall.has(hand);
+  if (quizPhase === 'vsopen-4bet') return sel5betShove.has(hand) || selVs4bet.has(hand);
+  if (quizPhase === 'fivebet') return selFiveBet.has(hand);
+  return false;
+}
+
+function applyDrag(hand, cell) {
+  if (quizPhase === 'rfi') {
+    if (dragAction === 'add') { selRfi.add(hand); cell.classList.add('sel-4bet'); }
+    else { selRfi.delete(hand); cell.classList.remove('sel-4bet'); }
+
+  } else if (quizPhase === 'defense') {
+    const rfiSet = RFI[heroPos];
+    if (rfiSet && !rfiSet.has(hand)) return;
+    if (dragAction === 'add') {
+      if (currentMode === '4bet') { sel4bet.add(hand); selCall.delete(hand); }
+      else { selCall.add(hand); sel4bet.delete(hand); }
+    } else {
+      sel4bet.delete(hand); selCall.delete(hand);
+    }
+    refreshDefenseCell(hand, cell);
+    return; // refreshDefenseCell handles class update
+
+  } else if (quizPhase === 'vsopen-3bet') {
+    if (dragAction === 'add') {
+      if (currentMode === '4bet') { sel3bet.add(hand); selCall.delete(hand); }
+      else { selCall.add(hand); sel3bet.delete(hand); }
+    } else {
+      sel3bet.delete(hand); selCall.delete(hand);
+    }
+    refreshVsOpenCell(hand, cell);
+    return;
+
+  } else if (quizPhase === 'vsopen-4bet') {
+    const def = DEFENSE[scenarioKey];
+    const correct3bet = def['4bet'];
+    if (!correct3bet.has(hand)) return;
+    if (dragAction === 'add') {
+      if (currentMode === '4bet') { sel5betShove.add(hand); selVs4bet.delete(hand); }
+      else { selVs4bet.add(hand); sel5betShove.delete(hand); }
+    } else {
+      sel5betShove.delete(hand); selVs4bet.delete(hand);
+    }
+    refreshVsOpen4betCell(hand, cell);
+    return;
+
+  } else if (quizPhase === 'fivebet') {
+    const correct4bet = DEFENSE[scenarioKey]['4bet'];
+    if (!correct4bet.has(hand)) return;
+    if (dragAction === 'add') { selFiveBet.add(hand); cell.classList.add('five-bet-selected'); }
+    else { selFiveBet.delete(hand); cell.classList.remove('five-bet-selected'); }
+  }
+}
+
+function refreshDefenseCell(hand, cell) {
+  const rfiSet = RFI[heroPos];
+  cell.className = 'hcell';
+  if (rfiSet && !rfiSet.has(hand)) cell.classList.add('out-of-range');
+  if (sel4bet.has(hand)) cell.classList.add('sel-4bet');
+  else if (selCall.has(hand)) cell.classList.add('sel-call');
+}
+
+function refreshVsOpenCell(hand, cell) {
+  cell.className = 'hcell';
+  if (sel3bet.has(hand)) cell.classList.add('sel-4bet'); // reuse same styling
+  else if (selCall.has(hand)) cell.classList.add('sel-call');
+}
+
+function refreshVsOpen4betCell(hand, cell) {
+  const def = DEFENSE[scenarioKey];
+  const correct3bet = def['4bet'];
+  cell.className = 'hcell';
+  if (!correct3bet.has(hand)) cell.classList.add('out-of-range');
+  if (sel5betShove.has(hand)) cell.classList.add('sel-4bet');
+  else if (selVs4bet.has(hand)) cell.classList.add('sel-call');
+}
+
+// ═══════════════════════════════════════
+//  MODE TOGGLE
+// ═══════════════════════════════════════
+function setMode(m) { currentMode = m; setModeUI(m); }
+function setModeUI(m) {
+  document.getElementById('btn-mode-4bet').className = 'mode-btn'+(m==='4bet'?' active-fourbet':'');
+  document.getElementById('btn-mode-call').className = 'mode-btn'+(m==='call'?' active-call':'');
+}
+
+// ═══════════════════════════════════════
+//  CHECK
+// ═══════════════════════════════════════
+function checkStep() {
+  if (quizPhase==='rfi') checkRfi();
+  else if (quizPhase==='defense') checkDefense();
+  else if (quizPhase==='vsopen-3bet') checkVsOpen3bet();
+  else if (quizPhase==='vsopen-4bet') checkVsOpen4bet();
+  else if (quizPhase==='fivebet') checkFiveBet();
+}
+
+function checkRfi() {
+  stepChecked = true;
+  const correct = RFI[heroPos];
+  let cC=0, cI=0, cM=0;
+  document.querySelectorAll('.hcell').forEach(c => {
+    const h = c.dataset.hand; const sel = selRfi.has(h); const ok = correct.has(h);
+    c.className = 'hcell';
+    if (sel && ok)  { c.classList.add('result-correct-4bet'); cC++; }
+    else if (sel)   { c.classList.add('result-incorrect');    cI++; }
+    else if (ok)    { c.classList.add('result-missed');       cM++; }
+  });
+  const pct = Math.round(cC / (cC+cI+cM||1) * 100);
+  document.getElementById('badge1').className = 'step-badge done';
+  showChip(pct);
+  document.getElementById('legend-result-raise').textContent = 'Correct Open';
+  document.getElementById('legend-result-call-item').style.display = 'none';
+  document.getElementById('legend-result-wrong-action-item').style.display = 'none';
+  document.getElementById('legend-result-wrong-4bet-item').style.display = 'none';
+  document.getElementById('legend-result-missed-4bet').style.display = 'none';
+  document.getElementById('legend-result-missed-call').style.display = 'none';
+  document.getElementById('legend-result-missed-single').style.display = 'flex';
+  document.getElementById('legend-result-wrong-4bet-item').style.display = 'none';
+  document.getElementById('legend-result-faded').textContent = 'Fold';
+  document.getElementById('legend-normal').style.display = 'none';
+  document.getElementById('legend-result').style.display = 'flex';
+  showResult(cC, cI, cM, pct, correct.size, true, 'rfi');
+  document.getElementById('check-btn').textContent = 'Practice vs 3-Bet →';
+  document.getElementById('check-btn').onclick = () => { buildOpponentRow(heroPos); showScreen('screen-opponent'); document.getElementById('check-btn').onclick = checkStep; };
+  document.getElementById('reset-btn').style.display = 'none';
+  addExtraBtn('Try Again', () => startRfiQuiz(heroPos));
+}
+
+function checkDefense() {
+  stepChecked = true;
+  const def = DEFENSE[scenarioKey];
+  const c4 = def['4bet'], cC = def['call'];
+  const rfiSet = RFI[heroPos];
+  let nC=0, nI=0, nW=0, nM=0;
+  document.querySelectorAll('.hcell').forEach(cell => {
+    const h = cell.dataset.hand;
+    if (rfiSet && !rfiSet.has(h)) { cell.className = 'hcell out-of-range'; return; }
+    const u4 = sel4bet.has(h), uC = selCall.has(h);
+    const is4 = c4.has(h), isC = cC.has(h);
+    cell.className = 'hcell';
+    if (u4 && is4)            { cell.classList.add('result-correct-4bet');  nC++; }
+    else if (uC && isC)       { cell.classList.add('result-correct-call');  nC++; }
+    else if (u4 && isC)       { cell.classList.add('result-wrong-4bet');    nW++; } // 4-bet a call hand
+    else if (uC && is4)       { cell.classList.add('result-wrong-call');    nW++; } // called a 4-bet hand
+    else if (u4||uC)          { cell.classList.add('result-incorrect');     nI++; } // shouldn't play at all
+    else if (is4)             { cell.classList.add('result-missed-4bet');   nM++; }
+    else if (isC)             { cell.classList.add('result-missed-call');   nM++; }
+  });
+  const totalPlayed = nC + nI + nW + nM;
+  const pct = Math.round(nC / (totalPlayed||1) * 100);
+  document.getElementById('badge1').className = 'step-badge done';
+  document.getElementById('badge2').className = 'step-badge active';
+  showChip(pct);
+  document.getElementById('legend-normal').style.display = 'none';
+  document.getElementById('legend-result').style.display = 'flex';
+  showResult(nC, nI+nW, nM, pct, c4.size+cC.size, false, 'defense');
+  // Save defense step 1 score
+  saveQuizResult(`${heroPos}_${oppPos}_defense`, pct);
+
+  // Only offer 5-bet step if this matchup exists in FIVEBET_CALL
+  if (FIVEBET_CALL[scenarioKey]) {
+    document.getElementById('check-btn').textContent = 'Continue to 5-Bet →';
+    document.getElementById('check-btn').onclick = () => { clearExtraButtons(); document.getElementById('check-btn').onclick = checkStep; applyFiveBetUI(); };
+  } else {
+    document.getElementById('check-btn').textContent = 'Play Again';
+    document.getElementById('check-btn').onclick = () => { clearExtraButtons(); startDefenseScenario(heroPos, oppPos); };
+    document.getElementById('badge2').className = 'step-badge';
+  }
+  document.getElementById('reset-btn').style.display = 'none';
+  addExtraBtn('Try Again', () => { clearExtraButtons(); startDefenseScenario(heroPos, oppPos); });
+}
+
+// ── vs OPEN 3-BET CHECK ──
+function checkVsOpen3bet() {
+  stepChecked = true;
+  const def = DEFENSE[scenarioKey];
+  const correct3bet = def['4bet']; // reuse the '4bet' key for 3-bet ranges vs open
+  const correctCall = def['call'];
+  const rfiSet = RFI[heroPos];
+  let nC=0, nI=0, nW=0, nM=0;
+
+  document.querySelectorAll('.hcell').forEach(cell => {
+    const h = cell.dataset.hand;
+    const u3 = sel3bet.has(h), uC = selCall.has(h);
+    const is3 = correct3bet.has(h), isC = correctCall.has(h);
+    cell.className = 'hcell';
+
+    if (u3 && is3)            { cell.classList.add('result-correct-4bet');  nC++; }
+    else if (uC && isC)       { cell.classList.add('result-correct-call');  nC++; }
+    else if (u3 && isC)       { cell.classList.add('result-wrong-4bet');    nW++; }
+    else if (uC && is3)       { cell.classList.add('result-wrong-call');    nW++; }
+    else if (u3||uC)          { cell.classList.add('result-incorrect');     nI++; }
+    else if (is3)             { cell.classList.add('result-missed-4bet');   nM++; }
+    else if (isC)             { cell.classList.add('result-missed-call');   nM++; }
+  });
+
+  const totalPlayed = nC + nI + nW + nM;
+  const pct = Math.round(nC / (totalPlayed||1) * 100);
+
+  document.getElementById('badge1').className = 'step-badge done';
+  document.getElementById('badge2').className = 'step-badge active';
+  showChip(pct);
+
+  document.getElementById('legend-normal').style.display = 'none';
+  document.getElementById('legend-result').style.display = 'flex';
+
+  showResult(nC, nI+nW, nM, pct, correct3bet.size+correctCall.size, false, 'vsopen');
+  // Save vsopen 3bet step 1 score
+  saveQuizResult(`${heroPos}_${oppPos}_vsopen-3bet`, pct);
+
+  document.getElementById('check-btn').textContent = 'Continue to vs 3-Bet →';
+  document.getElementById('check-btn').onclick = () => { clearExtraButtons(); document.getElementById('check-btn').onclick = checkStep; applyVsOpen4betUI(); };
+  document.getElementById('reset-btn').style.display = 'none';
+  addExtraBtn('Try Again', () => { clearExtraButtons(); startVsOpenScenario(heroPos, oppPos); });
+}
+
+// ── vs OPEN 4-BET UI ──
+function applyVsOpen4betUI() {
+  quizPhase = 'vsopen-4bet'; selVs4bet.clear(); sel5betShove.clear(); stepChecked = false; currentMode = '4bet';
+  const def = DEFENSE[scenarioKey];
+  const correct3bet = def['4bet']; // correct 3-bet range
+
+  document.querySelectorAll('.hcell').forEach(c => {
+    c.className = 'hcell';
+    if (!correct3bet.has(c.dataset.hand)) c.classList.add('out-of-range');
+    if (sel5betShove.has(c.dataset.hand)) c.classList.add('sel-4bet');
+    else if (selVs4bet.has(c.dataset.hand)) c.classList.add('sel-call');
+  });
+
+  document.getElementById('step-number-label').textContent = 'Step 2 of 2';
+  document.getElementById('step-title-main').textContent = `${oppPos} 4-Bets — 5-Bet Shove or Call?`;
+  document.getElementById('step-instruction-text').textContent = `You 3-bet, ${oppPos} 4-bets. Select your 5-bet shove hands, then switch to Call mode for calling hands.`;
+  
+  document.getElementById('mode-toggle-wrap').style.display = 'flex';
+  document.getElementById('btn-mode-4bet').textContent = '5-Bet Shove';
+  document.getElementById('btn-mode-call').textContent = 'Call';
+  
+  document.getElementById('legend-raise-label').textContent = '5-Bet Shove';
+  document.getElementById('legend-call-item').style.display = 'flex';
+  document.getElementById('legend-faded-label').textContent = 'Not in 3-Bet';
+  document.getElementById('legend-result-raise').textContent = 'Correct 5-Bet';
+  document.getElementById('legend-result-call-item').style.display = 'flex';
+  document.getElementById('legend-result-wrong-action-item').style.display = 'flex';
+  document.getElementById('legend-result-wrong-4bet-item').style.display = 'flex';
+  document.getElementById('legend-result-missed-4bet').style.display = 'flex';
+  document.getElementById('legend-result-missed-call').style.display = 'flex';
+  document.getElementById('legend-result-missed-single').style.display = 'none';
+  document.getElementById('legend-result-faded').textContent = 'Not in 3-Bet';
+  document.getElementById('legend-normal').style.display = 'flex';
+  document.getElementById('legend-result').style.display = 'none';
+  document.getElementById('legend-fivebet').style.display = 'none';
+  
+  document.getElementById('badge1').className = 'step-badge done';
+  document.getElementById('badge2').className = 'step-badge active';
+  document.getElementById('check-btn').textContent = 'Check Answer';
+  document.getElementById('check-btn').disabled = false;
+  document.getElementById('check-btn').onclick = checkStep;
+  document.getElementById('reset-btn').style.display = 'inline-block';
+  document.getElementById('score-chip').style.display = 'none';
+  document.getElementById('result-panel').classList.remove('show');
+  setModeUI(currentMode);
+  showInlineStepStats(`${heroPos}_${oppPos}_vsopen-4bet`);
+}
+
+function checkFiveBet() {
+  stepChecked = true;
+  const correct = FIVEBET_CALL[scenarioKey];
+  const correct4bet = DEFENSE[scenarioKey]['4bet'];
+  let nC=0, nI=0, nM=0;
+  document.querySelectorAll('.hcell').forEach(cell => {
+    const h = cell.dataset.hand;
+    if (!correct4bet.has(h)) { cell.className = 'hcell out-of-range'; return; }
+    cell.className = 'hcell';
+    if (correct.has(h)) {
+      if (selFiveBet.has(h)) { cell.classList.add('result-correct-4bet'); nC++; }
+      else { cell.classList.add('result-missed'); nM++; }
+    } else {
+      if (selFiveBet.has(h)) { cell.classList.add('result-incorrect'); nI++; }
+    }
+  });
+  const pct = Math.round(nC / (nC+nI+nM||1) * 100);
+  document.getElementById('badge2').className = 'step-badge done';
+  showChip(pct);
+  document.getElementById('legend-fivebet').style.display = 'flex';
+  showResult(nC, nI, nM, pct, correct.size, true, 'fivebet');
+  document.getElementById('check-btn').textContent = 'Play Again';
+  document.getElementById('check-btn').onclick = () => { clearExtraButtons(); document.getElementById('check-btn').onclick = checkStep; startDefenseScenario(heroPos, oppPos); };
+  document.getElementById('reset-btn').style.display = 'none';
+  addExtraBtn('New Matchup', () => { clearExtraButtons(); buildOpponentRow(heroPos); showScreen('screen-opponent'); });
+}
+
+// ── vs OPEN 4-BET CHECK ──
+function checkVsOpen4bet() {
+  stepChecked = true;
+  const def = DEFENSE[scenarioKey];
+  const correct3bet = def['4bet'];
+  
+  // Use proper data structures for vs Open 5-bet ranges
+  const correct5betShove = VSOPEN_5BET_SHOVE[scenarioKey] || new Set();
+  const correctCall = VSOPEN_5BET_CALL[scenarioKey] || new Set();
+  
+  let nC=0, nI=0, nW=0, nM=0;
+
+  document.querySelectorAll('.hcell').forEach(cell => {
+    const h = cell.dataset.hand;
+    if (!correct3bet.has(h)) { cell.className = 'hcell out-of-range'; return; }
+    
+    const uShove = sel5betShove.has(h), uCall = selVs4bet.has(h);
+    const isShove = correct5betShove.has(h), isCall = correctCall.has(h);
+    
+    cell.className = 'hcell';
+    
+    if (uShove && isShove)       { cell.classList.add('result-correct-4bet');  nC++; } // correct 5-bet shove (green)
+    else if (uCall && isCall)    { cell.classList.add('result-correct-call');  nC++; } // correct call (teal)
+    else if (uShove && isCall)   { cell.classList.add('result-wrong-4bet');    nW++; } // shoved when should call (pink)
+    else if (uCall && isShove)   { cell.classList.add('result-wrong-call');    nW++; } // called when should shove (purple)
+    else if (uShove || uCall)    { cell.classList.add('result-incorrect');     nI++; } // wrong hand entirely (red)
+    else if (isShove)            { cell.classList.add('result-missed-4bet');   nM++; } // missed shove (green tint)
+    else if (isCall)             { cell.classList.add('result-missed-call');   nM++; } // missed call (teal tint)
+  });
+
+  const totalPlayed = nC + nI + nW + nM;
+  const pct = Math.round(nC / (totalPlayed||1) * 100);
+  
+  document.getElementById('badge2').className = 'step-badge done';
+  showChip(pct);
+  
+  document.getElementById('legend-normal').style.display = 'none';
+  document.getElementById('legend-result').style.display = 'flex';
+
+  showResult(nC, nI+nW, nM, pct, correct5betShove.size + correctCall.size, true, 'vsopen4bet');
+
+  document.getElementById('check-btn').textContent = 'Play Again';
+  document.getElementById('check-btn').onclick = () => { clearExtraButtons(); document.getElementById('check-btn').onclick = checkStep; startVsOpenScenario(heroPos, oppPos); };
+  document.getElementById('reset-btn').style.display = 'none';
+  addExtraBtn('New Matchup', () => { clearExtraButtons(); buildOpenerRow(heroPos); showScreen('screen-opener'); });
+}
+
+// ═══════════════════════════════════════
+//  RESULT PANEL
+// ═══════════════════════════════════════
+function showChip(pct) {
+  const chip = document.getElementById('score-chip');
+  chip.textContent = `${pct}% Accurate`; chip.style.display = 'inline-block';
+}
+
+function showResult(correct, incorrect, missed, pct, total, isFinal, phase) {
+  let msg = pct===100 ? '🏆 Perfect — flawless execution.' : pct>=80 ? '✓ Solid. Fine-tune the edge cases.' : pct>=60 ? 'Good foundation. Review the highlighted hands.' : 'Keep drilling — study the ranges carefully.';
+  if (phase==='rfi') msg += ' <br><span style="opacity:0.6">Ready to practice facing a 3-bet?</span>';
+  if (isFinal) msg += ' <br><span style="opacity:0.6">Use "Play Again" to repeat or "New Matchup" to switch.</span>';
+  document.getElementById('result-stats').innerHTML = `
+    <div class="stat"><div class="stat-val gold">${pct}%</div><div class="stat-label">Accuracy</div></div>
+    <div class="stat"><div class="stat-val green">${correct}</div><div class="stat-label">Correct</div></div>
+    <div class="stat"><div class="stat-val red">${incorrect}</div><div class="stat-label">Incorrect</div></div>
+    <div class="stat"><div class="stat-val orange">${missed}</div><div class="stat-label">Missed (of ${total})</div></div>`;
+  document.getElementById('result-message').innerHTML = msg;
+  document.getElementById('result-panel').classList.add('show');
+  
+  // Save quiz result to Supabase (if user is logged in)
+  if (isFinal) {
+    let quizName;
+    if (phase === 'rfi') {
+      quizName = `${heroPos}_RFI_rfi`;
+    } else if (phase === 'defense') {
+      quizName = `${heroPos}_${oppPos}_defense`;
+    } else if (phase === 'fivebet') {
+      quizName = `${heroPos}_${oppPos}_fivebet`;
+    } else if (phase === 'vsopen') {
+      quizName = `${heroPos}_${oppPos}_vsopen-3bet`;
+    } else if (phase === 'vsopen4bet') {
+      quizName = `${heroPos}_${oppPos}_vsopen-4bet`;
+    } else {
+      quizName = `${heroPos}_${oppPos || 'RFI'}_${phase}`;
+    }
+    console.log("Saving quiz result:", quizName, pct);
+    saveQuizResult(quizName, pct);
+  }
+}
+
+// ═══════════════════════════════════════
+//  RESET / HELPERS
+// ═══════════════════════════════════════
+function resetStep() {
+  clearExtraButtons();
+  if (quizPhase==='rfi') startRfiQuiz(heroPos);
+  else if (quizPhase==='defense') { sel4bet.clear(); selCall.clear(); stepChecked=false; buildGrid(); applyDefenseUI(); }
+  else if (quizPhase==='vsopen-3bet') { sel3bet.clear(); selCall.clear(); stepChecked=false; buildGrid(); applyVsOpen3betUI(); }
+  else if (quizPhase==='vsopen-4bet') { sel5betShove.clear(); selVs4bet.clear(); stepChecked=false; applyVsOpen4betUI(); }
+  else if (quizPhase==='fivebet') { selFiveBet.clear(); stepChecked=false; applyFiveBetUI(); }
+}
+
+function clearExtraButtons() { document.getElementById('action-bar-extra').innerHTML = ''; }
+
+async function showInlineStepStats(quizName) {
+  const statsEl = document.getElementById('step-inline-stats');
+  statsEl.style.display = 'flex';
+  document.getElementById('step-inline-best').textContent = '—';
+  document.getElementById('step-inline-avg').textContent = '—';
+  
+  if (!supabaseClient) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+  
+  const attempts = await fetchStats(quizName);
+  if (attempts && attempts.length > 0) {
+    const stats = calculateStats(attempts);
+    document.getElementById('step-inline-best').textContent = `${stats.personalBest}%`;
+    document.getElementById('step-inline-avg').textContent = `${stats.average}%`;
+  }
+}
+
+function hideInlineStepStats() {
+  document.getElementById('step-inline-stats').style.display = 'none';
+}
+
+function addExtraBtn(label, fn) {
+  const btn = document.createElement('button');
+  btn.className = 'action-btn ghost'; btn.textContent = label; btn.onclick = fn;
+  document.getElementById('action-bar-extra').appendChild(btn);
+}
+// ═══════════════════════════════════════════════════════════════
+//  HAND TRAINER
+// ═══════════════════════════════════════════════════════════════
+
+const HT_RFI = {
+  UTG: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K6s','K7s','K8s','K9s','KTs','KJs','KQs','QTs','QJs','ATo','AJo','AQo','AKo','KJo','KQo','JTs','T9s','65s']),
+  HJ:  new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q9s','QTs','QJs','A9o','ATo','AJo','AQo','AKo','KTo','KJo','KQo','QTo','QJo','J9s','JTs','T8s','T9s','65s']),
+  CO:  new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K3s','K4s','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q6s','Q7s','Q8s','Q9s','QTs','QJs','A8o','A9o','ATo','AJo','AQo','AKo','KTo','KJo','KQo','QTo','QJo','JTo','J8s','J9s','JTs','T8s','T9s','98s','87s','76s','65s','54s','A5o']),
+  BTN: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K2s','K3s','K4s','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q2s','Q3s','Q4s','Q5s','Q6s','Q7s','Q8s','Q9s','QTs','QJs','A2o','A3o','A4o','A5o','A6o','A7o','A8o','A9o','ATo','AJo','AQo','AKo','K7o','K8o','K9o','KTo','KJo','KQo','Q9o','QTo','QJo','J9o','JTo','T9o','J4s','J5s','J6s','J7s','J8s','J9s','JTs','T6s','T7s','T8s','T9s','96s','97s','98s','86s','87s','75s','76s','65s','54s']),
+  SB:  new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','A2s','A3s','A4s','A5s','A6s','A7s','A8s','A9s','ATs','AJs','AQs','AKs','K2s','K3s','K4s','K5s','K6s','K7s','K8s','K9s','KTs','KJs','KQs','Q2s','Q3s','Q4s','Q5s','Q6s','Q7s','Q8s','Q9s','QTs','QJs','A2o','A3o','A4o','A5o','A6o','A7o','A8o','A9o','ATo','AJo','AQo','AKo','K7o','K8o','K9o','KTo','KJo','KQo','Q9o','QTo','QJo','J9o','JTo','T9o','J4s','J5s','J6s','J7s','J8s','J9s','JTs','T6s','T7s','T8s','T9s','96s','97s','98s','85s','86s','87s','75s','76s','64s','65s','53s','54s']),
+};
+const HT_DEF = DEFENSE; // reuse range quiz DEFENSE object
+const HT_FBC = FIVEBET_CALL;
+const HT_V5S = VSOPEN_5BET_SHOVE;
+const HT_V5C = VSOPEN_5BET_CALL;
+
+const HT_RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+const HT_SUITS = ['c','d','h','s'];
+const HT_SUIT_BG = { c:'clubbg.png', d:'diamondbg.png', h:'heartbg.png', s:'spadebg.png' };
+const HT_RANK_DISP = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','T':'10','J':'J','Q':'Q','K':'K','A':'A'};
+
+function htHandKey(c1,c2) {
+  const rv=c=>HT_RANKS.indexOf(c.rank);
+  const [hi,lo]=rv(c1)>=rv(c2)?[c1,c2]:[c2,c1];
+  if(hi.rank===lo.rank) return hi.rank+lo.rank;
+  return hi.rank+lo.rank+(hi.suit===lo.suit?'s':'o');
+}
+
+const HT_SEAT_POS = { UTG:{x:6,y:50}, HJ:{x:30,y:18}, CO:{x:70,y:18}, BTN:{x:94,y:50}, SB:{x:76,y:82}, BB:{x:24,y:82} };
+const HT_CARD_DIR = { UTG:'ht-cards-left', HJ:'ht-cards-above', CO:'ht-cards-above', BTN:'ht-cards-right', SB:'ht-cards-below', BB:'ht-cards-below' };
+const HT_CHIP_OFF = { UTG:{x:18,y:50}, HJ:{x:38,y:32}, CO:{x:62,y:32}, BTN:{x:82,y:50}, SB:{x:65,y:68}, BB:{x:35,y:68} };
+
+const HT_RFI_OPEN   = { UTG:2.5, HJ:2.5, CO:2.5, BTN:2.5, SB:3 };
+const HT_VO_3BET    = {'HJ_UTG':8,'CO_UTG':8,'CO_HJ':8,'BTN_UTG':8,'BTN_HJ':8,'BTN_CO':8,'SB_UTG':10,'SB_HJ':10,'SB_CO':10,'SB_BTN':10,'BB_UTG':10,'BB_HJ':10,'BB_CO':10,'BB_BTN':10,'BB_SB':9.5};
+const HT_VO_POT     = {'HJ_UTG':4,'CO_UTG':4,'CO_HJ':4,'BTN_UTG':4,'BTN_HJ':4,'BTN_CO':4,'SB_UTG':4,'SB_HJ':4,'SB_CO':4,'SB_BTN':4,'BB_UTG':4,'BB_HJ':4,'BB_CO':4,'BB_BTN':4,'BB_SB':4};
+// HT_RD_3BET_SIZE: the opponent's 3-bet size when hero opened (key = opp_hero, values 8-10bb)
+const HT_RD_3BET_SIZE = {'HJ_UTG':8,'CO_UTG':8,'CO_HJ':8,'BTN_UTG':8,'BTN_HJ':8,'BTN_CO':8,'SB_UTG':10,'SB_HJ':10,'SB_CO':10,'SB_BTN':10,'BB_UTG':10,'BB_HJ':10,'BB_CO':10,'BB_BTN':10,'BB_SB':9.5};
+const HT_VO_4BET    = {'HJ_UTG':22,'CO_UTG':22,'CO_HJ':22,'BTN_UTG':22,'BTN_HJ':22,'BTN_CO':22,'SB_UTG':22,'SB_HJ':22,'SB_CO':22,'SB_BTN':22,'BB_UTG':22,'BB_HJ':22,'BB_CO':22,'BB_BTN':22,'BB_SB':22};
+// HT_RD_3BET: hero's 4-bet size when facing a 3-bet after opening (key = hero_opp, values 20-24bb)
+const HT_RD_3BET    = {'UTG_HJ':20,'UTG_CO':20,'UTG_BTN':20,'UTG_SB':22.5,'UTG_BB':22.5,'HJ_CO':20,'HJ_BTN':20,'HJ_SB':22.5,'HJ_BB':22.5,'CO_BTN':20,'CO_SB':22.5,'CO_BB':22.5,'BTN_SB':22.5,'BTN_BB':22.5,'SB_BB':24};
+const HT_RD_POT     = {'UTG_HJ':12,'UTG_CO':12,'UTG_BTN':12,'UTG_SB':13.5,'UTG_BB':13.5,'HJ_CO':12,'HJ_BTN':12,'HJ_SB':13.5,'HJ_BB':13.5,'CO_BTN':12,'CO_SB':13.5,'CO_BB':13.5,'BTN_SB':13.5,'BTN_BB':13.5,'SB_BB':12.5};
+const HT_VO4_POT    = {'HJ_UTG':29.5,'CO_UTG':29.5,'CO_HJ':29.5,'BTN_UTG':29.5,'BTN_HJ':29.5,'BTN_CO':29.5,'SB_UTG':33.5,'SB_HJ':33.5,'SB_CO':33.5,'SB_BTN':33.5,'BB_UTG':33.5,'BB_HJ':33.5,'BB_CO':33.5,'BB_BTN':33.5,'BB_SB':33.5};
+const HT_RD5_POT    = {'UTG_HJ':121.5,'UTG_CO':121.5,'UTG_BTN':121.5,'UTG_SB':123.5,'UTG_BB':123.5,'HJ_CO':121.5,'HJ_BTN':121.5,'HJ_SB':123.5,'HJ_BB':123.5,'CO_BTN':121.5,'CO_SB':123.5,'CO_BB':123.5,'BTN_SB':123.5,'BTN_BB':123.5,'SB_BB':124};
+
+const HT_ALL_COMBOS = (()=>{
+  const d=[];
+  for(const r of HT_RANKS) for(const s of HT_SUITS) d.push({rank:r,suit:s});
+  const c=[];
+  for(let i=0;i<d.length;i++) for(let j=i+1;j<d.length;j++) c.push([d[i],d[j]]);
+  return c;
+})();
+
+function htBuildScenarios() {
+  const s=[];
+  const voMap={HJ:['UTG'],CO:['UTG','HJ'],BTN:['UTG','HJ','CO'],SB:['UTG','HJ','CO','BTN'],BB:['UTG','HJ','CO','BTN','SB']};
+  const rdMap={UTG:['HJ','CO','BTN','SB','BB'],HJ:['CO','BTN','SB','BB'],CO:['BTN','SB','BB'],BTN:['SB','BB'],SB:['BB']};
+  for(const pos of ['UTG','HJ','CO','BTN','SB'])
+    s.push({type:'rfi',hero:pos,label:`${pos} RFI`,actionLabel:'Folded to you'});
+  for(const [hero,ops] of Object.entries(voMap))
+    for(const opener of ops){
+      if(!HT_DEF[`${hero}_${opener}`]) continue;
+      s.push({type:'vsopen',hero,opener,label:`${hero} vs ${opener} Open`,actionLabel:`${opener} raised to ${HT_RFI_OPEN[opener]}`});
+    }
+  for(const [hero,ops] of Object.entries(rdMap))
+    for(const opp of ops){
+      const key=`${hero}_${opp}`; if(!HT_DEF[key]) continue;
+      s.push({type:'rfi_defense',hero,opp3bet:opp,label:`${hero} vs ${opp} 3-Bet`,actionLabel:`You raised ${HT_RFI_OPEN[hero]}, ${opp} 3-bet to ${HT_RD_3BET_SIZE[`${opp}_${hero}`]||8}`});
+    }
+  for(const [hero,ops] of Object.entries(voMap))
+    for(const opener of ops){
+      const key=`${hero}_${opener}`;
+      if(!HT_V5S[key]&&!HT_V5C[key]) continue;
+      s.push({type:'vsopen_4bet',hero,opener,label:`${hero} vs ${opener} 4-Bet`,actionLabel:`You 3-bet to ${HT_VO_3BET[key]||8}, ${opener} 4-bet to ${HT_VO_4BET[key]||22}`});
+    }
+  for(const [hero,ops] of Object.entries(rdMap))
+    for(const opp of ops){
+      const key=`${hero}_${opp}`; if(!HT_FBC[key]) continue;
+      s.push({type:'rfi_5bet',hero,opp3bet:opp,label:`${hero} vs ${opp} All-In`,actionLabel:`You 4-bet to ${HT_RD_3BET[key]}, ${opp} shoved`});
+    }
+  return s;
+}
+const HT_SCENARIOS = htBuildScenarios();
+
+function htEligible(sc) {
+  if(sc.type==='rfi'||sc.type==='vsopen') return HT_ALL_COMBOS;
+  const key=sc.type==='rfi_defense'||sc.type==='rfi_5bet'?`${sc.hero}_${sc.opp3bet}`:`${sc.hero}_${sc.opener}`;
+  const e=sc.type==='rfi_defense'?HT_RFI[sc.hero]:HT_DEF[key]?.['4bet']||new Set();
+  return HT_ALL_COMBOS.filter(([c1,c2])=>e.has(htHandKey(c1,c2)));
+}
+
+let htSc=null, htC1=null, htC2=null, htHK=null, htCorrect=[], htAnswered=false;
+let htStats={correct:0,wrong:0};
+
+function startHandTrainer() { showScreen('screen-trainer'); htNextHand(); }
+
+function htNextHand() {
+  htAnswered=false;
+  document.getElementById('ht-result-overlay').classList.remove('show');
+  htSc=HT_SCENARIOS[Math.floor(Math.random()*HT_SCENARIOS.length)];
+  const el=htEligible(htSc);
+  [htC1,htC2]=el[Math.floor(Math.random()*el.length)];
+  htHK=htHandKey(htC1,htC2);
+  htCorrect=htGetCorrect(htSc,htHK);
+  document.getElementById('ht-ib-scenario').textContent=htSc.label;
+  document.getElementById('ht-ib-action').textContent=htSc.actionLabel;
+  htRenderTable(); htRenderButtons(); htUpdateStats();
+}
+
+function htGetCorrect(s,hk) {
+  if(s.type==='rfi') return HT_RFI[s.hero].has(hk)?['raise']:['fold'];
+  if(s.type==='vsopen'){const def=HT_DEF[`${s.hero}_${s.opener}`];if(!def)return['fold'];if(def['4bet'].has(hk))return['raise'];if(def['call'].has(hk))return['call'];return['fold'];}
+  if(s.type==='rfi_defense'){const def=HT_DEF[`${s.hero}_${s.opp3bet}`];if(!def)return['fold'];if(def['4bet'].has(hk))return['raise'];if(def['call'].has(hk))return['call'];return['fold'];}
+  if(s.type==='vsopen_4bet'){const key=`${s.hero}_${s.opener}`;if((HT_V5S[key]||new Set()).has(hk))return['shove'];if((HT_V5C[key]||new Set()).has(hk))return['call'];return['fold'];}
+  if(s.type==='rfi_5bet') return(HT_FBC[`${s.hero}_${s.opp3bet}`]||new Set()).has(hk)?['call']:['fold'];
+  return['fold'];
+}
+
+function htRenderButtons() {
+  const{type}=htSc;
+  const fold=document.getElementById('ht-btn-fold'),call=document.getElementById('ht-btn-call'),
+        raise=document.getElementById('ht-btn-raise'),allin=document.getElementById('ht-btn-allin');
+  fold.classList.remove('hidden');call.classList.remove('hidden');raise.classList.remove('hidden');allin.classList.add('hidden');
+  raise.textContent='RAISE';
+  if(type==='rfi'){call.classList.add('hidden');}
+  else if(type==='vsopen'){if(!(HT_DEF[`${htSc.hero}_${htSc.opener}`]?.['call'].size>0))call.classList.add('hidden');}
+  else if(type==='rfi_defense'){if(!(HT_DEF[`${htSc.hero}_${htSc.opp3bet}`]?.['call'].size>0))call.classList.add('hidden');}
+  else if(type==='vsopen_4bet'){raise.classList.add('hidden');allin.classList.remove('hidden');}
+  else if(type==='rfi_5bet'){raise.classList.add('hidden');}
+}
+
+function htRenderTable() {
+  const sL=document.getElementById('ht-seats-layer'),cL=document.getElementById('ht-chips-layer'),com=document.getElementById('ht-community');
+  sL.innerHTML='';cL.innerHTML='';com.innerHTML='';
+  for(let i=0;i<5;i++) com.appendChild(htMakeBack());
+  const{type,hero}=htSc, allPos=['UTG','HJ','CO','BTN','SB','BB'];
+  allPos.forEach(pos=>{
+    const sp=HT_SEAT_POS[pos],isHero=pos===hero;
+    // ── Determine SB and BB folded state per scenario ──
+    let sbFolded=false, bbFolded=false;
+    if(type==='rfi'){
+      // SB/BB posted but haven't acted yet — neither is folded.
+      sbFolded=false; bbFolded=false;
+    } else if(type==='vsopen'||type==='vsopen_4bet'){
+      // SB folds only when hero=BB (open → SB folds → BB decides).
+      // BB is always active (they're the hero or opener).
+      sbFolded=(hero==='BB'); bbFolded=false;
+    } else if(type==='rfi_defense'||type==='rfi_5bet'){
+      const opp3=htSc.opp3bet;
+      if(opp3==='SB'){
+        // SB 3-bet — active. BB folded to hero's original open.
+        sbFolded=false; bbFolded=true;
+      } else if(opp3==='BB'){
+        // BB 3-bet — active. SB folded, unless hero=SB (then SB is hero, not folded).
+        sbFolded=(hero!=='SB'); bbFolded=false;
+      } else {
+        // 3-bettor is HJ/CO/BTN — both SB and BB folded to hero's open.
+        sbFolded=true; bbFolded=true;
+      }
+    }
+
+    // ── Determine overall folded state for this position ──
+    let folded=false;
+    if(pos==='SB')      folded=sbFolded;
+    else if(pos==='BB') folded=bbFolded;
+    else if(type==='rfi')                                        folded=!isHero;
+    else if(type==='vsopen'||type==='vsopen_4bet')               folded=!isHero&&pos!==htSc.opener;
+    else if(type==='rfi_defense'||type==='rfi_5bet')             folded=!isHero&&pos!==htSc.opp3bet;
+
+    const seat=document.createElement('div');
+    seat.className='ht-seat'+(folded?' ht-folded':'');
+    seat.style.left=sp.x+'%';seat.style.top=sp.y+'%';
+
+    const cw=document.createElement('div');
+    cw.className='ht-seat-cards '+(isHero?'ht-hero-cards ':'')+HT_CARD_DIR[pos];
+    if(isHero){cw.appendChild(htMakeCard(htC1));cw.appendChild(htMakeCard(htC2));}
+    else{cw.appendChild(htMakeBack());cw.appendChild(htMakeBack());}  // always render, folded seats just fade via CSS
+    seat.appendChild(cw);
+
+    const pw=document.createElement('div');pw.className='ht-pos-chip'+(isHero?' ht-hero':'');
+    const pi=document.createElement('img');pi.src='positionlabel.png';pw.appendChild(pi);
+    const pl=document.createElement('div');pl.className='ht-pos-chip-label';pl.textContent=pos;pw.appendChild(pl);
+    seat.appendChild(pw);
+    sL.appendChild(seat);
+
+    const cp=HT_CHIP_OFF[pos];let bet=null;
+    // SB posts 0.5, BB posts 1 — always show blind chips unless that position
+    // is the active bettor in this hand (their action chip replaces the blind).
+    const activeBettors=new Set([hero]);
+    if(type==='vsopen'||type==='vsopen_4bet') activeBettors.add(htSc.opener);
+    if(type==='rfi_defense'||type==='rfi_5bet') activeBettors.add(htSc.opp3bet);
+    if(pos==='SB'&&!activeBettors.has('SB')) bet=0.5;
+    if(pos==='BB'&&!activeBettors.has('BB')) bet=1;
+    // Action chips (override blind if this position is an active bettor)
+    if(type==='rfi'){
+      // No action chips — just blinds above
+    } else if(type==='vsopen'){
+      if(pos===htSc.opener) bet=HT_RFI_OPEN[htSc.opener]||2.5;
+    } else if(type==='rfi_defense'){
+      const oppKey=`${htSc.opp3bet}_${hero}`;
+      if(pos===hero) bet=HT_RFI_OPEN[hero]||2.5;
+      if(pos===htSc.opp3bet) bet=HT_RD_3BET_SIZE[oppKey]||8;
+    } else if(type==='vsopen_4bet'){
+      const key=`${hero}_${htSc.opener}`;
+      if(pos===hero) bet=HT_VO_3BET[key]||8;
+      if(pos===htSc.opener) bet=HT_VO_4BET[key]||22;
+    } else if(type==='rfi_5bet'){
+      const key=`${hero}_${htSc.opp3bet}`;
+      if(pos===hero) bet=HT_RD_3BET[key]||22;
+      if(pos===htSc.opp3bet) bet=100;
+    }
+
+    if(bet!==null){
+      const bc=document.createElement('div');bc.className='ht-bet-chip';
+      bc.style.left=cp.x+'%';bc.style.top=cp.y+'%';
+      const bi=document.createElement('img');bi.src='chip.png';bc.appendChild(bi);
+      const bv=document.createElement('div');bv.className='ht-chip-val';bv.textContent=bet;bc.appendChild(bv);
+      cL.appendChild(bc);
+    }
+  });
+  let pot=1.5;
+  if(type==='vsopen') pot=HT_VO_POT[`${htSc.hero}_${htSc.opener}`]||4;
+  if(type==='rfi_defense') pot=HT_RD_POT[`${htSc.hero}_${htSc.opp3bet}`]||12;
+  if(type==='vsopen_4bet') pot=HT_VO4_POT[`${htSc.hero}_${htSc.opener}`]||29.5;
+  if(type==='rfi_5bet') pot=HT_RD5_POT[`${htSc.hero}_${htSc.opp3bet}`]||121.5;
+  document.getElementById('ht-pot-amount').textContent=pot;
+}
+
+function htMakeCard(card) {
+  const el=document.createElement('div');el.className='ht-card';
+  const bg=document.createElement('img');bg.className='ht-card-bg';bg.src=HT_SUIT_BG[card.suit];el.appendChild(bg);
+  const face=document.createElement('div');face.className='ht-card-face';
+  const rk=document.createElement('div');rk.className='ht-card-rank';rk.textContent=HT_RANK_DISP[card.rank];
+  face.appendChild(rk);el.appendChild(face);return el;
+}
+function htMakeBack() {
+  const el=document.createElement('div');el.className='ht-card';
+  const bg=document.createElement('img');bg.className='ht-card-bg';bg.src='cardback.png';el.appendChild(bg);return el;
+}
+function htMakeSmall(card) {
+  const el=htMakeCard(card);el.style.width='38px';el.style.height='54px';
+  el.querySelector('.ht-card-rank').style.fontSize='1.3rem';return el;
+}
+
+function htAction(action) {
+  if(htAnswered) return;htAnswered=true;
+  const ok=htCorrect.includes(action);
+  if(ok)htStats.correct++;else htStats.wrong++;
+  htUpdateStats();htAddInfo(action,ok);htShowResult(action,ok);
+}
+
+function htShowResult(action,ok) {
+  document.getElementById('ht-result-icon').textContent=ok?'✓':'✗';
+  const v=document.getElementById('ht-result-verdict');
+  v.textContent=ok?'CORRECT':'INCORRECT';v.className='ht-result-verdict '+(ok?'correct':'wrong');
+  const al=document.getElementById('ht-result-action');
+  al.textContent={fold:'You folded',call:'You called',raise:'You raised',shove:'You went all-in'}[action]||`You ${action}`;
+  al.className='ht-result-action '+action;
+  const hd=document.getElementById('ht-result-hand');hd.innerHTML='';
+  hd.appendChild(htMakeSmall(htC1));hd.appendChild(htMakeSmall(htC2));
+  let detail='';
+  const s=htSc;
+  if(s.type==='rfi') detail=htCorrect[0]==='raise'?`${htHK} is in the ${s.hero} RFI range.`:`${htHK} is not in the ${s.hero} RFI range — fold.`;
+  else if(s.type==='vsopen'){const k=`${s.hero}_${s.opener}`;detail=HT_DEF[k]?.['4bet'].has(htHK)?`${htHK} is a 3-bet vs ${s.opener}'s open.`:HT_DEF[k]?.['call'].has(htHK)?`${htHK} calls ${s.opener}'s open.`:`${htHK} folds vs ${s.opener}'s open.`;}
+  else if(s.type==='rfi_defense'){const k=`${s.hero}_${s.opp3bet}`;detail=HT_DEF[k]?.['4bet'].has(htHK)?`${htHK} 4-bets vs ${s.opp3bet}'s 3-bet.`:HT_DEF[k]?.['call'].has(htHK)?`${htHK} calls the ${s.opp3bet} 3-bet.`:`${htHK} folds vs ${s.opp3bet}'s 3-bet.`;}
+  else if(s.type==='vsopen_4bet'){const k=`${s.hero}_${s.opener}`;detail=HT_V5S[k]?.has(htHK)?`${htHK} 5-bet shoves vs ${s.opener}'s 4-bet.`:HT_V5C[k]?.has(htHK)?`${htHK} calls ${s.opener}'s 4-bet.`:`${htHK} folds vs ${s.opener}'s 4-bet.`;}
+  else if(s.type==='rfi_5bet'){const k=`${s.hero}_${s.opp3bet}`;detail=HT_FBC[k]?.has(htHK)?`${htHK} calls the all-in shove.`:`${htHK} folds vs the all-in shove.`;}
+  document.getElementById('ht-result-detail').textContent=detail;
+  const cv={fold:'fold',call:'call',raise:'raise',shove:'all-in'}[htCorrect[0]]||htCorrect[0];
+  document.getElementById('ht-result-correct').innerHTML=ok?'':`Correct action: <strong>${cv}</strong>`;
+  document.getElementById('ht-result-overlay').classList.add('show');
+}
+
+function htUpdateStats() {
+  document.getElementById('ht-stat-correct').textContent=htStats.correct;
+  document.getElementById('ht-stat-wrong').textContent=htStats.wrong;
+  const t=htStats.correct+htStats.wrong;
+  document.getElementById('ht-stat-pct').textContent=t>0?Math.round(htStats.correct/t*100)+'%':'—';
+}
+function htAddInfo(action,ok) {
+  const bar=document.getElementById('ht-info-bar');
+  const seg=document.createElement('div');
+  const cls={fold:'ht-fold',call:'ht-call',raise:'ht-raise',shove:'ht-raise'}[action];
+  seg.className=`ht-info-seg ${cls}`;
+  seg.innerHTML=`<span class="value">${htSc.hero} ${htHK} ${ok?'✓':'✗'} ${action.toUpperCase()}</span>`;
+  bar.appendChild(seg);
+  setTimeout(()=>{bar.scrollLeft=bar.scrollWidth;},50);
+}
+
+</script>
+<!-- ══════════════════════════════════════ HAND TRAINER SCREEN ══════════════════════════════════════ -->
+<div id="screen-trainer" class="screen">
+  <div class="ht-info-bar" id="ht-info-bar">
+    <div class="ht-info-seg"><span class="value" id="ht-ib-scenario">—</span></div>
+    <div class="ht-info-seg"><span class="value" id="ht-ib-action">—</span></div>
+    <div class="ht-info-seg"><span class="value">0.5 / 1 BLINDS</span></div>
+    <div class="ht-info-seg"><span class="value">100BB STACKS</span></div>
+  </div>
+  <button class="ht-back-btn" onclick="showScreen('screen-home')">← Menu</button>
+  <div class="ht-stats">
+    <div class="ht-stat-pill"><span class="sl">✓</span><span id="ht-stat-correct">0</span></div>
+    <div class="ht-stat-pill"><span class="sl">✗</span><span id="ht-stat-wrong">0</span></div>
+    <div class="ht-stat-pill"><span class="sl">%</span><span id="ht-stat-pct">—</span></div>
+  </div>
+  <div class="ht-table-area">
+    <div class="ht-table-wrap" id="ht-table-wrap">
+      <img src="Board.png" alt="" class="ht-table-bg">
+      <div class="ht-community" id="ht-community"></div>
+      <div class="ht-pot-display" id="ht-pot-display">
+        <div class="ht-pot-img-wrap">
+          <img src="Pot.png" alt="">
+          <div class="ht-pot-overlay"><span class="ht-pot-amount" id="ht-pot-amount">1.5</span></div>
+        </div>
+      </div>
+      <div id="ht-seats-layer"></div>
+      <div id="ht-chips-layer"></div>
+    </div>
+  </div>
+  <div class="ht-action-bar" id="ht-action-bar">
+    <button class="ht-action-btn ht-btn-fold"  id="ht-btn-fold"  onclick="htAction('fold')">FOLD</button>
+    <button class="ht-action-btn ht-btn-call"  id="ht-btn-call"  onclick="htAction('call')">CALL</button>
+    <button class="ht-action-btn ht-btn-raise" id="ht-btn-raise" onclick="htAction('raise')">RAISE</button>
+    <button class="ht-action-btn ht-btn-allin hidden" id="ht-btn-allin" onclick="htAction('shove')">ALL-IN</button>
+  </div>
+</div>
+
+<!-- HAND TRAINER RESULT OVERLAY -->
+<div class="ht-result-overlay" id="ht-result-overlay">
+  <div class="ht-result-card">
+    <div class="ht-result-icon" id="ht-result-icon">✓</div>
+    <div class="ht-result-verdict" id="ht-result-verdict">CORRECT</div>
+    <div class="ht-result-action" id="ht-result-action"></div>
+    <div class="ht-result-hand" id="ht-result-hand"></div>
+    <div class="ht-result-detail" id="ht-result-detail"></div>
+    <div class="ht-result-correct" id="ht-result-correct"></div>
+    <button class="ht-result-next" onclick="htNextHand()">Next Hand →</button>
+  </div>
+</div>
+
+</body>
+</html>

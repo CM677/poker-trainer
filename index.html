@@ -2547,12 +2547,9 @@ function htRenderTable() {
       cL.appendChild(bc);
     }
   });
-  let pot=1.5;
-  if(type==='vsopen') pot=HT_VO_POT[`${htSc.hero}_${htSc.opener}`]||4;
-  if(type==='rfi_defense') pot=HT_RD_POT[`${htSc.hero}_${htSc.opp3bet}`]||12;
-  if(type==='vsopen_4bet') pot=HT_VO4_POT[`${htSc.hero}_${htSc.opener}`]||29.5;
-  if(type==='rfi_5bet') pot=HT_RD5_POT[`${htSc.hero}_${htSc.opp3bet}`]||121.5;
-  document.getElementById('ht-pot-amount').textContent=pot;
+  const pot=[...cL.querySelectorAll('.ht-chip-val')]
+    .reduce((sum, chip)=>sum + (parseFloat(chip.textContent) || 0), 0);
+  document.getElementById('ht-pot-amount').textContent=String(pot);
 }
 
 function htMakeCard(card) {

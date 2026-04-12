@@ -28,7 +28,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .screen.active { display:flex; flex-direction:column; }
 #screen-position { align-items:center; justify-content:center; padding:3rem 1rem; }
 #screen-home { position:relative; }
-#screen-home, #screen-rfi-position, #screen-vsopen-position { align-items:center; justify-content:center; padding:3rem 1rem; }
+#screen-home, #screen-range-quiz-menu, #screen-rfi-position, #screen-vsopen-position, #screen-multiway-position { align-items:center; justify-content:center; padding:3rem 1rem; }
 .logo-area { text-align:center; margin-bottom:3.5rem; }
 .logo-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,8vw,6rem); letter-spacing:6px; color:var(--gold); line-height:1; text-shadow:0 0 60px var(--gold-glow); }
 .logo-sub { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:0.6rem; }
@@ -267,7 +267,27 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     <div class="logo-title">PREFLOP</div>
     <div class="logo-sub">Range Trainer · 6-Max NLHE · 100bb</div>
   </div>
-  <div class="position-label">Choose Quiz Type</div>
+  <div class="position-label">Choose Mode</div>
+  <div class="path-grid">
+    <button class="pos-btn" onclick="showScreen('screen-range-quiz-menu')">
+      <div class="pos-acronym">Range Quiz</div>
+      <div class="pos-name">Range Quiz</div>
+    </button>
+    <button class="pos-btn" onclick="startHandTrainer()">
+      <div class="pos-acronym">🃏</div>
+      <div class="pos-name">Hand Trainer</div>
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 0A: RANGE QUIZ MENU -->
+<div id="screen-range-quiz-menu" class="screen">
+  <button class="back-btn" onclick="showScreen('screen-home')">&larr; Back</button>
+  <div class="logo-area">
+    <div class="logo-title">RANGE QUIZ</div>
+    <div class="logo-sub">Choose quiz type</div>
+  </div>
+  <div class="position-label">Select Path</div>
   <div class="path-grid">
     <button class="pos-btn" onclick="showScreen('screen-rfi-position')">
       <div class="pos-acronym">RFI</div>
@@ -281,16 +301,12 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
       <div class="pos-acronym">MULTI</div>
       <div class="pos-name">Multi-Way Pots</div>
     </button>
-    <button class="pos-btn" onclick="startHandTrainer()">
-      <div class="pos-acronym">🃏</div>
-      <div class="pos-name">Hand Trainer</div>
-    </button>
   </div>
 </div>
 
 <!-- SCREEN 1A: RFI POSITION PICKER -->
 <div id="screen-rfi-position" class="screen">
-  <button class="back-btn" onclick="showScreen('screen-home')">← Back</button>
+  <button class="back-btn" onclick="showScreen('screen-range-quiz-menu')">← Back</button>
   <div class="logo-area">
     <div class="logo-title">RFI QUIZ</div>
     <div class="logo-sub">Select your position</div>
@@ -336,7 +352,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 <!-- SCREEN 1B: VS OPEN POSITION PICKER -->
 <div id="screen-vsopen-position" class="screen">
-  <button class="back-btn" onclick="showScreen('screen-home')">← Back</button>
+  <button class="back-btn" onclick="showScreen('screen-range-quiz-menu')">← Back</button>
   <div class="logo-area">
     <div class="logo-title">VS OPEN QUIZ</div>
     <div class="logo-sub">Select your position</div>
@@ -382,7 +398,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 <!-- SCREEN 1C: MULTI-WAY POSITION PICKER -->
 <div id="screen-multiway-position" class="screen">
-  <button class="back-btn" onclick="showScreen('screen-home')">← Back</button>
+  <button class="back-btn" onclick="showScreen('screen-range-quiz-menu')">← Back</button>
   <div class="logo-area">
     <div class="logo-title">MULTI-WAY</div>
     <div class="logo-sub">Select your position</div>

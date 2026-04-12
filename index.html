@@ -31,6 +31,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 #screen-home, #screen-range-quiz-menu, #screen-rfi-position, #screen-vsopen-position, #screen-multiway-position, #screen-multiway-type, #screen-multiway-matchup { align-items:center; justify-content:center; padding:3rem 1rem; }
 .logo-area { text-align:center; margin-bottom:3.5rem; }
 .logo-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,8vw,6rem); letter-spacing:6px; color:var(--gold); line-height:1; text-shadow:0 0 60px var(--gold-glow); }
+.logo-title img { display:block; width:min(420px, 80vw); height:auto; margin:0 auto; }
 .logo-sub { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:0.6rem; }
 .position-label { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; text-align:center; margin-bottom:1.5rem; }
 .overall-stats { display:flex; justify-content:center; gap:3rem; margin-bottom:2rem; }
@@ -44,6 +45,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .path-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; max-width:840px; }
 .path-grid .pos-btn { flex:0 0 calc(33.33% - 1rem); min-width:180px; max-width:260px; }
 .pos-btn { background:var(--surface); border:1px solid var(--border2); border-radius:14px; padding:1.6rem 1rem; cursor:pointer; transition:all 0.2s ease; text-align:center; position:relative; overflow:hidden; }
+.home-mode-label { font-family:'DM Mono',monospace; font-size:0.8rem; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:0.9rem; }
+.home-mode-icon { display:block; width:min(112px, 48vw); height:auto; margin:0 auto; }
 .pos-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--gold-dim),transparent); opacity:0; transition:opacity 0.2s; }
 .pos-btn:hover::before { opacity:1; }
 .pos-btn:hover { border-color:var(--gold); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.4),0 0 0 1px var(--gold); }
@@ -264,18 +267,18 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     </div>
   </div>
   <div class="logo-area">
-    <div class="logo-title">PREFLOP</div>
+    <div class="logo-title"><img src="logo.png" alt="Preflop"></div>
     <div class="logo-sub">Range Trainer · 6-Max NLHE · 100bb</div>
   </div>
   <div class="position-label">Choose Mode</div>
   <div class="path-grid">
     <button class="pos-btn" onclick="showScreen('screen-range-quiz-menu')">
-      <div class="pos-acronym">Range Quiz</div>
-      <div class="pos-name">Range Quiz</div>
+      <div class="home-mode-label">Range Quiz</div>
+      <img class="home-mode-icon" src="Rangequizsymbol2.png" alt="Range Quiz">
     </button>
     <button class="pos-btn" onclick="startHandTrainer()">
-      <div class="pos-acronym">🃏</div>
-      <div class="pos-name">Hand Trainer</div>
+      <div class="home-mode-label">Hand Trainer</div>
+      <img class="home-mode-icon" src="Hand Trainer symbol.png" alt="Hand Trainer">
     </button>
   </div>
 </div>

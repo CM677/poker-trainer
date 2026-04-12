@@ -2372,6 +2372,47 @@ const HT_RD_POT     = {'UTG_HJ':12,'UTG_CO':12,'UTG_BTN':12,'UTG_SB':13.5,'UTG_B
 const HT_VO4_POT    = {'HJ_UTG':29.5,'CO_UTG':29.5,'CO_HJ':29.5,'BTN_UTG':29.5,'BTN_HJ':29.5,'BTN_CO':29.5,'SB_UTG':33.5,'SB_HJ':33.5,'SB_CO':33.5,'SB_BTN':33.5,'BB_UTG':33.5,'BB_HJ':33.5,'BB_CO':33.5,'BB_BTN':33.5,'BB_SB':33.5};
 const HT_RD5_POT    = {'UTG_HJ':121.5,'UTG_CO':121.5,'UTG_BTN':121.5,'UTG_SB':123.5,'UTG_BB':123.5,'HJ_CO':121.5,'HJ_BTN':121.5,'HJ_SB':123.5,'HJ_BB':123.5,'CO_BTN':121.5,'CO_SB':123.5,'CO_BB':123.5,'BTN_SB':123.5,'BTN_BB':123.5,'SB_BB':124};
 
+function htParseMWKey(key) {
+  const [hero, matchup] = key.split('_');
+  const [opener, second] = matchup.split('+');
+  return { hero, opener, second };
+}
+
+function htGet3BetSize(raiser, opener) {
+  return HT_VO_3BET[`${raiser}_${opener}`] || HT_RD_3BET_SIZE[`${raiser}_${opener}`] || 8;
+}
+
+function htGetMWActionLabel(sc) {
+  const { opener, second } = htParseMWKey(sc.key);
+  const openSize = HT_RFI_OPEN[opener] || 2.5;
+  if (sc.mwType === 'squeeze') return `${opener} raised to ${openSize}, ${second} called`;
+  return `${opener} raised to ${openSize}, ${second} re-raised to ${htGet3BetSize(second, opener)}`;
+}
+
+function htGetDisplayedBets(sc) {
+  const bets = { SB: 0.5, BB: 1 };
+  if (sc.type === 'vsopen') {
+    bets[sc.opener] = HT_RFI_OPEN[sc.opener] || 2.5;
+  } else if (sc.type === 'rfi_defense') {
+    bets[sc.hero] = HT_RFI_OPEN[sc.hero] || 2.5;
+    bets[sc.opp3bet] = htGet3BetSize(sc.opp3bet, sc.hero);
+  } else if (sc.type === 'vsopen_4bet') {
+    const key = `${sc.hero}_${sc.opener}`;
+    bets[sc.hero] = HT_VO_3BET[key] || 8;
+    bets[sc.opener] = HT_VO_4BET[key] || 22;
+  } else if (sc.type === 'rfi_5bet') {
+    const key = `${sc.hero}_${sc.opp3bet}`;
+    bets[sc.hero] = HT_RD_3BET[key] || 22;
+    bets[sc.opp3bet] = 100;
+  } else if (sc.type === 'multiway') {
+    const { opener, second } = htParseMWKey(sc.key);
+    const openSize = HT_RFI_OPEN[opener] || 2.5;
+    bets[opener] = openSize;
+    bets[second] = sc.mwType === 'squeeze' ? openSize : htGet3BetSize(second, opener);
+  }
+  return bets;
+}
+
 const HT_ALL_COMBOS = (()=>{
   const d=[];
   for(const r of HT_RANKS) for(const s of HT_SUITS) d.push({rank:r,suit:s});
@@ -2407,12 +2448,22 @@ function htBuildScenarios() {
       const key=`${hero}_${opp}`; if(!HT_FBC[key]) continue;
       s.push({type:'rfi_5bet',hero,opp3bet:opp,label:`${hero} vs ${opp} All-In`,actionLabel:`You 4-bet to ${HT_RD_3BET[key]}, ${opp} shoved`});
     }
+  for(const [hero,scenarios] of Object.entries(MW_SCENARIOS))
+    for(const sc of scenarios)
+      s.push({
+        type:'multiway',
+        hero,
+        key:sc.key,
+        mwType:sc.type,
+        label:`${hero} vs ${sc.label} Multi-Way`,
+        actionLabel:htGetMWActionLabel({ key: sc.key, mwType: sc.type })
+      });
   return s;
 }
 const HT_SCENARIOS = htBuildScenarios();
 
 function htEligible(sc) {
-  if(sc.type==='rfi'||sc.type==='vsopen') return HT_ALL_COMBOS;
+  if(sc.type==='rfi'||sc.type==='vsopen'||sc.type==='multiway') return HT_ALL_COMBOS;
   const key=sc.type==='rfi_defense'||sc.type==='rfi_5bet'?`${sc.hero}_${sc.opp3bet}`:`${sc.hero}_${sc.opener}`;
   const e=sc.type==='rfi_defense'?HT_RFI[sc.hero]:HT_DEF[key]?.['4bet']||new Set();
   return HT_ALL_COMBOS.filter(([c1,c2])=>e.has(htHandKey(c1,c2)));
@@ -2442,6 +2493,7 @@ function htGetCorrect(s,hk) {
   if(s.type==='rfi_defense'){const def=HT_DEF[`${s.hero}_${s.opp3bet}`];if(!def)return['fold'];if(def['4bet'].has(hk))return['raise'];if(def['call'].has(hk))return['call'];return['fold'];}
   if(s.type==='vsopen_4bet'){const key=`${s.hero}_${s.opener}`;if((HT_V5S[key]||new Set()).has(hk))return['shove'];if((HT_V5C[key]||new Set()).has(hk))return['call'];return['fold'];}
   if(s.type==='rfi_5bet') return(HT_FBC[`${s.hero}_${s.opp3bet}`]||new Set()).has(hk)?['call']:['fold'];
+  if(s.type==='multiway'){if((MW_SQUEEZE[s.key]||new Set()).has(hk))return['raise'];if((MW_CALL[s.key]||new Set()).has(hk))return['call'];return['fold'];}
   return['fold'];
 }
 
@@ -2456,6 +2508,7 @@ function htRenderButtons() {
   else if(type==='rfi_defense'){if(!(HT_DEF[`${htSc.hero}_${htSc.opp3bet}`]?.['call'].size>0))call.classList.add('hidden');}
   else if(type==='vsopen_4bet'){raise.classList.add('hidden');allin.classList.remove('hidden');}
   else if(type==='rfi_5bet'){raise.classList.add('hidden');}
+  else if(type==='multiway'){if(!((MW_CALL[htSc.key]||new Set()).size>0))call.classList.add('hidden');}
 }
 
 function htRenderTable() {
@@ -2463,11 +2516,18 @@ function htRenderTable() {
   sL.innerHTML='';cL.innerHTML='';com.innerHTML='';
   for(let i=0;i<5;i++) com.appendChild(htMakeBack());
   const{type,hero}=htSc, allPos=['UTG','HJ','CO','BTN','SB','BB'];
+  const displayedBets=htGetDisplayedBets(htSc);
   allPos.forEach(pos=>{
     const sp=HT_SEAT_POS[pos],isHero=pos===hero;
     // ── Determine SB and BB folded state per scenario ──
     let sbFolded=false, bbFolded=false;
-    if(type==='rfi'){
+    if(type==='multiway'){
+      const { opener, second } = htParseMWKey(htSc.key);
+      const involved=new Set([hero, opener, second]);
+      sbFolded=!involved.has('SB');
+      bbFolded=!involved.has('BB');
+      if(hero==='SB'&&!involved.has('BB')) bbFolded=false;
+    } else if(type==='rfi'){
       // SB/BB posted but haven't acted yet — neither is folded.
       sbFolded=false; bbFolded=false;
     } else if(type==='vsopen'||type==='vsopen_4bet'){
@@ -2495,6 +2555,7 @@ function htRenderTable() {
     else if(type==='rfi')                                        folded=!isHero;
     else if(type==='vsopen'||type==='vsopen_4bet')               folded=!isHero&&pos!==htSc.opener;
     else if(type==='rfi_defense'||type==='rfi_5bet')             folded=!isHero&&pos!==htSc.opp3bet;
+    else if(type==='multiway'){const { opener, second } = htParseMWKey(htSc.key); folded=!isHero&&pos!==opener&&pos!==second;}
 
     const seat=document.createElement('div');
     seat.className='ht-seat'+(folded?' ht-folded':'');
@@ -2512,7 +2573,8 @@ function htRenderTable() {
     seat.appendChild(pw);
     sL.appendChild(seat);
 
-    const cp=HT_CHIP_OFF[pos];let bet=null;
+    const cp=HT_CHIP_OFF[pos];
+    let bet=displayedBets[pos];
     // SB posts 0.5, BB posts 1 — always show blind chips unless that position
     // is the active bettor in this hand (their action chip replaces the blind).
     const activeBettors=new Set([hero]);
@@ -2539,7 +2601,8 @@ function htRenderTable() {
       if(pos===htSc.opp3bet) bet=100;
     }
 
-    if(bet!==null){
+    bet=displayedBets[pos];
+    if(bet!==undefined){
       const bc=document.createElement('div');bc.className='ht-bet-chip';
       bc.style.left=cp.x+'%';bc.style.top=cp.y+'%';
       const bi=document.createElement('img');bi.src='chip.png';bc.appendChild(bi);
@@ -2591,6 +2654,7 @@ function htShowResult(action,ok) {
   else if(s.type==='rfi_defense'){const k=`${s.hero}_${s.opp3bet}`;detail=HT_DEF[k]?.['4bet'].has(htHK)?`${htHK} 4-bets vs ${s.opp3bet}'s 3-bet.`:HT_DEF[k]?.['call'].has(htHK)?`${htHK} calls the ${s.opp3bet} 3-bet.`:`${htHK} folds vs ${s.opp3bet}'s 3-bet.`;}
   else if(s.type==='vsopen_4bet'){const k=`${s.hero}_${s.opener}`;detail=HT_V5S[k]?.has(htHK)?`${htHK} 5-bet shoves vs ${s.opener}'s 4-bet.`:HT_V5C[k]?.has(htHK)?`${htHK} calls ${s.opener}'s 4-bet.`:`${htHK} folds vs ${s.opener}'s 4-bet.`;}
   else if(s.type==='rfi_5bet'){const k=`${s.hero}_${s.opp3bet}`;detail=HT_FBC[k]?.has(htHK)?`${htHK} calls the all-in shove.`:`${htHK} folds vs the all-in shove.`;}
+  else if(s.type==='multiway'){const { opener, second } = htParseMWKey(s.key);detail=MW_SQUEEZE[s.key]?.has(htHK)?(s.mwType==='squeeze'?`${htHK} is a squeeze vs ${opener}'s open and ${second}'s call.`:`${htHK} is a 4-bet after ${opener} opened and ${second} re-raised.`):MW_CALL[s.key]?.has(htHK)?`${htHK} calls in the ${opener} + ${second} multi-way spot.`:`${htHK} folds in the ${opener} + ${second} multi-way spot.`;}
   document.getElementById('ht-result-detail').textContent=detail;
   const cv={fold:'fold',call:'call',raise:'raise',shove:'all-in'}[htCorrect[0]]||htCorrect[0];
   document.getElementById('ht-result-correct').innerHTML=ok?'':`Correct action: <strong>${cv}</strong>`;

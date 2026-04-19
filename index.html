@@ -246,6 +246,36 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .ht-stat-pill .sl { color:rgba(212,175,55,0.6); }
 .ht-back-btn { position:absolute; top:52px; left:1rem; background:none; border:1px solid rgba(255,255,255,0.15); color:rgba(245,240,232,0.5); font-family:'Bebas Neue',sans-serif; font-size:0.85rem; letter-spacing:0.06em; padding:0.3rem 0.8rem; border-radius:20px; cursor:pointer; transition:all 0.15s; z-index:10; }
 .ht-back-btn:hover { color:#f5f0e8; }
+#screen-postflop-trainer { flex-direction:column; background:#0a0f18; position:relative; overflow:hidden; }
+.pft-status { position:absolute; top:92px; left:50%; transform:translateX(-50%); z-index:12; min-width:220px; max-width:min(92vw, 520px); text-align:center; padding:0.55rem 1rem; border-radius:999px; background:rgba(15,25,35,0.88); border:1px solid rgba(255,255,255,0.12); font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; color:rgba(245,240,232,0.8); text-transform:uppercase; }
+.pft-status.error { color:#ff9e9e; border-color:rgba(232,80,112,0.5); }
+.pft-status.ready { color:rgba(245,240,232,0.72); }
+.pft-status.revealed { color:var(--gold); border-color:rgba(232,200,74,0.45); }
+.pft-debug { position:absolute; top:132px; left:50%; transform:translateX(-50%); z-index:12; max-width:min(92vw, 720px); padding:0.7rem 0.9rem; border-radius:12px; background:rgba(50,8,16,0.92); border:1px solid rgba(232,80,112,0.45); color:#ffb5c0; font-family:'DM Mono',monospace; font-size:0.68rem; line-height:1.45; white-space:pre-wrap; text-transform:none; display:none; }
+.pft-board-hidden { opacity:0; }
+.pft-board-deal .ht-card { animation:pftBoardDeal 0.3s ease both; }
+.pft-board-deal .ht-card:nth-child(1) { animation-delay:0ms; }
+.pft-board-deal .ht-card:nth-child(2) { animation-delay:90ms; }
+.pft-board-deal .ht-card:nth-child(3) { animation-delay:180ms; }
+.pft-board-deal .ht-card:nth-child(4) { animation-delay:270ms; }
+.pft-board-deal .ht-card:nth-child(5) { animation-delay:360ms; }
+.pft-frequency-list { display:flex; flex-direction:column; gap:0.65rem; margin:1.1rem 0 1.2rem; }
+.pft-frequency-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.85rem 1rem; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); font-family:'DM Mono',monospace; font-size:0.86rem; color:rgba(245,240,232,0.82); }
+.pft-frequency-row.best { background:rgba(82,201,122,0.16); border-color:rgba(82,201,122,0.5); color:#8ef2af; }
+.pft-frequency-row.chosen { box-shadow:inset 0 0 0 1px var(--gold); }
+.pft-frequency-label { letter-spacing:0.12em; text-transform:uppercase; }
+.pft-frequency-value { font-family:'Bebas Neue',sans-serif; font-size:1.35rem; letter-spacing:0.08em; }
+.pft-result-meta { font-size:0.84rem; color:rgba(245,240,232,0.6); line-height:1.55; }
+.pft-result-meta strong { color:var(--green); font-weight:600; }
+.pft-action-bar .ht-action-btn { white-space:normal; line-height:1.1; font-size:1.1rem; padding:0.8rem 0.65rem; }
+.pft-choice-note { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.08em; color:rgba(245,240,232,0.58); text-transform:uppercase; margin-top:-0.1rem; margin-bottom:0.9rem; }
+.pft-best-label { display:inline-block; margin-left:0.55rem; padding:0.12rem 0.45rem; border-radius:999px; background:rgba(82,201,122,0.22); color:#8ef2af; font-size:0.65rem; letter-spacing:0.08em; vertical-align:middle; }
+@keyframes pftBoardDeal { from { opacity:0; transform:translateY(16px) scale(0.92); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media(max-width:600px) {
+  .pft-status { top:86px; font-size:0.64rem; letter-spacing:0.08em; min-width:180px; padding:0.5rem 0.8rem; }
+  .pft-debug { top:124px; font-size:0.62rem; }
+  .pft-action-bar .ht-action-btn { font-size:0.92rem; }
+}
 </style>
 </head>
 <body>
@@ -279,6 +309,10 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     <button class="pos-btn" onclick="startHandTrainer()">
       <div class="home-mode-label">Hand Trainer</div>
       <img class="home-mode-icon" src="Hand Trainer symbol.png" alt="Hand Trainer">
+    </button>
+    <button class="pos-btn" onclick="startPostflopTrainer()">
+      <div class="home-mode-label">Postflop Trainer</div>
+      <img class="home-mode-icon" src="Pot.png" alt="Postflop Trainer">
     </button>
   </div>
 </div>
@@ -2863,6 +2897,651 @@ function htAddInfo(action,ok) {
   setTimeout(()=>{bar.scrollLeft=bar.scrollWidth;},50);
 }
 
+let pftCurrentSolution = null;
+let pftCurrentScenario = null;
+let pftCardCode1 = '', pftCardCode2 = '';
+let pftAnswered = false;
+let pftHandLoading = false;
+let pftIntroToken = 0;
+let pftIntroRunning = false;
+let pftVisualState = null;
+let pftStats = { correct: 0, wrong: 0 };
+let pftLastFetchMeta = null;
+const PFT_POS_LABELS = { utg:'UTG', hj:'HJ', co:'CO', btn:'BTN', sb:'SB', bb:'BB' };
+const PFT_POT_LABELS = { srp:'Single Raised Pot', '3bp':'3-Bet Pot', '4bp':'4-Bet Pot' };
+
+function pftNormalizeAction(action) {
+  const normalized = String(action || '').trim().toLowerCase();
+  if (!normalized) return 'fold';
+  if (normalized === 'bet' || normalized === 'jam' || normalized === 'allin' || normalized === 'all-in') return 'raise';
+  if (normalized.includes('raise')) return 'raise';
+  if (normalized.includes('call') || normalized === 'check') return 'call';
+  if (normalized.includes('fold')) return 'fold';
+  return normalized;
+}
+
+function pftActionLabel(action) {
+  return { fold: 'Fold', call: 'Call', raise: 'Raise' }[pftNormalizeAction(action)] || String(action || '').toUpperCase();
+}
+
+function pftFormatFreq(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '0%';
+  const pct = num <= 1 ? num * 100 : num;
+  const rounded = Math.round(pct * 10) / 10;
+  return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)}%`;
+}
+
+function pftFormatEv(ev) {
+  const num = Number(ev);
+  if (!Number.isFinite(num)) return 'EV unavailable';
+  const rounded = Math.round(num * 100) / 100;
+  return `EV ${rounded > 0 ? '+' : ''}${rounded.toFixed(2)}`;
+}
+
+function pftChunkHand(hand) {
+  return String(hand || '').match(/.{1,2}/g) || [];
+}
+
+function pftParseHand(hand) {
+  const parts = pftChunkHand(hand);
+  if (parts.length !== 2 || parts.some(part => part.length !== 2)) return null;
+  const [r1, s1] = parts[0].split('');
+  const [r2, s2] = parts[1].split('');
+  return [
+    { rank: r1.toUpperCase(), suit: s1.toLowerCase() },
+    { rank: r2.toUpperCase(), suit: s2.toLowerCase() }
+  ];
+}
+
+function pftParseBoard(board) {
+  const parts = pftChunkHand(board);
+  if (parts.length !== 3 || parts.some(part => part.length !== 2)) return null;
+  return parts.map(part => ({
+    rank: part[0].toUpperCase(),
+    suit: part[1].toLowerCase()
+  }));
+}
+
+function pftExactCardTokens(text) {
+  return [...String(text || '').matchAll(/([2-9TJQKA][cdhs])/ig)].map(match => match[1]);
+}
+
+function pftBuildCardsFromRanks(rankString) {
+  const suits = ['s','h','d','c','s'];
+  return rankString.split('').map((rank, index) => ({
+    rank: rank.toUpperCase(),
+    suit: suits[index % suits.length]
+  }));
+}
+
+function pftExtractBoardCards(spotName) {
+  const exact = pftExactCardTokens(spotName)
+    .slice(0, 5)
+    .map(token => ({ rank: token[0].toUpperCase(), suit: token[1].toLowerCase() }));
+  if (exact.length >= 3) return exact;
+
+  const boardMatch = String(spotName || '').match(/\b(?:flop|turn|river|board)[^2-9TJQKA]*([2-9TJQKA]{3,5})\b/i);
+  if (boardMatch) return pftBuildCardsFromRanks(boardMatch[1]).slice(0, 5);
+
+  const rankRun = [...String(spotName || '').matchAll(/\b([2-9TJQKA]{3,5})\b/ig)]
+    .map(match => match[1])
+    .find(token => token.length >= 3);
+  if (rankRun) return pftBuildCardsFromRanks(rankRun).slice(0, 5);
+
+  return [];
+}
+
+function pftExtractPositions(spotName) {
+  const seen = new Set();
+  const positions = [];
+  for (const match of String(spotName || '').matchAll(/\b(UTG|HJ|CO|BTN|SB|BB)\b/ig)) {
+    const pos = match[1].toUpperCase();
+    if (!seen.has(pos)) {
+      seen.add(pos);
+      positions.push(pos);
+    }
+  }
+  return positions;
+}
+
+function pftDetectScenarioKind(spotName) {
+  const text = String(spotName || '').toLowerCase();
+  if (/(4bet|4-bet|4bp)/.test(text)) return '4bet';
+  if (/(3bet|3-bet|3bp)/.test(text)) return '3bet';
+  return 'srp';
+}
+
+function pftParseScenarioText(spotName) {
+  const parts = String(spotName || '').toLowerCase().split('-').filter(Boolean);
+  const heroKey = parts[0] || 'btn';
+  const vsIndex = parts.indexOf('vs');
+  const villainKey = vsIndex >= 0 ? parts[vsIndex + 1] : 'bb';
+  const potKey = parts.find(part => PFT_POT_LABELS[part]) || 'srp';
+  const decisionType = String(spotName || '').toLowerCase().includes('hero_betting') ? 'hero_betting' : 'hero_facing_bet';
+  const heroPos = PFT_POS_LABELS[heroKey] || heroKey.toUpperCase();
+  const villainPos = PFT_POS_LABELS[villainKey] || villainKey.toUpperCase();
+  const potLabel = PFT_POT_LABELS[potKey] || potKey.toUpperCase();
+  const decisionLabel = decisionType === 'hero_betting' ? 'You are betting' : 'You are facing a bet';
+  return {
+    heroPos,
+    villainPos,
+    potKey,
+    decisionType,
+    displayText: `${heroPos} vs ${villainPos} - ${potLabel} - ${decisionLabel}`
+  };
+}
+
+function pftBuildScenario(row) {
+  const parsed = pftParseScenarioText(row.spot_name);
+  const positions = pftExtractPositions(row.spot_name);
+  const hero = parsed.heroPos || positions[0] || 'BTN';
+  const villain = parsed.villainPos || positions.find(pos => pos !== hero) || (hero === 'BTN' ? 'BB' : 'BTN');
+  const ordered = [hero, villain].sort((a, b) => HT_ACTION_ORDER.indexOf(a) - HT_ACTION_ORDER.indexOf(b));
+  const opener = ordered[0];
+  const caller = ordered[1];
+  const kind = pftDetectScenarioKind(row.spot_name);
+  const board = Array.isArray(row.board) ? row.board : pftExtractBoardCards(row.spot_name);
+  const threebettor = kind === '3bet' || kind === '4bet' ? caller : null;
+  const fourbettor = kind === '4bet' ? opener : null;
+  return {
+    hero,
+    villain,
+    opener,
+    caller,
+    threebettor,
+    fourbettor,
+    kind,
+    board,
+    decisionType: parsed.decisionType,
+    displayText: parsed.displayText,
+    streetLabel: parsed.decisionType === 'hero_betting' ? 'Decision: betting' : 'Decision: facing bet'
+  };
+}
+
+function pftShowDebugError(message) {
+  const el = document.getElementById('pft-debug');
+  if (!el) return;
+  if (!message) {
+    el.style.display = 'none';
+    el.textContent = '';
+    return;
+  }
+  el.style.display = 'block';
+  el.textContent = message;
+}
+
+async function pftFetchRandomSolution() {
+  if (!supabaseClient) throw new Error('Supabase client not initialised');
+  pftLastFetchMeta = null;
+
+  const { count, error: countError } = await supabaseClient
+    .from('hand_solutions')
+    .select('*', { count: 'exact', head: true });
+
+  if (countError) {
+    console.error('Supabase error:', countError);
+    throw new Error(`Supabase error: ${countError.message || JSON.stringify(countError)}${countError.details ? ` | ${countError.details}` : ''}${countError.code ? ` | code ${countError.code}` : ''}`);
+  }
+
+  if (!count || count < 1) {
+    throw new Error('Supabase error: hand_solutions returned a count of 0');
+  }
+
+  const randomOffset = Math.floor(Math.random() * count);
+  pftLastFetchMeta = { count, randomOffset };
+  const { data, error } = await supabaseClient
+    .from('hand_solutions')
+    .select('*')
+    .range(randomOffset, randomOffset);
+
+  if (error) {
+    console.error('Supabase error:', error);
+    throw new Error(`Supabase error: ${error.message || JSON.stringify(error)}${error.details ? ` | ${error.details}` : ''}${error.code ? ` | code ${error.code}` : ''}`);
+  }
+
+  const row = Array.isArray(data) ? data[0] : null;
+  if (!row) {
+    throw new Error(`Supabase error: no row returned at offset ${randomOffset}`);
+  }
+
+  return row;
+}
+
+async function pftFetchBoardForSpot(spotName) {
+  if (!supabaseClient) throw new Error('Supabase client not initialised');
+  console.log('querying spot_boards for:', spotName);
+  const { data, error } = await supabaseClient
+    .from('spot_boards')
+    .select('board')
+    .eq('spot_name', spotName)
+    .limit(1);
+
+  if (error) {
+    console.error('Supabase error:', error);
+    throw new Error(`Supabase error: ${error.message || JSON.stringify(error)}${error.details ? ` | ${error.details}` : ''}${error.code ? ` | code ${error.code}` : ''}`);
+  }
+
+  if (!Array.isArray(data) || data.length < 1 || !data[0] || !data[0].board) {
+    throw new Error(`Supabase error: no board found for spot ${spotName}`);
+  }
+
+  return data[0].board;
+}
+
+function pftSetStatus(message, tone='ready') {
+  const el = document.getElementById('pft-status');
+  if (!el) return;
+  el.textContent = message;
+  el.className = `pft-status ${tone}`.trim();
+}
+
+function pftUpdateStats() {
+  document.getElementById('pft-stat-correct').textContent = pftStats.correct;
+  document.getElementById('pft-stat-wrong').textContent = pftStats.wrong;
+  const total = pftStats.correct + pftStats.wrong;
+  document.getElementById('pft-stat-pct').textContent = total > 0 ? `${Math.round((pftStats.correct / total) * 100)}%` : '--';
+}
+
+function pftGetActionConfig() {
+  const betting = pftCurrentScenario && pftCurrentScenario.decisionType === 'hero_betting';
+  return betting
+    ? [
+        { key: 'fold', label: 'Check', freqKey: 'fold_freq' },
+        { key: 'call', label: 'Bet Small (33-75%)', freqKey: 'call_freq' },
+        { key: 'raise', label: 'Bet Large', freqKey: 'raise_freq' }
+      ]
+    : [
+        { key: 'fold', label: 'Fold', freqKey: 'fold_freq' },
+        { key: 'call', label: 'Call', freqKey: 'call_freq' },
+        { key: 'raise', label: 'Raise', freqKey: 'raise_freq' }
+      ];
+}
+
+function pftSetActionLegend(config) {
+  const legend = document.getElementById('pft-ib-actions');
+  if (!legend || !Array.isArray(config)) return;
+  legend.textContent = config.map(item => item.label).join(' / ');
+}
+
+function pftRenderActionButtons() {
+  const config = pftGetActionConfig();
+  const ids = ['pft-btn-fold', 'pft-btn-call', 'pft-btn-raise'];
+  pftSetActionLegend(config);
+  config.forEach((item, index) => {
+    const btn = document.getElementById(ids[index]);
+    if (!btn) return;
+    btn.textContent = item.label;
+    btn.dataset.action = item.key;
+  });
+}
+
+function pftParseCardCode(code) {
+  const value = String(code || '').trim();
+  if (value.length !== 2) return null;
+  return { rank: value[0].toUpperCase(), suit: value[1].toLowerCase() };
+}
+
+function pftMakeCardNode(code, small = false) {
+  const parsed = pftParseCardCode(code);
+  if (!parsed) return htMakeBack();
+  const fallback = small ? htMakeSmall(parsed) : htMakeCard(parsed);
+  const el = document.createElement('div');
+  el.className = fallback.className;
+  if (small) {
+    el.style.width = '38px';
+    el.style.height = '54px';
+  }
+  const img = document.createElement('img');
+  img.src = `${code}.png`;
+  img.alt = code;
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'cover';
+  img.onerror = () => el.replaceWith(fallback);
+  el.appendChild(img);
+  return el;
+}
+
+function pftSetActionBarVisible(isVisible) {
+  document.getElementById('pft-action-bar').classList.toggle('ht-hidden', !isVisible);
+}
+
+function pftSyncPotFromDisplayedChips() {
+  const pot = [...document.querySelectorAll('#pft-chips-layer .ht-chip-val')]
+    .reduce((sum, chip) => sum + (parseFloat(chip.textContent) || 0), 0);
+  document.getElementById('pft-pot-amount').textContent = String(pot);
+}
+
+function pftFindSeat(pos) {
+  return document.querySelector(`#pft-seats-layer .ht-seat[data-pos="${pos}"]`);
+}
+
+function pftFindChip(pos) {
+  return document.querySelector(`#pft-chips-layer .ht-bet-chip[data-pos="${pos}"]`);
+}
+
+function pftSetDisplayedBet(pos, amount) {
+  const chipsLayer = document.getElementById('pft-chips-layer');
+  let chip = pftFindChip(pos);
+  if (amount === undefined) {
+    if (chip) chip.remove();
+    pftSyncPotFromDisplayedChips();
+    return;
+  }
+  if (!chip) {
+    chip = document.createElement('div');
+    chip.className = 'ht-bet-chip';
+    chip.dataset.pos = pos;
+    chip.style.left = HT_CHIP_OFF[pos].x + '%';
+    chip.style.top = HT_CHIP_OFF[pos].y + '%';
+    const img = document.createElement('img');
+    img.src = 'chip.png';
+    chip.appendChild(img);
+    const val = document.createElement('div');
+    val.className = 'ht-chip-val';
+    chip.appendChild(val);
+    chipsLayer.appendChild(chip);
+  }
+  chip.querySelector('.ht-chip-val').textContent = amount;
+  pftSyncPotFromDisplayedChips();
+}
+
+function pftGetInitialVisualState() {
+  return { bets: { SB: 0.5, BB: 1 }, folded: new Set() };
+}
+
+function pftGetActionSequence(sc) {
+  const actions = [];
+  const openAmount = HT_RFI_OPEN[sc.opener] || 2.5;
+  const threeBetAmount = sc.threebettor ? (htGet3BetSize(sc.threebettor, sc.opener) || 8) : null;
+  const push = (pos, action, amount) => actions.push({ pos, action, amount });
+  const openerIdx = HT_ACTION_ORDER.indexOf(sc.opener);
+  const callerIdx = HT_ACTION_ORDER.indexOf(sc.caller);
+
+  if (sc.kind === 'srp') {
+    for (let i = 0; i < callerIdx; i++) {
+      const pos = HT_ACTION_ORDER[i];
+      if (pos === sc.opener) push(pos, 'raise', openAmount);
+      else push(pos, 'fold');
+    }
+    if (sc.caller !== sc.opener) push(sc.caller, 'call', openAmount);
+    for (let i = callerIdx + 1; i < HT_ACTION_ORDER.length; i++) {
+      push(HT_ACTION_ORDER[i], 'fold');
+    }
+    return actions;
+  }
+
+  for (let i = 0; i < HT_ACTION_ORDER.length; i++) {
+    const pos = HT_ACTION_ORDER[i];
+    if (i < openerIdx) push(pos, 'fold');
+    else if (pos === sc.opener) push(pos, 'raise', openAmount);
+    else if (pos === sc.threebettor) push(pos, 'raise', threeBetAmount);
+    else if (i < HT_ACTION_ORDER.indexOf(sc.threebettor)) push(pos, 'fold');
+    else if (i > HT_ACTION_ORDER.indexOf(sc.threebettor)) push(pos, 'fold');
+  }
+
+  if (sc.kind === '3bet') {
+    push(sc.opener, 'call', threeBetAmount);
+  } else if (sc.kind === '4bet') {
+    const fourBetAmount = HT_VO_4BET[`${sc.threebettor}_${sc.opener}`] || HT_VO_4BET[`${sc.opener}_${sc.threebettor}`] || 22;
+    push(sc.opener, 'raise', fourBetAmount);
+    push(sc.threebettor, 'call', fourBetAmount);
+  }
+
+  return actions;
+}
+
+function pftRenderBoard(cards, hidden = false) {
+  const community = document.getElementById('pft-community');
+  community.innerHTML = '';
+  community.className = `ht-community${hidden ? ' pft-board-hidden' : ''}`;
+  cards.forEach(card => {
+    const code = `${card.rank}${card.suit}`;
+    community.appendChild(pftMakeCardNode(code));
+  });
+}
+
+function pftRenderTable() {
+  const seatsLayer = document.getElementById('pft-seats-layer');
+  const chipsLayer = document.getElementById('pft-chips-layer');
+  const visualState = pftVisualState || pftGetInitialVisualState();
+  seatsLayer.innerHTML = '';
+  chipsLayer.innerHTML = '';
+  pftRenderBoard(pftCurrentScenario.board, true);
+
+  HT_ACTION_ORDER.forEach(pos => {
+    const seat = document.createElement('div');
+    seat.className = 'ht-seat' + (visualState.folded.has(pos) ? ' ht-folded' : '');
+    seat.dataset.pos = pos;
+    seat.style.left = HT_SEAT_POS[pos].x + '%';
+    seat.style.top = HT_SEAT_POS[pos].y + '%';
+
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'ht-seat-cards ' + (pos === pftCurrentScenario.hero ? 'ht-hero-cards ' : '') + HT_CARD_DIR[pos];
+    if (pos === pftCurrentScenario.hero) {
+      cardsWrap.appendChild(pftMakeCardNode(pftCardCode1));
+      cardsWrap.appendChild(pftMakeCardNode(pftCardCode2));
+    } else {
+      cardsWrap.appendChild(htMakeBack());
+      cardsWrap.appendChild(htMakeBack());
+    }
+    seat.appendChild(cardsWrap);
+
+    const chip = document.createElement('div');
+    chip.className = 'ht-pos-chip' + (pos === pftCurrentScenario.hero ? ' ht-hero' : '');
+    const chipImg = document.createElement('img');
+    chipImg.src = 'positionlabel.png';
+    chip.appendChild(chipImg);
+    const label = document.createElement('div');
+    label.className = 'ht-pos-chip-label';
+    label.textContent = pos;
+    chip.appendChild(label);
+    seat.appendChild(chip);
+    seatsLayer.appendChild(seat);
+
+    if (visualState.bets[pos] !== undefined) pftSetDisplayedBet(pos, visualState.bets[pos]);
+  });
+
+  pftSyncPotFromDisplayedChips();
+}
+
+async function pftAnimateBetAction(action, token) {
+  const wrap = document.getElementById('pft-table-wrap');
+  const flying = document.createElement('div');
+  flying.className = 'ht-flying-chip';
+  flying.style.left = HT_SEAT_POS[action.pos].x + '%';
+  flying.style.top = HT_SEAT_POS[action.pos].y + '%';
+  const img = document.createElement('img');
+  img.src = 'chip.png';
+  flying.appendChild(img);
+  const val = document.createElement('div');
+  val.className = 'ht-chip-val';
+  val.textContent = action.amount;
+  flying.appendChild(val);
+  wrap.appendChild(flying);
+  void flying.offsetWidth;
+  flying.style.opacity = '1';
+  flying.style.left = HT_CHIP_OFF[action.pos].x + '%';
+  flying.style.top = HT_CHIP_OFF[action.pos].y + '%';
+  flying.style.transform = 'translate(-50%,-50%) scale(1)';
+  await htWait(HT_INTRO_STEP_MS);
+  if (token !== pftIntroToken) { flying.remove(); return; }
+  pftVisualState.bets[action.pos] = action.amount;
+  pftSetDisplayedBet(action.pos, action.amount);
+  flying.style.opacity = '0';
+  await htWait(80);
+  flying.remove();
+}
+
+async function pftAnimateFoldAction(action, token) {
+  const seat = pftFindSeat(action.pos);
+  if (!seat) return;
+  pftVisualState.folded.add(action.pos);
+  seat.classList.add('ht-folded');
+  await htWait(HT_INTRO_STEP_MS);
+  if (token !== pftIntroToken) return;
+}
+
+async function pftRevealBoard(token) {
+  const community = document.getElementById('pft-community');
+  community.className = 'ht-community pft-board-deal';
+  await htWait(520);
+  if (token !== pftIntroToken) return;
+  community.className = 'ht-community';
+  document.getElementById('pft-ib-stage').textContent = pftCurrentScenario.streetLabel.toUpperCase();
+  pftSetStatus(pftCurrentScenario.displayText, 'revealed');
+}
+
+async function pftPlayIntro(token) {
+  const actions = pftGetActionSequence(pftCurrentScenario);
+  pftIntroRunning = true;
+  await htWait(HT_INTRO_START_DELAY_MS);
+  if (token !== pftIntroToken) return;
+  for (const action of actions) {
+    if (token !== pftIntroToken) return;
+    if (action.action === 'fold') await pftAnimateFoldAction(action, token);
+    else await pftAnimateBetAction(action, token);
+    if (token !== pftIntroToken) return;
+    await htWait(HT_INTRO_GAP_MS);
+  }
+  if (token !== pftIntroToken) return;
+  pftRenderBoard(pftCurrentScenario.board, false);
+  await pftRevealBoard(token);
+  if (token !== pftIntroToken) return;
+  pftIntroRunning = false;
+  pftSetActionBarVisible(true);
+}
+
+function pftAddInfo(action, ok) {
+  const bar = document.getElementById('pft-info-bar');
+  const seg = document.createElement('div');
+  const normalized = pftNormalizeAction(action);
+  const labelByKey = Object.fromEntries(pftGetActionConfig().map(item => [item.key, item.label]));
+  const cls = { fold: 'ht-fold', call: 'ht-call', raise: 'ht-raise' }[normalized] || 'ht-raise';
+  seg.className = `ht-info-seg ${cls}`;
+  seg.innerHTML = `<span class="value">${pftCurrentSolution.hand} ${ok ? 'OK' : 'X'} ${(labelByKey[normalized] || pftActionLabel(normalized)).toUpperCase()}</span>`;
+  bar.appendChild(seg);
+  setTimeout(() => { bar.scrollLeft = bar.scrollWidth; }, 50);
+}
+
+function pftShowResult(action, ok) {
+  const bestAction = pftNormalizeAction(pftCurrentSolution.best_action);
+  const actionConfig = pftGetActionConfig();
+  const labelByKey = Object.fromEntries(actionConfig.map(item => [item.key, item.label]));
+  document.getElementById('pft-result-icon').textContent = ok ? 'OK' : 'NO';
+  const verdict = document.getElementById('pft-result-verdict');
+  verdict.textContent = ok ? 'CORRECT' : 'INCORRECT';
+  verdict.className = `ht-result-verdict ${ok ? 'correct' : 'wrong'}`;
+
+  const actionEl = document.getElementById('pft-result-action');
+  actionEl.textContent = `You chose ${labelByKey[action] || pftActionLabel(action)}`;
+  actionEl.className = `ht-result-action ${pftNormalizeAction(action)}`;
+
+  const handEl = document.getElementById('pft-result-hand');
+  handEl.innerHTML = '';
+  handEl.appendChild(pftMakeCardNode(pftCardCode1, true));
+  handEl.appendChild(pftMakeCardNode(pftCardCode2, true));
+
+  document.getElementById('pft-result-detail').textContent = `${pftCurrentScenario.displayText} - ${pftFormatEv(pftCurrentSolution.ev)}`;
+  document.getElementById('pft-result-correct').innerHTML = ok
+    ? `<strong>Correct.</strong> ${labelByKey[bestAction] || pftActionLabel(bestAction)} was best.`
+    : `<strong>Incorrect.</strong> Best action: <strong>${labelByKey[bestAction] || pftActionLabel(bestAction)}</strong>`;
+
+  const frequencies = actionConfig.map(item => ({
+    key: item.key,
+    label: item.label,
+    value: pftCurrentSolution[item.freqKey]
+  }));
+  const list = document.getElementById('pft-result-frequencies');
+  list.innerHTML = '';
+  frequencies.forEach(freq => {
+    const normalized = pftNormalizeAction(freq.key);
+    const row = document.createElement('div');
+    row.className = `pft-frequency-row${normalized === bestAction ? ' best' : ''}${normalized === pftNormalizeAction(action) ? ' chosen' : ''}`;
+    row.innerHTML = `
+      <span class="pft-frequency-label">${freq.label}</span>
+      <span class="pft-frequency-value">${pftFormatFreq(freq.value)}${normalized === bestAction ? '<span class="pft-best-label">BEST</span>' : ''}</span>
+    `;
+    list.appendChild(row);
+  });
+
+  document.getElementById('pft-result-meta').innerHTML = `<strong>${ok ? 'Correct.' : 'Incorrect.'}</strong> Green highlight marks the solver's best action.`;
+  document.getElementById('pft-result-overlay').classList.add('show');
+}
+
+async function startPostflopTrainer() {
+  pftStats = { correct: 0, wrong: 0 };
+  pftUpdateStats();
+  pftIntroToken++;
+  showScreen('screen-postflop-trainer');
+  pftShowDebugError('');
+  await pftNextHand();
+}
+
+async function pftNextHand() {
+  pftIntroToken++;
+  const token = pftIntroToken;
+  let solution = null;
+  pftAnswered = false;
+  pftHandLoading = true;
+  pftIntroRunning = false;
+  pftVisualState = pftGetInitialVisualState();
+  document.getElementById('pft-result-overlay').classList.remove('show');
+  document.getElementById('pft-ib-stage').textContent = 'BUILDING PREFLOP';
+  pftSetStatus('Loading random hand...', 'ready');
+  pftShowDebugError('');
+  pftSetActionBarVisible(false);
+  document.getElementById('pft-community').innerHTML = '';
+  document.getElementById('pft-chips-layer').innerHTML = '';
+  document.getElementById('pft-seats-layer').innerHTML = '';
+
+  try {
+    solution = await pftFetchRandomSolution();
+    console.log('spot_name from hand_solutions:', solution.spot_name);
+    const boardCode = await pftFetchBoardForSpot(solution.spot_name);
+
+    const cards = pftParseHand(solution.hand);
+    if (!cards) throw new Error(`Invalid hand value: ${solution.hand}`);
+    const boardCards = pftParseBoard(boardCode);
+    if (!boardCards) throw new Error(`Invalid board value: ${boardCode}`);
+
+    pftCurrentSolution = solution;
+    pftCurrentScenario = pftBuildScenario({ ...solution, board: boardCards });
+    [pftCardCode1, pftCardCode2] = pftChunkHand(solution.hand);
+    pftRenderActionButtons();
+    pftRenderTable();
+    pftSetStatus(pftCurrentScenario.displayText, 'ready');
+    pftHandLoading = false;
+    void pftPlayIntro(token);
+  } catch (error) {
+    console.error('Failed to load postflop hand:', error);
+    pftCurrentSolution = null;
+    pftCurrentScenario = null;
+    pftHandLoading = false;
+    pftSetStatus('Unable to load a postflop hand', 'error');
+    const details = error && error.message ? error.message : String(error);
+    const meta = pftLastFetchMeta
+      ? `count=${pftLastFetchMeta.count}, offset=${pftLastFetchMeta.randomOffset}`
+      : 'count/offset unavailable';
+    const spotMeta = solution && solution.spot_name ? `spot_name=${solution.spot_name}` : '';
+    pftShowDebugError(`${details}\n${meta}${spotMeta ? `\n${spotMeta}` : ''}`);
+    document.getElementById('pft-ib-stage').textContent = 'ERROR';
+  }
+}
+
+function pftAction(action) {
+  if (pftAnswered || pftHandLoading || pftIntroRunning || !pftCurrentSolution) return;
+  pftAnswered = true;
+  const normalized = pftNormalizeAction(action);
+  const ok = normalized === pftNormalizeAction(pftCurrentSolution.best_action);
+  if (ok) pftStats.correct++;
+  else pftStats.wrong++;
+  pftUpdateStats();
+  pftAddInfo(normalized, ok);
+  pftShowResult(normalized, ok);
+}
+
 </script>
 <!-- ══════════════════════════════════════ HAND TRAINER SCREEN ══════════════════════════════════════ -->
 <div id="screen-trainer" class="screen">
@@ -2910,6 +3589,59 @@ function htAddInfo(action,ok) {
     <div class="ht-result-detail" id="ht-result-detail"></div>
     <div class="ht-result-correct" id="ht-result-correct"></div>
     <button class="ht-result-next" onclick="htNextHand()">Next Hand →</button>
+  </div>
+</div>
+
+<!-- POSTFLOP TRAINER SCREEN -->
+<div id="screen-postflop-trainer" class="screen">
+  <div class="ht-info-bar" id="pft-info-bar">
+    <div class="ht-info-seg"><span class="value">POSTFLOP TRAINER</span></div>
+    <div class="ht-info-seg"><span class="value" id="pft-ib-stage">BUILDING PREFLOP</span></div>
+    <div class="ht-info-seg"><span class="value">Solver Frequencies</span></div>
+    <div class="ht-info-seg"><span class="value" id="pft-ib-actions">Fold / Call / Raise</span></div>
+  </div>
+  <button class="ht-back-btn" onclick="showScreen('screen-home')">&larr; Menu</button>
+  <div class="ht-stats">
+    <div class="ht-stat-pill"><span class="sl">OK</span><span id="pft-stat-correct">0</span></div>
+    <div class="ht-stat-pill"><span class="sl">NO</span><span id="pft-stat-wrong">0</span></div>
+    <div class="ht-stat-pill"><span class="sl">%</span><span id="pft-stat-pct">--</span></div>
+  </div>
+  <div class="pft-status ready" id="pft-status">Loading random hand...</div>
+  <div class="pft-debug" id="pft-debug"></div>
+  <div class="ht-table-area">
+    <div class="ht-table-wrap" id="pft-table-wrap">
+      <img src="Board.png" alt="" class="ht-table-bg">
+      <div class="ht-community" id="pft-community"></div>
+      <div class="ht-pot-display">
+        <div class="ht-pot-img-wrap">
+          <img src="Pot.png" alt="">
+          <div class="ht-pot-overlay"><span class="ht-pot-amount" id="pft-pot-amount">1.5</span></div>
+        </div>
+      </div>
+      <div id="pft-seats-layer"></div>
+      <div id="pft-chips-layer"></div>
+    </div>
+  </div>
+  <div class="pft-choice-note">Choose the best GTO action</div>
+  <div class="ht-action-bar ht-hidden pft-action-bar" id="pft-action-bar">
+    <button class="ht-action-btn ht-btn-fold" id="pft-btn-fold" onclick="pftAction('fold')">FOLD</button>
+    <button class="ht-action-btn ht-btn-call" id="pft-btn-call" onclick="pftAction('call')">CALL</button>
+    <button class="ht-action-btn ht-btn-raise" id="pft-btn-raise" onclick="pftAction('raise')">RAISE</button>
+  </div>
+</div>
+
+<!-- POSTFLOP TRAINER RESULT OVERLAY -->
+<div class="ht-result-overlay" id="pft-result-overlay">
+  <div class="ht-result-card">
+    <div class="ht-result-icon" id="pft-result-icon">OK</div>
+    <div class="ht-result-verdict" id="pft-result-verdict">CORRECT</div>
+    <div class="ht-result-action" id="pft-result-action"></div>
+    <div class="ht-result-hand" id="pft-result-hand"></div>
+    <div class="ht-result-detail" id="pft-result-detail"></div>
+    <div class="pft-frequency-list" id="pft-result-frequencies"></div>
+    <div class="pft-result-meta" id="pft-result-meta"></div>
+    <div class="ht-result-correct" id="pft-result-correct"></div>
+    <button class="ht-result-next" onclick="pftNextHand()">Next Hand &rarr;</button>
   </div>
 </div>
 

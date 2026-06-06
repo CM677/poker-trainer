@@ -44,9 +44,22 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .position-grid .pos-btn { flex:0 0 calc(20% - 0.85rem); min-width:150px; max-width:220px; }
 .path-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; max-width:840px; }
 .path-grid .pos-btn { flex:0 0 calc(33.33% - 1rem); min-width:180px; max-width:260px; }
+#screen-home .path-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); width:100%; max-width:1120px; }
+#screen-home .path-grid .pos-btn { width:100%; min-width:0; max-width:none; }
 .pos-btn { background:var(--surface); border:1px solid var(--border2); border-radius:14px; padding:1.6rem 1rem; cursor:pointer; transition:all 0.2s ease; text-align:center; position:relative; overflow:hidden; }
 .home-mode-label { font-family:'DM Mono',monospace; font-size:0.8rem; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:0.9rem; }
 .home-mode-icon { display:block; width:min(112px, 48vw); height:auto; margin:0 auto; }
+.home-brain-icon { display:flex; align-items:center; justify-content:center; width:min(132px, 56vw); height:min(190px, 82vw); margin:0 auto; }
+.home-brain-icon img { width:auto; height:100%; max-width:100%; display:block; object-fit:contain; filter:drop-shadow(0 10px 18px rgba(184,137,0,0.22)); }
+.home-card-fan { display:flex; align-items:center; justify-content:center; width:min(1040px, 94vw); margin:0 auto; padding:0.25rem 0 0; gap:clamp(1rem, 3vw, 2.3rem); }
+.home-fan-card { appearance:none; -webkit-appearance:none; border:0; background:transparent; padding:0; margin:0; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; transform:none; transition:transform 0.2s ease, filter 0.2s ease; }
+.home-fan-card:hover { transform:translateY(-6px) scale(1.03); filter:brightness(1.06); }
+.home-fan-title { font-family:'DM Mono',monospace; font-size:clamp(0.72rem, 1.3vw, 0.95rem); font-weight:800; letter-spacing:0.16em; text-transform:uppercase; margin-bottom:0.72rem; white-space:nowrap; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; text-shadow:none; }
+.range-title { background:linear-gradient(to bottom,#d7ff45,#64b800); }
+.preflop-title { background:linear-gradient(to bottom,#ffe680,#b87500); }
+.postflop-title { background:linear-gradient(to bottom,#ffb347,#d35400); }
+.thought-title { background:linear-gradient(to bottom,#ff5555,#a40000); }
+.home-fan-card img { height:clamp(150px, 22vw, 280px); width:auto; max-width:22vw; display:block; object-fit:contain; filter:drop-shadow(0 14px 24px rgba(0,0,0,0.36)); pointer-events:none; }
 .pos-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--gold-dim),transparent); opacity:0; transition:opacity 0.2s; }
 .pos-btn:hover::before { opacity:1; }
 .pos-btn:hover { border-color:var(--gold); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.4),0 0 0 1px var(--gold); }
@@ -225,6 +238,11 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .ht-btn-raise { background:#d4a017; color:#1a1000; box-shadow:0 3px 10px rgba(212,160,23,0.4); }
 .ht-btn-allin { background:#e91e8c; color:#fff; box-shadow:0 3px 10px rgba(233,30,140,0.4); }
 .ht-action-btn.hidden { display:none; }
+#screen-trainer .ht-action-btn { font-size:1.42rem; text-shadow:0 2px 5px rgba(0,0,0,0.36); }
+#screen-trainer .ht-btn-fold { background:linear-gradient(180deg,#d93636,#5d0f17); color:#fff; box-shadow:0 5px 16px rgba(180,28,40,0.34); }
+#screen-trainer .ht-btn-call { background:linear-gradient(180deg,#347fc7,#123d78); color:#fff; box-shadow:0 5px 16px rgba(24,91,160,0.34); }
+#screen-trainer .ht-btn-raise { background:linear-gradient(180deg,#ffbc3e,#b87500); color:#1a1000; box-shadow:0 5px 16px rgba(216,142,0,0.34); }
+#screen-trainer .ht-btn-allin { background:linear-gradient(180deg,#ff4fb7,#b91479 56%,#6f0b4d); color:#fff; box-shadow:0 5px 16px rgba(214,28,137,0.38); }
 .ht-result-overlay { position:fixed; inset:0; background:transparent; display:block; z-index:200; opacity:1; pointer-events:none; }
 .ht-result-overlay.show { pointer-events:none; }
 .ht-result-card { position:absolute; top:0; bottom:0; left:0; width:min(420px, 92vw); max-width:420px; overflow-y:auto; background:#2d2f3a; border:none; border-radius:0; padding:1.35rem 1.5rem 1.5rem; text-align:left; box-shadow:18px 0 48px rgba(0,0,0,0.45); transform:translateX(-100%); transition:transform 0.26s ease; pointer-events:auto; }
@@ -249,7 +267,9 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .ht-back-btn { position:absolute; top:52px; left:1rem; background:none; border:1px solid rgba(255,255,255,0.15); color:rgba(245,240,232,0.5); font-family:'Bebas Neue',sans-serif; font-size:0.85rem; letter-spacing:0.06em; padding:0.3rem 0.8rem; border-radius:20px; cursor:pointer; transition:all 0.15s; z-index:10; }
 .ht-back-btn:hover { color:#f5f0e8; }
 #screen-postflop-trainer { flex-direction:column; background:#0a0f18; position:relative; overflow:hidden; }
-.pft-status { position:absolute; top:92px; left:50%; transform:translateX(-50%); z-index:12; min-width:220px; max-width:min(92vw, 520px); text-align:center; padding:0.55rem 1rem; border-radius:999px; background:rgba(15,25,35,0.88); border:1px solid rgba(255,255,255,0.12); font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; color:rgba(245,240,232,0.8); text-transform:uppercase; display:none; }
+#screen-thought-process-v2 { flex-direction:column; background:#0a0f18; position:relative; overflow:hidden; }
+.pft-status { position:absolute; top:92px; left:50%; transform:translateX(-50%); z-index:12; min-width:220px; max-width:min(92vw, 520px); text-align:center; padding:0.55rem 1rem; border-radius:999px; background:rgba(15,25,35,0.88); border:1px solid rgba(255,255,255,0.12); font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; color:rgba(245,240,232,0.8); text-transform:uppercase; }
+#screen-thought-process-v2 .pft-status { display:none !important; }
 .pft-status.error { color:#ff9e9e; border-color:rgba(232,80,112,0.5); }
 .pft-status.ready { color:rgba(245,240,232,0.72); }
 .pft-status.revealed { color:var(--gold); border-color:rgba(232,200,74,0.45); }
@@ -262,11 +282,60 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .pft-board-deal .ht-card:nth-child(4) { animation-delay:270ms; }
 .pft-board-deal .ht-card:nth-child(5) { animation-delay:360ms; }
 #pft-result-overlay .ht-result-card { background:linear-gradient(180deg,#000000 0%, #1B1B21 100%); overflow:hidden; }
+#tpv2-result-overlay .ht-result-card { background:linear-gradient(180deg,#000000 0%, #1B1B21 100%); overflow-y:auto; }
+#ht-result-overlay .ht-result-card { background:linear-gradient(180deg,#000000 0%, #1B1B21 100%); overflow-y:auto; }
 #pft-result-overlay .ht-result-card::after { content:none; display:none; }
+#tpv2-result-overlay .ht-result-card::after { content:none; display:none; }
+#ht-result-overlay .ht-result-card::after { content:none; display:none; }
 #pft-result-overlay .ht-result-next { background:linear-gradient(180deg,#B89900,#EEBB00); font-size:2.15rem; }
+#tpv2-result-overlay .ht-result-next { background:linear-gradient(180deg,#B89900,#EEBB00); font-size:1.85rem; padding:0.72rem 1rem; min-height:58px; }
 #pft-result-overlay .ht-result-next .pft-button-text { color:#000000; -webkit-text-fill-color:#000000; }
+#tpv2-result-overlay .ht-result-next .pft-button-text { color:#000000; -webkit-text-fill-color:#000000; }
+#ht-result-overlay .ht-result-next { background:linear-gradient(180deg,#B89900,#EEBB00); font-size:1.85rem; padding:0.72rem 1rem; min-height:58px; }
+#ht-result-overlay .ht-result-next .pft-button-text { color:#000000; -webkit-text-fill-color:#000000; }
+#ht-result-overlay .ht-result-detail,#ht-result-overlay .ht-result-correct { display:block; color:rgba(245,240,232,0.68); font-family:'DM Mono',monospace; font-size:0.82rem; line-height:1.55; margin:1rem 0 0; }
+#ht-result-overlay .ht-result-correct strong { color:#d4af37; }
+.ht-preflop-result-summary { margin:1rem 0 0.35rem; padding:0.95rem 0.8rem; border-radius:10px; background:linear-gradient(180deg,#20212b,#111218); text-align:center; border:1px solid rgba(218,216,224,0.12); }
+.ht-panel-verdict { font-family:'Bebas Neue',sans-serif; font-size:2.55rem; letter-spacing:0.08em; line-height:1; }
+.ht-panel-verdict.correct { background:linear-gradient(180deg,#b8ffcf,#1db954); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.ht-panel-verdict.wrong { background:linear-gradient(180deg,#ff9aa5,#c51f35); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.ht-panel-streak { margin-top:0.35rem; font-family:'DM Mono',monospace; font-size:0.78rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(218,216,224,0.75); }
+.ht-best-streak { margin:0 auto 0.45rem; padding:0.28rem 0.72rem; width:max-content; border-radius:999px; background:rgba(0,0,0,0.42); border:1px solid rgba(212,175,55,0.28); color:#d4af37; font-family:'DM Mono',monospace; font-size:0.82rem; font-weight:800; letter-spacing:0.13em; text-transform:uppercase; box-shadow:0 6px 18px rgba(0,0,0,0.25); }
+.preflop-range-grid { display:grid; grid-template-columns:repeat(13, minmax(0, 1fr)); gap:2px; width:min(360px, 92vw); margin:0.18rem auto 0.5rem; padding:0.45rem; border-radius:10px; background:linear-gradient(180deg,rgba(12,14,20,0.94),rgba(0,0,0,0.92)); border:1px solid rgba(218,216,224,0.1); box-shadow:0 10px 28px rgba(0,0,0,0.35); }
+#ht-result-overlay .preflop-range-grid { width:100%; max-width:330px; margin:1rem auto 0.35rem; padding:0.35rem; gap:1px; box-shadow:0 8px 20px rgba(0,0,0,0.32); }
+.preflop-range-grid.hidden { display:none; }
+.preflop-range-cell { aspect-ratio:1; min-width:0; border-radius:4px; display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:clamp(0.48rem, 1.06vw, 0.66rem); font-weight:800; letter-spacing:-0.03em; color:rgba(245,240,232,0.78); border:1px solid rgba(255,255,255,0.05); background:#030305; box-shadow:inset 0 0 0 1px rgba(0,0,0,0.45); }
+#ht-result-overlay .preflop-range-cell { border-radius:3px; font-size:clamp(0.42rem, 1.55vw, 0.58rem); }
+.preflop-range-cell.raise { background:linear-gradient(180deg,#f0c94a,#9b6f05); color:#120c00; border-color:rgba(240,201,74,0.42); }
+.preflop-range-cell.call { background:linear-gradient(180deg,#3b9be8,#0c4d99); color:#ffffff; border-color:rgba(83,174,255,0.42); }
+.preflop-range-cell.allin { background:linear-gradient(180deg,#ff53bd,#9e0b6f); color:#ffffff; border-color:rgba(255,112,205,0.44); }
+.preflop-range-cell.fold { background:linear-gradient(180deg,#07080b,#000000); color:rgba(245,240,232,0.3); border-color:rgba(255,255,255,0.04); }
+.preflop-range-cell.current-hand { outline:2px solid rgba(255,255,255,0.94); outline-offset:1px; z-index:1; }
+.preflop-trainer-content { width:100%; display:flex; flex-direction:column; min-height:0; flex:1; transition:filter 0.18s ease, opacity 0.18s ease; }
+#screen-trainer.filter-open .preflop-trainer-content { filter:blur(5px); pointer-events:none; user-select:none; }
+.ht-change-filters { align-self:center; margin:0.55rem auto 0.25rem; padding:0.36rem 0.9rem 0.32rem; border-radius:999px; border:1px solid rgba(212,175,55,0.34); background:linear-gradient(180deg,rgba(55,45,16,0.92),rgba(15,13,8,0.9)); color:#d4af37; font-family:'DM Mono',monospace; font-size:0.78rem; font-weight:800; letter-spacing:0.13em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,0.28); z-index:12; }
+.ht-change-filters:hover { filter:brightness(1.12); }
+.ht-filter-panel { display:none; width:min(1040px, 94vw); padding:0.95rem 1rem; border-radius:14px; background:linear-gradient(180deg,rgba(24,27,36,0.98),rgba(10,12,18,0.97)); border:1px solid rgba(218,216,224,0.16); box-shadow:0 22px 60px rgba(0,0,0,0.58),0 0 28px rgba(212,175,55,0.08); gap:0.55rem; }
+#screen-trainer.filter-open .ht-filter-panel { display:grid; position:absolute; left:50%; z-index:80; }
+#screen-trainer.filter-initial .ht-filter-panel { top:50%; transform:translate(-50%,-50%); }
+#screen-trainer.filter-change .ht-filter-panel { top:92px; transform:translateX(-50%); }
+.ht-filter-title { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0 0.15rem 0.2rem; font-family:'Bebas Neue',sans-serif; font-size:1.38rem; letter-spacing:0.09em; color:#d4af37; text-transform:uppercase; }
+.ht-filter-subtitle { font-family:'DM Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; color:rgba(245,240,232,0.58); text-transform:uppercase; }
+.ht-filter-row { display:grid; grid-template-columns:126px 1fr; gap:0.7rem; align-items:center; }
+.ht-filter-label { font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.13em; text-transform:uppercase; color:rgba(245,240,232,0.58); }
+.ht-filter-options { display:flex; flex-wrap:wrap; gap:0.42rem; }
+.ht-filter-cell { appearance:none; -webkit-appearance:none; border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:0.34rem 0.72rem 0.3rem; min-width:76px; font-family:'Bebas Neue',sans-serif; font-size:0.98rem; letter-spacing:0.08em; text-transform:uppercase; color:#f5f0e8; cursor:pointer; transition:transform 0.14s ease, filter 0.14s ease, border-color 0.14s ease; }
+.ht-filter-cell.enabled { background:linear-gradient(180deg,#1f9f46,#0d4f28); border-color:rgba(93,255,144,0.46); box-shadow:0 5px 14px rgba(19,173,63,0.2); }
+.ht-filter-cell.disabled { background:linear-gradient(180deg,#aa2936,#4a1219); border-color:rgba(255,118,132,0.42); box-shadow:0 5px 14px rgba(170,41,54,0.2); }
+.ht-filter-cell:hover { transform:translateY(-1px); filter:brightness(1.08); }
+.ht-filter-actions { display:flex; justify-content:flex-end; padding-top:0.25rem; }
+.ht-filter-apply { border:0; border-radius:9px; padding:0.58rem 1.1rem 0.52rem; background:linear-gradient(180deg,#d4af37,#8e6a10); color:#080808; font-family:'Bebas Neue',sans-serif; font-size:1.25rem; letter-spacing:0.1em; cursor:pointer; box-shadow:0 8px 22px rgba(212,175,55,0.22); }
+.ht-filter-apply:hover { filter:brightness(1.08); }
+.ht-no-match { display:none; margin:0.25rem auto 0; padding:0.5rem 0.9rem; border-radius:999px; background:rgba(74,18,25,0.84); border:1px solid rgba(255,118,132,0.42); color:#ffb9c2; font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; }
+.ht-no-match.show { display:block; }
+@media(max-width:760px) { .ht-filter-row { grid-template-columns:1fr; gap:0.35rem; } .ht-filter-panel { padding:0.7rem; max-height:82vh; overflow:auto; } #screen-trainer.filter-change .ht-filter-panel { top:72px; } .ht-filter-cell { min-width:64px; padding-inline:0.58rem; } }
 .pft-analysis-header { display:flex; align-items:center; gap:1.25rem; margin:-1.35rem -1.5rem 0; padding:1.35rem 1.5rem 1.1rem; background:radial-gradient(circle at 50% 48%, #5B5870 0%, #3d3b4b 45%, #1B1B21 100%); border-bottom:3px solid transparent; border-image:linear-gradient(90deg,#1B1B21,#DAD8E0) 1; }
-.pft-analysis-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.07rem, 6.88vw, 2.93rem); font-weight:700; letter-spacing:0.02em; line-height:0.95; text-transform:uppercase; white-space:nowrap; min-width:0; background:linear-gradient(180deg,#B5B2C2,#DAD8E0); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.pft-analysis-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.76rem, 5.85vw, 2.49rem); font-weight:700; letter-spacing:0.02em; line-height:0.95; text-transform:uppercase; white-space:nowrap; min-width:0; background:linear-gradient(180deg,#B5B2C2,#DAD8E0); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
 .pft-frequency-list { display:flex; flex-direction:column; gap:0.75rem; margin:0 -1.5rem; padding:0.95rem 1.5rem 0; border-top:3px solid transparent; border-image:linear-gradient(90deg,#1B1B21,#DAD8E0) 1; max-width:none; overflow:hidden; }
 .pft-analysis-table-head { display:grid; grid-template-columns:1fr 1.35fr 0.88fr; gap:0.85rem; align-items:center; padding:0.8rem 0.2rem 0.75rem; font-family:'DM Mono',monospace; font-size:clamp(0.83rem, 1.5vw, 1.15rem); line-height:1; letter-spacing:0.08em; text-transform:uppercase; font-weight:800; text-align:center; }
 .pft-analysis-table-head div { background:linear-gradient(180deg,#B5B2C2,#DAD8E0); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
@@ -288,19 +357,42 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .pft-choice-note { font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.08em; color:rgba(245,240,232,0.58); text-transform:uppercase; margin-top:-0.1rem; margin-bottom:0.9rem; }
 .pft-best-label { display:inline-block; margin-left:0.55rem; padding:0.12rem 0.45rem; border-radius:999px; background:rgba(82,201,122,0.22); color:#8ef2af; font-size:0.65rem; letter-spacing:0.08em; vertical-align:middle; }
 #screen-postflop-trainer .ht-community .ht-card { width:46px; height:auto; aspect-ratio:54 / 76; }
+#screen-thought-process-v2 .ht-community .ht-card { width:46px; height:auto; aspect-ratio:54 / 76; }
 #screen-postflop-trainer .ht-card { border-radius:0; }
+#screen-thought-process-v2 .ht-card { border-radius:0; }
 #screen-postflop-trainer .ht-pot-display img { width:38px; height:auto; }
+#screen-thought-process-v2 .ht-pot-display img { width:38px; height:auto; }
 #screen-postflop-trainer .ht-hero-cards .ht-card { width:46px; height:auto; aspect-ratio:54 / 76; }
+#screen-thought-process-v2 .ht-hero-cards .ht-card { width:46px; height:auto; aspect-ratio:54 / 76; }
 #screen-postflop-trainer .ht-community .ht-card .ht-card-rank { font-size:2rem; }
+#screen-thought-process-v2 .ht-community .ht-card .ht-card-rank { font-size:2rem; }
+#screen-trainer .ht-pos-chip img,#screen-postflop-trainer .ht-pos-chip img { content:url("positionlabelblack.png"); }
+#screen-trainer .ht-pot-display img,#screen-postflop-trainer .ht-pot-display img { content:url("Pot red.png"); transform:none; }
+#screen-trainer .ht-bet-chip img,#screen-trainer .ht-flying-chip img,#screen-postflop-trainer .ht-bet-chip img,#screen-postflop-trainer .ht-flying-chip img { content:url("chip2.png"); transform:none; }
+#screen-trainer .ht-bet-chip .ht-chip-val,#screen-trainer .ht-flying-chip .ht-chip-val,#screen-postflop-trainer .ht-bet-chip .ht-chip-val,#screen-postflop-trainer .ht-flying-chip .ht-chip-val { transform:translateY(calc(0.5em - 3px)); background:linear-gradient(180deg,#7c5700 0%, #2a1700 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; }
+#screen-trainer .ht-bet-chip { width:47.5px; height:47.5px; }
+#screen-trainer .ht-flying-chip { width:47.5px; height:47.5px; }
+#screen-trainer .ht-bet-chip .ht-chip-val,#screen-trainer .ht-flying-chip .ht-chip-val { font-size:1.03rem; }
+#screen-trainer .ht-pot-overlay,#screen-postflop-trainer .ht-pot-overlay { transform:translateY(0.9em); }
+#screen-trainer .ht-pot-amount,#screen-postflop-trainer .ht-pot-amount { font-size:1.23rem; background:linear-gradient(180deg,#71151c 0%, #260409 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; }
 #screen-postflop-trainer .ht-seat[data-pos="UTG"] { left:11.5% !important; top:50% !important; }
 #screen-postflop-trainer .ht-seat[data-pos="HJ"] { left:35% !important; top:18% !important; }
 #screen-postflop-trainer .ht-seat[data-pos="CO"] { left:65% !important; top:18% !important; }
 #screen-postflop-trainer .ht-seat[data-pos="BTN"] { left:88.5% !important; top:50% !important; }
 #screen-postflop-trainer .ht-seat[data-pos="SB"] { left:65% !important; top:82% !important; }
 #screen-postflop-trainer .ht-seat[data-pos="BB"] { left:35% !important; top:82% !important; }
+#screen-thought-process-v2 .ht-seat[data-pos="UTG"] { left:11.5% !important; top:50% !important; }
+#screen-thought-process-v2 .ht-seat[data-pos="HJ"] { left:35% !important; top:18% !important; }
+#screen-thought-process-v2 .ht-seat[data-pos="CO"] { left:65% !important; top:18% !important; }
+#screen-thought-process-v2 .ht-seat[data-pos="BTN"] { left:88.5% !important; top:50% !important; }
+#screen-thought-process-v2 .ht-seat[data-pos="SB"] { left:65% !important; top:82% !important; }
+#screen-thought-process-v2 .ht-seat[data-pos="BB"] { left:35% !important; top:82% !important; }
 #screen-postflop-trainer .ht-seat[data-pos="UTG"] .ht-seat-cards,
 #screen-postflop-trainer .ht-seat[data-pos="HJ"] .ht-seat-cards,
-#screen-postflop-trainer .ht-seat[data-pos="BB"] .ht-seat-cards {
+#screen-postflop-trainer .ht-seat[data-pos="BB"] .ht-seat-cards,
+#screen-thought-process-v2 .ht-seat[data-pos="UTG"] .ht-seat-cards,
+#screen-thought-process-v2 .ht-seat[data-pos="HJ"] .ht-seat-cards,
+#screen-thought-process-v2 .ht-seat[data-pos="BB"] .ht-seat-cards {
   right:calc(100% + 8px);
   left:auto;
   top:50%;
@@ -309,7 +401,10 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 }
 #screen-postflop-trainer .ht-seat[data-pos="CO"] .ht-seat-cards,
 #screen-postflop-trainer .ht-seat[data-pos="SB"] .ht-seat-cards,
-#screen-postflop-trainer .ht-seat[data-pos="BTN"] .ht-seat-cards {
+#screen-postflop-trainer .ht-seat[data-pos="BTN"] .ht-seat-cards,
+#screen-thought-process-v2 .ht-seat[data-pos="CO"] .ht-seat-cards,
+#screen-thought-process-v2 .ht-seat[data-pos="SB"] .ht-seat-cards,
+#screen-thought-process-v2 .ht-seat[data-pos="BTN"] .ht-seat-cards {
   left:calc(100% + 8px);
   right:auto;
   top:50%;
@@ -328,11 +423,127 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 #screen-postflop-trainer .ht-flying-chip[data-pos="BTN"] { left:calc(88.5% - 62px) !important; top:50% !important; }
 #screen-postflop-trainer .ht-flying-chip[data-pos="SB"] { left:65% !important; top:calc(82% - 60px) !important; }
 #screen-postflop-trainer .ht-flying-chip[data-pos="BB"] { left:35% !important; top:calc(82% - 60px) !important; }
+.tpv2-sizing-panel { display:none; z-index:18; align-items:center; justify-content:center; padding:0.35rem 1.5rem 1rem; text-align:center; width:100%; }
+.tpv2-sizing-panel.show { display:flex; }
+.tpv2-sizing-inner { width:min(960px, 96vw); }
+.tpv2-sizing-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.55rem, 3.15vw, 2.3rem); line-height:1; letter-spacing:0.02em; color:var(--cream); text-transform:uppercase; margin-bottom:0.85rem; white-space:nowrap; }
+.tpv2-sizing-buttons { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0.9rem; }
+.tpv2-sizing-btn { min-height:62px; border:2px solid rgba(232,200,74,0.45); border-radius:8px; background:linear-gradient(180deg,#242536,#121722); color:#ffffff; font-family:'Bebas Neue',sans-serif; font-size:clamp(1.55rem, 4vw, 2.15rem); letter-spacing:0.04em; cursor:pointer; text-transform:uppercase; padding:0.45rem 0.75rem; text-shadow:0 2px 5px rgba(0,0,0,0.34); }
+.tpv2-sizing-btn.size-33,.tpv2-bet-btn.size-33 { background:linear-gradient(180deg,#FFE46A 0%, #E8C84A 45%, #B88900 100%); border-color:#8f6f00; color:#171004; }
+.tpv2-sizing-btn.size-75,.tpv2-bet-btn.size-75 { background:linear-gradient(180deg,#FFB24A 0%, #F07A17 48%, #B94A00 100%); border-color:#9b3f00; color:#fff8ed; }
+.tpv2-sizing-btn.size-125,.tpv2-bet-btn.size-125 { background:linear-gradient(180deg,#FF6868 0%, #D73535 48%, #941616 100%); border-color:#7f1212; color:#fff6f6; }
+.tpv2-sizing-btn.size-50,.tpv2-bet-btn.size-50 { background:linear-gradient(180deg,#FFE46A 0%, #E8C84A 45%, #B88900 100%); border-color:#8f6f00; color:#171004; }
+.tpv2-sizing-btn.size-100,.tpv2-bet-btn.size-100 { background:linear-gradient(180deg,#FFB24A 0%, #F07A17 48%, #B94A00 100%); border-color:#9b3f00; color:#fff8ed; }
+.tpv2-sizing-btn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+.tpv2-bet-btn { text-shadow:0 2px 5px rgba(0,0,0,0.34); }
+#screen-thought-process-v2 .ht-pos-chip-label { font-size:1.2rem; }
+#screen-thought-process-v2 #tpv2-action-bar { align-self:center; width:min(740px, 62vw); justify-content:center; padding:0.95rem 1rem; transform:translateX(min(187px, 17vw)); }
+#screen-thought-process-v2 #tpv2-action-bar .ht-action-btn { flex:0 1 230px; font-size:1.85rem; padding:0.95rem 0.75rem; }
+#screen-thought-process-v2 #tpv2-action-bar .ht-btn-call { background:linear-gradient(180deg,#3f9bd8 0%, #1b65b2 50%, #07356f 100%); border-color:#062d5a; color:#ffffff; box-shadow:0 5px 16px rgba(25,96,176,0.34); text-shadow:0 2px 5px rgba(0,0,0,0.38); }
+#screen-thought-process-v2 #tpv2-action-bar .tpv2-bet-btn.size-33 { background:linear-gradient(180deg,#FFE100 0%, #E1B900 46%, #A87800 100%); border-color:#8f6900; color:#171004; }
+#screen-thought-process-v2 #tpv2-action-bar .tpv2-bet-btn.size-75 { background:linear-gradient(180deg,#FF9F1F 0%, #F05F00 48%, #A73A00 100%); border-color:#943400; color:#fff8ed; }
+#screen-thought-process-v2 #tpv2-action-bar .tpv2-bet-btn.size-125 { background:linear-gradient(180deg,#FF4242 0%, #D61F1F 48%, #841010 100%); border-color:#741010; color:#fff6f6; }
+#screen-thought-process-v2 #tpv2-action-bar .tpv2-bet-btn.size-50 { background:linear-gradient(180deg,#FFE100 0%, #E1B900 46%, #A87800 100%); border-color:#8f6900; color:#171004; }
+#screen-thought-process-v2 #tpv2-action-bar .tpv2-bet-btn.size-100 { background:linear-gradient(180deg,#FF9F1F 0%, #F05F00 48%, #A73A00 100%); border-color:#943400; color:#fff8ed; }
+.thought-v2-main-layout { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; gap:18px; width:100%; padding:0.3rem 1rem; }
+.thought-v2-main-layout .ht-table-area { flex:0 1 740px; width:min(740px, 62vw); padding:0; }
+.thought-v2-score-grid { display:none; grid-template-columns:repeat(2, auto); gap:14px 16px; flex:0 0 auto; }
+.thought-v2-score-grid.show { display:grid; }
+.thought-v2-score-item { display:flex; flex-direction:column; align-items:center; gap:0.32rem; min-width:150px; --score-color:#fff; --score-glow:rgba(255,255,255,0.45); --score-grad-top:#fff; --score-grad-bottom:#d7d7d7; --score-number-light:#ffffff; --score-number-mid:#eeeeee; --score-number-dark:#d7d7d7; }
+.thought-v2-score-label { font-family:'DM Mono',monospace; font-size:0.88rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; background:linear-gradient(to bottom,var(--score-color),var(--score-grad-bottom)); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-align:center; line-height:1.12; white-space:nowrap; text-shadow:0 0 18px var(--score-glow); }
+.thought-v2-score-halo { position:relative; width:148px; height:148px; display:flex; align-items:center; justify-content:center; border:0; background:none; padding:0; cursor:pointer; }
+.thought-v2-score-halo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 18px rgba(232,80,112,0.32)); }
+.thought-v2-score-number { position:relative; z-index:1; font-family:'Bebas Neue',sans-serif; font-size:6.8rem; letter-spacing:0.02em; line-height:1; background-image:linear-gradient(to bottom,var(--score-number-light) 0%,var(--score-number-mid) 50%,var(--score-number-dark) 100%); background-size:100% 100%; background-position:0 0; background-repeat:no-repeat; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; text-shadow:none; -webkit-text-stroke:0; filter:none; mix-blend-mode:normal; }
+.thought-v2-score-number.na { font-family:'DM Mono',monospace; font-size:1.28rem; letter-spacing:0; }
+.thought-v2-score-question { position:relative; z-index:1; font-family:'Bebas Neue',sans-serif; font-size:6.8rem; font-weight:400; letter-spacing:0.02em; line-height:1; color:#707070; text-shadow:none; }
+.thought-v2-score-input { appearance:none; -webkit-appearance:none; position:relative; z-index:2; width:100%; height:100%; border:0; outline:0; border-radius:0; background:transparent; box-shadow:none; padding:0; margin:0; color:#707070; caret-color:#707070; font-family:'Bebas Neue',sans-serif; font-size:6.8rem; font-weight:400; letter-spacing:0.02em; line-height:1; text-align:center; }
+.thought-v2-score-input:focus,.thought-v2-score-input:active { border:0; outline:0; background:transparent; box-shadow:none; }
+.thought-v2-score-input::-webkit-outer-spin-button,.thought-v2-score-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+.thought-v2-score-input[type=number] { -moz-appearance:textfield; }
+.thought-v2-score-ring-feedback { position:absolute; inset:0; z-index:3; pointer-events:none; display:grid; place-items:center; overflow:visible; }
+.thought-v2-score-ring-feedback span { position:absolute; border:3px solid currentColor; border-radius:50%; opacity:0; animation:thoughtV2RingPulse 780ms ease-out forwards; }
+.thought-v2-score-ring-feedback span:nth-child(1) { width:22%; height:22%; animation-delay:0ms; }
+.thought-v2-score-ring-feedback span:nth-child(2) { width:42%; height:42%; animation-delay:90ms; }
+.thought-v2-score-ring-feedback span:nth-child(3) { width:62%; height:62%; animation-delay:180ms; }
+.thought-v2-score-ring-feedback.correct span:nth-child(1) { border-color:#006b1f; }
+.thought-v2-score-ring-feedback.correct span:nth-child(2) { border-color:#00b83a; }
+.thought-v2-score-ring-feedback.correct span:nth-child(3) { border-color:#61ff8f; }
+.thought-v2-score-ring-feedback.wrong span:nth-child(1) { border-color:#8b0000; }
+.thought-v2-score-ring-feedback.wrong span:nth-child(2) { border-color:#e00000; }
+.thought-v2-score-ring-feedback.wrong span:nth-child(3) { border-color:#ff6b6b; }
+.thought-v2-score-item.score-color-1,.thought-v2-range-cell.score-color-1 { --score-color:#ff0000; --score-grad-top:#ff3636; --score-grad-bottom:#650000; --score-number-light:#FF3737; --score-number-mid:#D00000; --score-number-dark:#A40000; --score-glow:rgba(255,0,0,0.62); }
+.thought-v2-score-item.score-color-2,.thought-v2-range-cell.score-color-2 { --score-color:#f04400; --score-grad-top:#ff6d1a; --score-grad-bottom:#702000; --score-number-light:#FF6A2A; --score-number-mid:#E34A0C; --score-number-dark:#B12A00; --score-glow:rgba(240,68,0,0.6); }
+.thought-v2-score-item.score-color-3,.thought-v2-range-cell.score-color-3 { --score-color:#d89400; --score-grad-top:#ffc21c; --score-grad-bottom:#6f4300; --score-number-light:#FFD447; --score-number-mid:#D99A10; --score-number-dark:#A86B00; --score-glow:rgba(216,148,0,0.58); }
+.thought-v2-score-item.score-color-4,.thought-v2-range-cell.score-color-4 { --score-color:#e6d600; --score-grad-top:#fff200; --score-grad-bottom:#817200; --score-number-light:#FFF047; --score-number-mid:#E2CF18; --score-number-dark:#B8A600; --score-glow:rgba(230,214,0,0.56); }
+.thought-v2-score-item.score-color-5,.thought-v2-range-cell.score-color-5 { --score-color:#84df00; --score-grad-top:#b7ff00; --score-grad-bottom:#326a00; --score-number-light:#B8FF3D; --score-number-mid:#82D81A; --score-number-dark:#4C9A00; --score-glow:rgba(132,223,0,0.56); }
+.thought-v2-score-item.score-color-6,.thought-v2-range-cell.score-color-6 { --score-color:#00bf38; --score-grad-top:#27f060; --score-grad-bottom:#006b1f; --score-number-light:#3DFF74; --score-number-mid:#13C84A; --score-number-dark:#007A29; --score-glow:rgba(0,191,56,0.56); }
+.thought-v2-score-item.score-color-7,.thought-v2-range-cell.score-color-7 { --score-color:#00cfc3; --score-grad-top:#21fff1; --score-grad-bottom:#006c66; --score-number-light:#38FFF2; --score-number-mid:#12C8BD; --score-number-dark:#007A75; --score-glow:rgba(0,207,195,0.56); }
+.thought-v2-score-item.score-color-8,.thought-v2-range-cell.score-color-8 { --score-color:#008dd9; --score-grad-top:#24c7ff; --score-grad-bottom:#004b7f; --score-number-light:#35C8FF; --score-number-mid:#1391D9; --score-number-dark:#005E9F; --score-glow:rgba(0,141,217,0.58); }
+.thought-v2-score-item.score-color-9,.thought-v2-range-cell.score-color-9 { --score-color:#004dff; --score-grad-top:#2678ff; --score-grad-bottom:#001d91; --score-number-light:#3D6BFF; --score-number-mid:#1542E5; --score-number-dark:#001EAE; --score-glow:rgba(0,77,255,0.62); }
+.thought-v2-score-item.score-color-10,.thought-v2-range-cell.score-color-10 { --score-color:#8f00e8; --score-grad-top:#be35ff; --score-grad-bottom:#3b006e; --score-number-light:#C45BFF; --score-number-mid:#8F20D6; --score-number-dark:#5F008F; --score-glow:rgba(143,0,232,0.62); }
+#screen-thought-process-v2 .pft-choice-note { display:none; }
+#screen-thought-process-v2 .ht-bet-chip img { content:url("chip2.png"); transform:none; }
+#screen-thought-process-v2 .ht-bet-chip .ht-chip-val { transform:translateY(calc(0.5em - 3px)); background:linear-gradient(180deg,#7c5700 0%, #2a1700 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; }
+#screen-thought-process-v2 .ht-pot-display img { width:50px; content:url("Pot red.png"); transform:none; }
+#screen-thought-process-v2 .ht-pot-overlay { transform:translateY(0.9em); }
+#screen-thought-process-v2 .ht-pot-amount { font-size:1.23rem; background:linear-gradient(180deg,#71151c 0%, #260409 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; }
+.tpv2-result-buttons { display:flex; gap:0.85rem; justify-content:center; flex-wrap:wrap; margin-top:0.75rem; }
+.tpv2-result-buttons .ht-result-next { margin-top:0; flex:0 1 240px; }
+.thought-v2-range-section { margin:0.95rem -0.35rem 0; padding-top:0.9rem; border-top:1px solid rgba(218,216,224,0.22); }
+.thought-v2-range-toggle { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0.25rem; width:100%; max-width:360px; margin:0 auto 0.55rem; padding:0.2rem; border:1px solid rgba(255,255,255,0.08); border-radius:7px; background:linear-gradient(180deg,#191a22,#0d0e14); }
+.thought-v2-range-toggle-btn { border:0; border-radius:5px; padding:0.38rem 0.2rem; background:linear-gradient(180deg,#343441,#20212b); color:rgba(245,240,232,0.72); font-family:'DM Mono',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; }
+.thought-v2-range-toggle-btn.active { background:linear-gradient(180deg,#5b5b6d,#333442); color:#ffffff; }
+.thought-v2-range-grid { display:grid; grid-template-columns:repeat(13, minmax(0, 1fr)); gap:2px; width:100%; max-width:360px; margin:0 auto; }
+.thought-v2-range-cell { aspect-ratio:1 / 1; display:flex; align-items:center; justify-content:center; border:0; outline:0; border-radius:3px; background:#020204; color:rgba(245,240,232,0.72); font-family:'DM Mono',monospace; font-size:clamp(0.45rem, 1.55vw, 0.68rem); font-weight:600; line-height:1; position:relative; box-shadow:none; text-rendering:geometricPrecision; -webkit-font-smoothing:antialiased; }
+.thought-v2-range-cell.check { background:linear-gradient(180deg,#16b847,#087528); color:#ffffff; }
+.thought-v2-range-cell.bet-33 { background:linear-gradient(180deg,#FFE100,#A87800); color:#171004; }
+.thought-v2-range-cell.bet-75 { background:linear-gradient(180deg,#FF9F1F,#A73A00); color:#fff8ed; }
+.thought-v2-range-cell.bet-125 { background:linear-gradient(180deg,#FF4242,#841010); color:#fff6f6; }
+.thought-v2-range-cell.bet-50 { background:linear-gradient(180deg,#FFE100,#A87800); color:#171004; }
+.thought-v2-range-cell.bet-100 { background:linear-gradient(180deg,#FF9F1F,#A73A00); color:#fff8ed; }
+.thought-v2-range-cell.score-mode { background:linear-gradient(180deg,var(--score-number-light),var(--score-number-mid) 50%,var(--score-number-dark)); color:#ffffff; text-shadow:none; }
+.thought-v2-range-cell.not-in-range { background:#020204; color:rgba(245,240,232,0.42); }
+.thought-v2-range-cell.current-hand { outline:0; }
+.thought-v2-range-cell.range-loading { grid-column:1 / -1; aspect-ratio:auto; min-height:42px; border-radius:6px; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; }
+@media(max-width:600px) {
+  .tpv2-sizing-buttons { grid-template-columns:1fr; }
+  .tpv2-sizing-title { white-space:normal; }
+  .thought-v2-main-layout { flex-direction:column; gap:0.8rem; padding:0.3rem 0.5rem; }
+  .thought-v2-main-layout .ht-table-area { width:100%; }
+  .thought-v2-score-grid { grid-template-columns:repeat(2, auto); gap:10px; }
+  .thought-v2-score-halo { width:108px; height:108px; }
+  .thought-v2-score-number { font-size:4.95rem; }
+  .thought-v2-score-question { font-size:4.95rem; }
+  .thought-v2-score-input { font-size:4.95rem; }
+  .thought-v2-score-item { min-width:120px; }
+  .thought-v2-score-label { font-size:0.7rem; }
+  #screen-thought-process-v2 #tpv2-action-bar { width:100%; transform:none; }
+  #screen-thought-process-v2 #tpv2-action-bar .ht-action-btn { font-size:1.45rem; }
+  .tpv2-result-buttons { flex-direction:column; }
+}
+@keyframes thoughtV2RingPulse {
+  0% { transform:scale(0.35); opacity:0; }
+  15% { opacity:1; }
+  70% { opacity:0.9; }
+  100% { transform:scale(1.35); opacity:0; }
+}
 @keyframes pftBoardDeal { from { opacity:0; transform:translateY(16px) scale(0.92); } to { opacity:1; transform:translateY(0) scale(1); } }
 @media(max-width:600px) {
   .pft-status { top:86px; font-size:0.64rem; letter-spacing:0.08em; min-width:180px; padding:0.5rem 0.8rem; }
   .pft-debug { top:124px; font-size:0.62rem; }
   .pft-action-bar .ht-action-btn { font-size:0.92rem; }
+}
+@media(max-width:900px) {
+  #screen-home .path-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); max-width:560px; }
+  .home-card-fan { flex-wrap:wrap; gap:1.1rem; padding-top:0.7rem; }
+  .home-fan-card { margin:0; flex:0 1 42%; }
+  .home-fan-card img { max-width:100%; height:clamp(170px, 40vw, 260px); }
+}
+@media(max-width:600px) {
+  #screen-home .path-grid { grid-template-columns:1fr; max-width:280px; }
+  .home-card-fan { flex-direction:column; align-items:center; gap:1.25rem; }
+  .home-fan-card { flex:0 0 auto; }
+  .home-fan-card img { height:clamp(170px, 58vw, 240px); }
 }
 </style>
 </head>
@@ -358,19 +569,18 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     <div class="logo-title"><img src="logo.png" alt="Preflop"></div>
     <div class="logo-sub">Range Trainer · 6-Max NLHE · 100bb</div>
   </div>
-  <div class="position-label">Choose Mode</div>
-  <div class="path-grid">
-    <button class="pos-btn" onclick="showScreen('screen-range-quiz-menu')">
-      <div class="home-mode-label">Range Quiz</div>
-      <img class="home-mode-icon" src="Range quiz Symbol 2.png" alt="Range Quiz">
+  <div class="home-card-fan">
+    <button class="home-fan-card range-card" onclick="showScreen('screen-range-quiz-menu')" aria-label="Range Quiz">
+      <img src="Range quiz Symbol 2.png" alt="Range Quiz">
     </button>
-    <button class="pos-btn" onclick="startHandTrainer()">
-      <div class="home-mode-label">Hand Trainer</div>
-      <img class="home-mode-icon" src="Hand Trainer symbol.png" alt="Hand Trainer">
+    <button class="home-fan-card preflop-card" onclick="startHandTrainer()" aria-label="Pre-flop Trainer">
+      <img src="PreflopTrainer.png" alt="Pre-flop Trainer">
     </button>
-    <button class="pos-btn" onclick="startPostflopTrainer()">
-      <div class="home-mode-label">Postflop Trainer</div>
-      <img class="home-mode-icon" src="Pot.png" alt="Postflop Trainer">
+    <button class="home-fan-card postflop-card" onclick="startPostflopTrainer()" aria-label="Post-flop Trainer">
+      <img src="PostflopTrainer.png" alt="Post-flop Trainer">
+    </button>
+    <button class="home-fan-card thought-card" onclick="showThoughtProcessTrainer2()" aria-label="Thought Process Trainer 2.0">
+      <img src="Brain.png" alt="Thought Process Trainer">
     </button>
   </div>
 </div>
@@ -2592,6 +2802,17 @@ const HT_INTRO_GAP_MS = 60;
 
 let htSc=null, htC1=null, htC2=null, htHK=null, htCorrect=[], htAnswered=false;
 let htStats={correct:0,wrong:0};
+let preflopTrainerStreak = 0;
+let preflopTrainerBestStreak = 0;
+let preflopTrainerFilters = {
+  players: { headsUp: true, multiWay: true },
+  heroPositions: { UTG: true, HJ: true, CO: true, BTN: true, SB: true, BB: true },
+  villainPositions: { UTG: true, HJ: true, CO: true, BTN: true, SB: true, BB: true },
+  potTypes: { rfi: true, vsOpen: true, vs3Bet: true, vs4Bet: true, vs5Bet: true }
+};
+let preflopFiltersStarted = false;
+let preflopFiltersOpen = false;
+let preflopFilterMode = 'initial';
 let htVisualState=null, htIntroToken=0, htIntroRunning=false;
 
 function htWait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -2669,6 +2890,119 @@ function htSetActionBarVisible(isVisible) {
   document.getElementById('ht-action-bar').classList.toggle('ht-hidden', !isVisible);
 }
 
+function renderPreflopFilterPanel() {
+  const panel=document.getElementById('ht-filter-panel');
+  if(!panel) return;
+  const rows=[
+    { label:'Players', category:'players', options:[['headsUp','Heads-up'],['multiWay','Multi-way']] },
+    { label:'Hero position', category:'heroPositions', options:HT_ACTION_ORDER.map(pos=>[pos,pos]) },
+    { label:'Villain position', category:'villainPositions', options:HT_ACTION_ORDER.map(pos=>[pos,pos]) },
+    { label:'Pot type', category:'potTypes', options:[['rfi','RFI'],['vsOpen','vs Open'],['vs3Bet','vs 3-Bet'],['vs4Bet','vs 4-Bet'],['vs5Bet','vs 5-Bet']] }
+  ];
+  const actionLabel=preflopFilterMode==='initial'?'START TRAINING':'APPLY FILTERS';
+  const actionFn=preflopFilterMode==='initial'?'startPreflopTrainingWithFilters()':'applyPreflopFilters()';
+  panel.innerHTML=`
+    <div class="ht-filter-title">
+      <span>Preflop Filters</span>
+      <span class="ht-filter-subtitle">${preflopFilterMode==='initial'?'Configure before start':'Changes apply to future hands'}</span>
+    </div>
+    ${rows.map(row=>`
+    <div class="ht-filter-row">
+      <div class="ht-filter-label">${row.label}</div>
+      <div class="ht-filter-options">
+        ${row.options.map(([key,label])=>{
+          const enabled=!!preflopTrainerFilters[row.category][key];
+          return `<button class="ht-filter-cell ${enabled?'enabled':'disabled'}" onclick="togglePreflopFilter('${row.category}','${key}')">${label}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('')}
+    <div class="ht-filter-actions"><button class="ht-filter-apply" onclick="${actionFn}">${actionLabel}</button></div>
+  `;
+}
+
+function togglePreflopFilter(category, key) {
+  if(!preflopTrainerFilters[category] || !(key in preflopTrainerFilters[category])) return;
+  preflopTrainerFilters[category][key]=!preflopTrainerFilters[category][key];
+  renderPreflopFilterPanel();
+}
+
+function openPreflopFilterPopup(mode='change') {
+  preflopFilterMode=mode;
+  preflopFiltersOpen=true;
+  const screen=document.getElementById('screen-trainer');
+  if(screen){
+    screen.classList.add('filter-open');
+    screen.classList.toggle('filter-initial', mode==='initial');
+    screen.classList.toggle('filter-change', mode!=='initial');
+  }
+  renderPreflopFilterPanel();
+}
+
+function closePreflopFilterPopup() {
+  preflopFiltersOpen=false;
+  const screen=document.getElementById('screen-trainer');
+  if(screen) screen.classList.remove('filter-open','filter-initial','filter-change');
+}
+
+function startPreflopTrainingWithFilters() {
+  preflopFiltersStarted=true;
+  closePreflopFilterPopup();
+  htNextHand();
+}
+
+function applyPreflopFilters() {
+  closePreflopFilterPopup();
+  if(!getFilteredPreflopSpotPool().length) htShowNoFilterMatches(true);
+  else htShowNoFilterMatches(false);
+}
+
+function htRfiVillainPositions(hero) {
+  const heroIdx=HT_ACTION_ORDER.indexOf(hero);
+  return HT_ACTION_ORDER.slice(heroIdx+1);
+}
+
+function classifyPreflopSpot(sc) {
+  if(!sc) return { players:'headsUp', hero:null, villains:[], potType:'rfi' };
+  if(sc.type==='rfi') return { players:'headsUp', hero:sc.hero, villains:htRfiVillainPositions(sc.hero), potType:'rfi' };
+  if(sc.type==='vsopen') return { players:'headsUp', hero:sc.hero, villains:[sc.opener], potType:'vsOpen' };
+  if(sc.type==='rfi_defense') return { players:'headsUp', hero:sc.hero, villains:[sc.opp3bet], potType:'vs3Bet' };
+  if(sc.type==='vsopen_4bet') return { players:'headsUp', hero:sc.hero, villains:[sc.opener], potType:'vs4Bet' };
+  if(sc.type==='rfi_5bet') return { players:'headsUp', hero:sc.hero, villains:[sc.opp3bet], potType:'vs5Bet' };
+  if(sc.type==='multiway') {
+    const { opener, second } = htParseMWKey(sc.key);
+    return {
+      players:'multiWay',
+      hero:sc.hero,
+      villains:[opener, second],
+      potType:sc.mwType==='squeeze' ? 'vsOpen' : 'vs3Bet'
+    };
+  }
+  return { players:'headsUp', hero:sc.hero, villains:[], potType:'rfi' };
+}
+
+function preflopSpotPassesFilters(sc) {
+  const info=classifyPreflopSpot(sc);
+  if(!preflopTrainerFilters.players[info.players]) return false;
+  if(!preflopTrainerFilters.heroPositions[info.hero]) return false;
+  if(!preflopTrainerFilters.potTypes[info.potType]) return false;
+  return info.villains.some(pos=>preflopTrainerFilters.villainPositions[pos]);
+}
+
+function getFilteredPreflopSpotPool() {
+  return HT_SCENARIOS.filter(sc=>preflopSpotPassesFilters(sc) && htEligible(sc).length>0);
+}
+
+function htShowNoFilterMatches(show) {
+  const el=document.getElementById('ht-no-match');
+  if(el) el.classList.toggle('show', !!show);
+}
+
+function htUpdateBestStreakDisplay() {
+  const el=document.getElementById('ht-best-streak');
+  if(el) el.textContent=`BEST STREAK: ${preflopTrainerBestStreak}`;
+}
+
 function htFindSeat(pos) {
   return document.querySelector(`#ht-seats-layer .ht-seat[data-pos="${pos}"]`);
 }
@@ -2691,7 +3025,7 @@ function htSetDisplayedBet(pos, amount) {
     chip.dataset.pos=pos;
     chip.style.left=HT_CHIP_OFF[pos].x+'%';
     chip.style.top=HT_CHIP_OFF[pos].y+'%';
-    const img=document.createElement('img');img.src='chip.png';chip.appendChild(img);
+    const img=document.createElement('img');img.src='chip2.png';chip.appendChild(img);
     const val=document.createElement('div');val.className='ht-chip-val';chip.appendChild(val);
     cL.appendChild(chip);
   }
@@ -2705,7 +3039,7 @@ async function htAnimateBetAction(action, token) {
   flying.className='ht-flying-chip';
   flying.style.left=HT_SEAT_POS[action.pos].x+'%';
   flying.style.top=HT_SEAT_POS[action.pos].y+'%';
-  const img=document.createElement('img');img.src='chip.png';flying.appendChild(img);
+  const img=document.createElement('img');img.src='chip2.png';flying.appendChild(img);
   const val=document.createElement('div');val.className='ht-chip-val';val.textContent=action.amount;flying.appendChild(val);
   wrap.appendChild(flying);
   void flying.offsetWidth;
@@ -2748,7 +3082,13 @@ async function htPlayIntro(sc, token) {
   htSetActionBarVisible(true);
 }
 
-function startHandTrainer() { showScreen('screen-trainer'); htNextHand(); }
+function startHandTrainer() {
+  showScreen('screen-trainer');
+  preflopFiltersStarted=false;
+  renderPreflopFilterPanel();
+  htNextHand();
+  openPreflopFilterPopup('initial');
+}
 
 function htNextHand() {
   htIntroToken++;
@@ -2759,14 +3099,31 @@ function htNextHand() {
   document.querySelectorAll('.ht-flying-chip').forEach(el=>el.remove());
   document.getElementById('ht-result-overlay').classList.remove('show');
   htSetActionBarVisible(false);
-  htSc=HT_SCENARIOS[Math.floor(Math.random()*HT_SCENARIOS.length)];
+  const spotPool=getFilteredPreflopSpotPool();
+  if(!spotPool.length){
+    htSc=null; htC1=null; htC2=null; htHK=null; htCorrect=[];
+    htShowNoFilterMatches(true);
+    document.getElementById('ht-ib-scenario').textContent='No matching filters';
+    document.getElementById('ht-ib-action').textContent='Turn more filters on';
+    const sL=document.getElementById('ht-seats-layer'),cL=document.getElementById('ht-chips-layer'),com=document.getElementById('ht-community');
+    if(sL) sL.innerHTML='';
+    if(cL) cL.innerHTML='';
+    if(com) com.innerHTML='';
+    const pot=document.getElementById('ht-pot-amount');
+    if(pot) pot.textContent='1.5';
+    renderPreflopRangeGrid(null);
+    htUpdateStats(); htUpdateBestStreakDisplay();
+    return;
+  }
+  htShowNoFilterMatches(false);
+  htSc=spotPool[Math.floor(Math.random()*spotPool.length)];
   const el=htEligible(htSc);
   [htC1,htC2]=el[Math.floor(Math.random()*el.length)];
   htHK=htHandKey(htC1,htC2);
   htCorrect=htGetCorrect(htSc,htHK);
   document.getElementById('ht-ib-scenario').textContent=htSc.label;
   document.getElementById('ht-ib-action').textContent=htSc.actionLabel;
-  htRenderTable(); htRenderButtons(); htUpdateStats();
+  htRenderTable(); htRenderButtons(); renderPreflopRangeGrid(htSc); htUpdateStats(); htUpdateBestStreakDisplay();
   void htPlayIntro(htSc, token);
 }
 
@@ -2780,18 +3137,146 @@ function htGetCorrect(s,hk) {
   return['fold'];
 }
 
+const PREFLOP_GRID_RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+
+function preflopGridHandClass(rowRank, colRank, rowIndex, colIndex) {
+  if(rowIndex===colIndex) return rowRank+colRank;
+  return rowIndex<colIndex ? rowRank+colRank+'s' : colRank+rowRank+'o';
+}
+
+function classifyPreflopGridAction(actions) {
+  const normalized=(Array.isArray(actions)?actions:[actions])
+    .map(action=>String(action||'').toLowerCase().replace(/[_\s-]/g,''));
+  if(normalized.some(action=>['allin','jam','shove','allinraise'].includes(action))) return 'allin';
+  if(normalized.some(action=>['raise','open','rfi','iso','3bet','4bet','5bet'].includes(action))) return 'raise';
+  if(normalized.some(action=>['call','flat','defend'].includes(action))) return 'call';
+  return 'fold';
+}
+
+function getPreflopGridActionsForHandClass(spot, handClass) {
+  if(!spot || !handClass) return ['fold'];
+  const actions=[];
+  if(spot.type==='rfi') {
+    if((HT_RFI[spot.hero]||new Set()).has(handClass)) actions.push('raise');
+  } else if(spot.type==='vsopen') {
+    const def=HT_DEF[`${spot.hero}_${spot.opener}`];
+    if(def?.['4bet']?.has(handClass)) actions.push('raise');
+    if(def?.['call']?.has(handClass)) actions.push('call');
+  } else if(spot.type==='rfi_defense') {
+    const def=HT_DEF[`${spot.hero}_${spot.opp3bet}`];
+    if(def?.['4bet']?.has(handClass)) actions.push('raise');
+    if(def?.['call']?.has(handClass)) actions.push('call');
+  } else if(spot.type==='vsopen_4bet') {
+    const key=`${spot.hero}_${spot.opener}`;
+    if((HT_V5S[key]||new Set()).has(handClass)) actions.push('shove');
+    if((HT_V5C[key]||new Set()).has(handClass)) actions.push('call');
+  } else if(spot.type==='rfi_5bet') {
+    if((HT_FBC[`${spot.hero}_${spot.opp3bet}`]||new Set()).has(handClass)) actions.push('call');
+  } else if(spot.type==='multiway') {
+    if((MW_SQUEEZE[spot.key]||new Set()).has(handClass)) actions.push('raise');
+    if((MW_CALL[spot.key]||new Set()).has(handClass)) actions.push('call');
+  }
+  return actions.length ? actions : ['fold'];
+}
+
+function getPreflopActionForHandClass(spot, handClass) {
+  if(!spot || !handClass) return 'fold';
+  return classifyPreflopGridAction(getPreflopGridActionsForHandClass(spot, handClass));
+}
+
+function getCurrentHeroHandClass() {
+  return htHK || '';
+}
+
+function renderPreflopRangeGrid(spot) {
+  const grid=document.getElementById('preflop-range-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+  if(!spot){
+    grid.classList.add('hidden');
+    return;
+  }
+  grid.classList.remove('hidden');
+  const currentHand=getCurrentHeroHandClass();
+  PREFLOP_GRID_RANKS.forEach((rowRank,rowIndex)=>{
+    PREFLOP_GRID_RANKS.forEach((colRank,colIndex)=>{
+      const handClass=preflopGridHandClass(rowRank,colRank,rowIndex,colIndex);
+      const action=getPreflopActionForHandClass(spot, handClass);
+      const cell=document.createElement('div');
+      cell.className=`preflop-range-cell ${action}${handClass===currentHand?' current-hand':''}`;
+      cell.textContent=handClass;
+      grid.appendChild(cell);
+    });
+  });
+}
+
 function htRenderButtons() {
   const{type}=htSc;
   const fold=document.getElementById('ht-btn-fold'),call=document.getElementById('ht-btn-call'),
         raise=document.getElementById('ht-btn-raise'),allin=document.getElementById('ht-btn-allin');
   fold.classList.remove('hidden');call.classList.remove('hidden');raise.classList.remove('hidden');allin.classList.add('hidden');
-  raise.textContent='RAISE';
+  fold.textContent='FOLD';
+  call.textContent=htActionButtonLabel('call');
+  raise.textContent=htActionButtonLabel('raise');
+  allin.textContent=htActionButtonLabel('shove');
   if(type==='rfi'){call.classList.add('hidden');}
   else if(type==='vsopen'){if(!(HT_DEF[`${htSc.hero}_${htSc.opener}`]?.['call'].size>0))call.classList.add('hidden');}
   else if(type==='rfi_defense'){if(!(HT_DEF[`${htSc.hero}_${htSc.opp3bet}`]?.['call'].size>0))call.classList.add('hidden');}
   else if(type==='vsopen_4bet'){raise.classList.add('hidden');allin.classList.remove('hidden');}
   else if(type==='rfi_5bet'){raise.classList.add('hidden');}
   else if(type==='multiway'){if(!((MW_CALL[htSc.key]||new Set()).size>0))call.classList.add('hidden');}
+}
+
+function htFormatBbLabel(amount) {
+  const num = Number(amount);
+  if (!Number.isFinite(num)) return '';
+  return `${String(Math.round(num * 10) / 10).replace(/\.0$/, '')} BB`;
+}
+
+function htCallAmountToMatch(sc = htSc) {
+  if (!sc) return null;
+  const displayedBets = htGetDisplayedBets(sc);
+  const heroCommitted = Number(displayedBets[sc.hero]) || 0;
+  let amountToMatch = null;
+  if (sc.type === 'vsopen') amountToMatch = HT_RFI_OPEN[sc.opener] || 2.5;
+  else if (sc.type === 'rfi_defense') amountToMatch = htGet3BetSize(sc.opp3bet, sc.hero);
+  else if (sc.type === 'vsopen_4bet') amountToMatch = HT_VO_4BET[`${sc.hero}_${sc.opener}`] || 22;
+  else if (sc.type === 'rfi_5bet') amountToMatch = 100;
+  else if (sc.type === 'multiway') {
+    const { opener, second } = htParseMWKey(sc.key);
+    amountToMatch = sc.mwType === 'squeeze' ? (HT_RFI_OPEN[opener] || 2.5) : htGet3BetSize(second, opener);
+  }
+  const target = Number(amountToMatch);
+  if (!Number.isFinite(target)) return null;
+  return Math.max(0, target - heroCommitted);
+}
+
+function htActionAmount(action, sc = htSc) {
+  if (!sc) return null;
+  if (action === 'call') {
+    return htCallAmountToMatch(sc);
+  }
+  if (action === 'raise') {
+    if (sc.type === 'rfi') return HT_RFI_OPEN[sc.hero] || 2.5;
+    if (sc.type === 'vsopen') return HT_VO_3BET[`${sc.hero}_${sc.opener}`] || htGet3BetSize(sc.hero, sc.opener);
+    if (sc.type === 'rfi_defense') return HT_RD_3BET[`${sc.hero}_${sc.opp3bet}`] || 22;
+    if (sc.type === 'multiway') {
+      const { opener } = htParseMWKey(sc.key);
+      return sc.mwType === 'squeeze' ? htGet3BetSize(sc.hero, opener) : 22;
+    }
+  }
+  if (action === 'shove') return 100;
+  return null;
+}
+
+function htActionButtonLabel(action) {
+  if (action === 'fold') return 'FOLD';
+  const amount = htActionAmount(action);
+  const bb = htFormatBbLabel(amount);
+  if (action === 'call') return bb ? `CALL ${bb}` : 'CALL';
+  if (action === 'raise') return bb ? `RAISE TO ${bb}` : 'RAISE';
+  if (action === 'shove') return bb ? `ALL-IN TO ${bb}` : 'ALL-IN';
+  return String(action || '').toUpperCase();
 }
 
 function htRenderTable() {
@@ -2847,7 +3332,7 @@ function htRenderTable() {
     seat.appendChild(cw);
 
     const pw=document.createElement('div');pw.className='ht-pos-chip'+(isHero?' ht-hero':'');
-    const pi=document.createElement('img');pi.src='positionlabel2.png';pw.appendChild(pi);
+    const pi=document.createElement('img');pi.src='positionlabelblack.png';pw.appendChild(pi);
     const pl=document.createElement('div');pl.className='ht-pos-chip-label';pl.textContent=pos;pw.appendChild(pl);
     seat.appendChild(pw);
     sL.appendChild(seat);
@@ -2885,7 +3370,7 @@ function htRenderTable() {
       const bc=document.createElement('div');bc.className='ht-bet-chip';
       bc.dataset.pos=pos;
       bc.style.left=cp.x+'%';bc.style.top=cp.y+'%';
-      const bi=document.createElement('img');bi.src='chip.png';bc.appendChild(bi);
+      const bi=document.createElement('img');bi.src='chip2.png';bc.appendChild(bi);
       const bv=document.createElement('div');bv.className='ht-chip-val';bv.textContent=bet;bc.appendChild(bv);
       cL.appendChild(bc);
     }
@@ -2910,10 +3395,10 @@ function htMakeSmall(card) {
 }
 
 function htAction(action) {
-  if(htAnswered||htIntroRunning) return;htAnswered=true;
+  if(preflopFiltersOpen||htAnswered||htIntroRunning) return;htAnswered=true;
   const ok=htCorrect.includes(action);
-  if(ok)htStats.correct++;else htStats.wrong++;
-  htUpdateStats();htAddInfo(action,ok);htShowResult(action,ok);
+  if(ok){htStats.correct++;preflopTrainerStreak++;preflopTrainerBestStreak=Math.max(preflopTrainerBestStreak,preflopTrainerStreak);}else{htStats.wrong++;preflopTrainerStreak=0;}
+  htUpdateStats();htUpdateBestStreakDisplay();htShowResult(action,ok);
 }
 
 function htShowResult(action,ok) {
@@ -2925,6 +3410,13 @@ function htShowResult(action,ok) {
   al.className='ht-result-action '+action;
   const hd=document.getElementById('ht-result-hand');hd.innerHTML='';
   hd.appendChild(htMakeSmall(htC1));hd.appendChild(htMakeSmall(htC2));
+  const panelVerdict=document.getElementById('ht-panel-verdict');
+  if(panelVerdict){
+    panelVerdict.textContent=ok?'CORRECT':'WRONG';
+    panelVerdict.className='ht-panel-verdict '+(ok?'correct':'wrong');
+  }
+  const streakEl=document.getElementById('ht-panel-streak');
+  if(streakEl) streakEl.textContent=ok?`${preflopTrainerStreak} IN A ROW`:'STREAK RESET';
   let detail='';
   const s=htSc;
   if(s.type==='rfi') detail=htCorrect[0]==='raise'?`${htHK} is in the ${s.hero} RFI range.`:`${htHK} is not in the ${s.hero} RFI range — fold.`;
@@ -3596,7 +4088,7 @@ function pftEnsureBetChip(pos) {
   chip.style.left = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].x : 50) + '%';
   chip.style.top = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].y : 50) + '%';
   const img = document.createElement('img');
-  img.src = 'chip.png';
+  img.src = 'chip2.png';
   chip.appendChild(img);
   const val = document.createElement('div');
   val.className = 'ht-chip-val';
@@ -3711,7 +4203,7 @@ function pftRenderTable() {
     const chip = document.createElement('div');
     chip.className = 'ht-pos-chip' + (pos === pftCurrentScenario.hero ? ' ht-hero' : '');
     const chipImg = document.createElement('img');
-    chipImg.src = pos === pftCurrentScenario.hero ? 'inpositionlabel2.png' : 'positionlabel2.png';
+    chipImg.src = 'positionlabelblack.png';
     chip.appendChild(chipImg);
     const label = document.createElement('div');
     label.className = 'ht-pos-chip-label';
@@ -3734,7 +4226,7 @@ async function pftAnimateBetAction(action, token) {
   flying.style.left = HT_SEAT_POS[action.pos].x + '%';
   flying.style.top = HT_SEAT_POS[action.pos].y + '%';
   const img = document.createElement('img');
-  img.src = 'chip.png';
+  img.src = 'chip2.png';
   flying.appendChild(img);
   const val = document.createElement('div');
   val.className = 'ht-chip-val';
@@ -4009,6 +4501,1012 @@ function pftAction(action) {
   pftShowResult(normalized, ok);
 }
 
+let thoughtProcessV2SelectedSizing = null;
+let thoughtProcessV2SelectedFlopSizing = null;
+let thoughtProcessV2SelectedTurnSizing = null;
+let thoughtProcessV2Street = 'flop';
+let currentThoughtProcessV2Hand = null;
+let thoughtProcessV2CurrentFlopRow = null;
+let thoughtProcessV2CurrentTurnRow = null;
+let thoughtProcessV2CurrentHandCombo = null;
+let thoughtProcessV2FlopUserAction = null;
+let thoughtProcessV2FlopActionBranch = null;
+let thoughtProcessV2Answered = false;
+let thoughtProcessV2Loading = false;
+let thoughtProcessV2Stats = { correct: 0, wrong: 0 };
+let thoughtProcessV2CardCode1 = '';
+let thoughtProcessV2CardCode2 = '';
+let thoughtProcessV2RangeRows = [];
+let thoughtProcessV2RangeRowsSizing = null;
+let thoughtV2RangeGridMode = 'action';
+let thoughtV2ScoreRevealState = {};
+let thoughtV2ScoreGuessState = {};
+let thoughtV2ScoreFeedbackState = {};
+let thoughtV2ScoreInputKey = null;
+let thoughtV2ScoreRevealToken = 0;
+const TPV2_TURN_TABLE = 'thought_process_turn_hands';
+const TPV2_FLOP_BOARD = 'Ah7s4c';
+const TPV2_TURN_CARD = '6s';
+const TPV2_TURN_BOARD = 'Ah7s4c6s';
+const TPV2_RANGE_RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+const TPV2_SCORE_KEYS = ['strength', 'improvability', 'range-adv', 'nut-adv'];
+
+function tpv2IsTurnStreet() {
+  return thoughtProcessV2Street === 'turn';
+}
+
+function tpv2SizingLabel(size = thoughtProcessV2SelectedSizing) {
+  const num = Number(size);
+  if (!Number.isFinite(num)) return 'Sizing not selected';
+  if (Math.abs(num - 0.33) < 0.001) return '33% pot';
+  if (Math.abs(num - 0.50) < 0.001) return '50% pot';
+  if (Math.abs(num - 0.75) < 0.001) return '75% pot';
+  if (Math.abs(num - 1.00) < 0.001) return '100% pot';
+  if (Math.abs(num - 1.25) < 0.001) return '125% pot';
+  return `${Math.round(num * 100)}% pot`;
+}
+
+function tpv2SizingShortLabel(size = thoughtProcessV2SelectedSizing) {
+  const num = Number(size);
+  if (!Number.isFinite(num)) return 'BET';
+  if (Math.abs(num - 0.33) < 0.001) return '33%';
+  if (Math.abs(num - 0.50) < 0.001) return '50%';
+  if (Math.abs(num - 0.75) < 0.001) return '75%';
+  if (Math.abs(num - 1.00) < 0.001) return '100%';
+  if (Math.abs(num - 1.25) < 0.001) return '125%';
+  return `${Math.round(num * 100)}%`;
+}
+
+function tpv2SizingClass(size = thoughtProcessV2SelectedSizing) {
+  const num = Number(size);
+  if (!Number.isFinite(num)) return '';
+  if (Math.abs(num - 0.33) < 0.001) return 'size-33';
+  if (Math.abs(num - 0.50) < 0.001) return 'size-50';
+  if (Math.abs(num - 0.75) < 0.001) return 'size-75';
+  if (Math.abs(num - 1.00) < 0.001) return 'size-100';
+  if (Math.abs(num - 1.25) < 0.001) return 'size-125';
+  return '';
+}
+
+function tpv2UpdateBetButton() {
+  const btn = document.getElementById('tpv2-bet-btn');
+  if (!btn) return;
+  const sizeClass = tpv2SizingClass();
+  btn.className = `ht-action-btn ht-btn-raise tpv2-bet-btn${sizeClass ? ` ${sizeClass}` : ''}`;
+  btn.textContent = sizeClass ? `BET ${tpv2SizingShortLabel()}` : 'BET';
+}
+
+function tpv2RangeBetClass(size = thoughtProcessV2SelectedSizing) {
+  const sizeClass = tpv2SizingClass(size);
+  if (sizeClass === 'size-33') return 'bet-33';
+  if (sizeClass === 'size-50') return 'bet-50';
+  if (sizeClass === 'size-75') return 'bet-75';
+  if (sizeClass === 'size-100') return 'bet-100';
+  if (sizeClass === 'size-125') return 'bet-125';
+  return 'bet-33';
+}
+
+function tpv2IsNullish(value) {
+  return value === null || value === undefined || value === '' || String(value).toLowerCase() === 'null';
+}
+
+function tpv2SizingMatches(value, target) {
+  if (!Number.isFinite(Number(target))) return false;
+  return Math.abs(Number(value) - Number(target)) < 0.001;
+}
+
+function tpv2ParseBoard(board) {
+  const parts = pftChunkHand(board);
+  if (parts.length < 3 || parts.length > 5 || parts.some(part => part.length !== 2)) return null;
+  return parts.map(part => ({
+    rank: part[0].toUpperCase(),
+    suit: part[1].toLowerCase()
+  }));
+}
+
+function tpv2HandClassFromCombo(hand) {
+  const cards = pftParseHand(hand);
+  if (!cards) return null;
+  const [first, second] = cards;
+  const firstIndex = TPV2_RANGE_RANKS.indexOf(first.rank);
+  const secondIndex = TPV2_RANGE_RANKS.indexOf(second.rank);
+  if (firstIndex < 0 || secondIndex < 0) return null;
+  if (first.rank === second.rank) return first.rank + second.rank;
+  const high = firstIndex < secondIndex ? first : second;
+  const low = firstIndex < secondIndex ? second : first;
+  return `${high.rank}${low.rank}${first.suit === second.suit ? 's' : 'o'}`;
+}
+
+function tpv2RangeGridLabel(rowIndex, colIndex) {
+  const rowRank = TPV2_RANGE_RANKS[rowIndex];
+  const colRank = TPV2_RANGE_RANKS[colIndex];
+  if (rowIndex === colIndex) return rowRank + colRank;
+  if (rowIndex < colIndex) return rowRank + colRank + 's';
+  return colRank + rowRank + 'o';
+}
+
+function tpv2BuildRangeClassMap(rows = thoughtProcessV2RangeRows) {
+  const grouped = {};
+  (Array.isArray(rows) ? rows : []).forEach(row => {
+    const handClass = tpv2HandClassFromCombo(row && row.hand);
+    if (!handClass) return;
+    if (!grouped[handClass]) grouped[handClass] = { check: 0, bet: 0 };
+    const action = pftNormalizeAction(row.best_action);
+    if (action === 'check') grouped[handClass].check++;
+    if (action === 'bet_1' || action === 'allin' || String(row.best_action || '').toLowerCase() === 'bet_1') grouped[handClass].bet++;
+  });
+
+  const strategy = {};
+  Object.entries(grouped).forEach(([handClass, counts]) => {
+    if (counts.bet > counts.check) strategy[handClass] = 'bet';
+    else if (counts.check > counts.bet) strategy[handClass] = 'check';
+    else strategy[handClass] = counts.bet > 0 ? 'bet' : 'check';
+  });
+  return strategy;
+}
+
+function tpv2ScoreForRangeMode(row, mode) {
+  if (mode === 'strength') {
+    return tpv2StrengthScoreFromPct(tpv2ToPct(row && row.hero_equity_vs_villain));
+  }
+  if (mode === 'improvability') {
+    return tpv2ScoreFromThresholds(tpv2DiffPct(row && row.equity_with_draws, row && row.hero_equity_vs_villain), [
+      { min: 32, score: 10 }, { min: 26, score: 9 }, { min: 20, score: 8 },
+      { min: 15, score: 7 }, { min: 10, score: 6 }, { min: 5, score: 5 },
+      { min: 0, score: 4 }, { min: -4, score: 3 }, { min: -10, score: 2 }
+    ]);
+  }
+  return null;
+}
+
+function tpv2BuildRangeScoreMap(mode, rows = thoughtProcessV2RangeRows) {
+  const grouped = {};
+  (Array.isArray(rows) ? rows : []).forEach(row => {
+    const handClass = tpv2HandClassFromCombo(row && row.hand);
+    const score = tpv2ScoreForRangeMode(row, mode);
+    if (!handClass || score === null) return;
+    if (!grouped[handClass]) grouped[handClass] = { total: 0, count: 0 };
+    grouped[handClass].total += score;
+    grouped[handClass].count++;
+  });
+
+  const scores = {};
+  Object.entries(grouped).forEach(([handClass, value]) => {
+    const average = value.count ? value.total / value.count : null;
+    if (average !== null) scores[handClass] = Math.max(1, Math.min(10, Math.round(average)));
+  });
+  return scores;
+}
+
+function tpv2SetRangeGridMode(mode) {
+  if (!['action', 'strength', 'improvability'].includes(mode)) return;
+  thoughtV2RangeGridMode = mode;
+  tpv2RenderRangeGrid();
+}
+
+function tpv2UpdateRangeModeButtons() {
+  document.querySelectorAll('#tpv2-range-toggle .thought-v2-range-toggle-btn').forEach(button => {
+    button.classList.toggle('active', button.dataset.mode === thoughtV2RangeGridMode);
+  });
+}
+
+function tpv2RenderRangeGrid() {
+  const grid = document.getElementById('tpv2-range-grid');
+  if (!grid) return;
+  tpv2UpdateRangeModeButtons();
+  const hasSizing = Number.isFinite(Number(thoughtProcessV2SelectedSizing));
+  if (!hasSizing) {
+    grid.innerHTML = '<div class="thought-v2-range-cell not-in-range range-loading">Choose sizing</div>';
+    return;
+  }
+
+  const strategy = thoughtV2RangeGridMode === 'action' ? tpv2BuildRangeClassMap() : tpv2BuildRangeScoreMap(thoughtV2RangeGridMode);
+  const currentClass = currentThoughtProcessV2Hand ? tpv2HandClassFromCombo(currentThoughtProcessV2Hand.hand) : null;
+  const betClass = tpv2RangeBetClass();
+  grid.innerHTML = '';
+
+  TPV2_RANGE_RANKS.forEach((_, rowIndex) => {
+    TPV2_RANGE_RANKS.forEach((__, colIndex) => {
+      const label = tpv2RangeGridLabel(rowIndex, colIndex);
+      const cell = document.createElement('div');
+      let cellClass = 'not-in-range';
+      if (thoughtV2RangeGridMode === 'action') {
+        const action = strategy[label];
+        cellClass = action === 'check' ? 'check' : (action === 'bet' ? betClass : 'not-in-range');
+      } else if (strategy[label]) {
+        cellClass = `score-mode score-color-${strategy[label]}`;
+      }
+      cell.className = `thought-v2-range-cell ${cellClass}${label === currentClass ? ' current-hand' : ''}`;
+      cell.textContent = label;
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function tpv2BestBinaryAction(row) {
+  const best = pftNormalizeAction(row && row.best_action);
+  return best === 'check' ? 'check' : 'bet';
+}
+
+function tpv2SolverBestActionLabel(row) {
+  const best = pftNormalizeAction(row && row.best_action);
+  if (best === 'check') return 'Check';
+  if (best === 'allin') return 'All-In';
+  if (best === 'bet_1' || String(row && row.best_action || '').toLowerCase() === 'bet_1') return `Bet ${tpv2SizingLabel()}`;
+  return pftActionLabel(best);
+}
+
+function tpv2SetStatus(message, tone='ready') {
+  const el = document.getElementById('tpv2-status');
+  if (!el) return;
+  el.textContent = message || '';
+  el.className = `pft-status ${tone}`.trim();
+  el.style.display = message ? 'block' : 'none';
+}
+
+function tpv2ShowDebugError(message) {
+  const el = document.getElementById('tpv2-debug');
+  if (!el) return;
+  if (!message) {
+    el.style.display = 'none';
+    el.textContent = '';
+    return;
+  }
+  el.style.display = 'block';
+  el.textContent = message;
+}
+
+function tpv2UpdateStats() {
+  document.getElementById('tpv2-stat-correct').textContent = thoughtProcessV2Stats.correct;
+  document.getElementById('tpv2-stat-wrong').textContent = thoughtProcessV2Stats.wrong;
+  const total = thoughtProcessV2Stats.correct + thoughtProcessV2Stats.wrong;
+  document.getElementById('tpv2-stat-pct').textContent = total > 0 ? `${Math.round((thoughtProcessV2Stats.correct / total) * 100)}%` : '--';
+}
+
+function tpv2NumberOrNull(value) {
+  if (value === null || value === undefined || value === '' || String(value).toLowerCase() === 'null') return null;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function tpv2ToPct(value) {
+  const num = tpv2NumberOrNull(value);
+  return num === null ? null : num * 100;
+}
+
+function tpv2DiffPct(a, b) {
+  const first = tpv2NumberOrNull(a);
+  const second = tpv2NumberOrNull(b);
+  if (first === null || second === null) return null;
+  return (first - second) * 100;
+}
+
+function tpv2RatioPct(numerator, denominator) {
+  const num = tpv2NumberOrNull(numerator);
+  const den = tpv2NumberOrNull(denominator);
+  if (num === null || den === null || den <= 0) return null;
+  return (num / den) * 100;
+}
+
+function tpv2ScoreFromThresholds(value, thresholds) {
+  if (value === null || value === undefined) return null;
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  for (const threshold of thresholds) {
+    if (num >= threshold.min) return threshold.score;
+  }
+  return 1;
+}
+
+function tpv2StrengthScoreFromPct(value) {
+  if (value === null || value === undefined) return null;
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  if (num >= 90) return 10;
+  if (num >= 80) return 9;
+  if (num >= 70) return 8;
+  if (num >= 60) return 7;
+  if (num >= 50) return 6;
+  if (num >= 40) return 5;
+  if (num >= 30) return 4;
+  if (num >= 20) return 3;
+  if (num >= 10) return 2;
+  return 1;
+}
+
+function tpv2CalculateScores(row) {
+  const strengthPct = tpv2ToPct(row && row.hero_equity_vs_villain);
+  const improvabilityPct = tpv2DiffPct(row && row.equity_with_draws, row && row.hero_equity_vs_villain);
+  const valueBlockedPct = tpv2RatioPct(row && row.hero_blocks_value_combos, row && row.villain_weighted_value_combos);
+  const foldBlockedPct = tpv2RatioPct(row && row.hero_blocks_fold_combos, row && row.villain_weighted_fold_combos);
+  const rangeEquityPct = tpv2ToPct(row && row.range_equity_hero);
+  const nutAdvantagePct = tpv2ToPct(row && row.nut_advantage_pct);
+
+  return [
+    { key: 'strength', label: 'Strength', score: tpv2StrengthScoreFromPct(strengthPct) },
+    { key: 'improvability', label: 'Improvability', score: tpv2ScoreFromThresholds(improvabilityPct, [
+      { min: 32, score: 10 }, { min: 26, score: 9 }, { min: 20, score: 8 },
+      { min: 15, score: 7 }, { min: 10, score: 6 }, { min: 5, score: 5 },
+      { min: 0, score: 4 }, { min: -4, score: 3 }, { min: -10, score: 2 }
+    ]) },
+    { key: 'value-blocked', label: 'Value Blockers', score: tpv2ScoreFromThresholds(valueBlockedPct, [
+      { min: 78, score: 10 }, { min: 65, score: 9 }, { min: 53, score: 8 },
+      { min: 42, score: 7 }, { min: 32, score: 6 }, { min: 23, score: 5 },
+      { min: 15, score: 4 }, { min: 8, score: 3 }, { min: 3, score: 2 }
+    ]) },
+    { key: 'fold-blocked', label: 'Fold Blockers', score: tpv2ScoreFromThresholds(foldBlockedPct, [
+      { min: 70, score: 10 }, { min: 56, score: 9 }, { min: 44, score: 8 },
+      { min: 34, score: 7 }, { min: 25, score: 6 }, { min: 17, score: 5 },
+      { min: 10, score: 4 }, { min: 5, score: 3 }, { min: 2, score: 2 }
+    ]) },
+    { key: 'range-adv', label: 'Range Adv', score: tpv2ScoreFromThresholds(rangeEquityPct, [
+      { min: 68, score: 10 }, { min: 63, score: 9 }, { min: 58, score: 8 },
+      { min: 54, score: 7 }, { min: 50, score: 6 }, { min: 46, score: 5 },
+      { min: 42, score: 4 }, { min: 37, score: 3 }, { min: 32, score: 2 }
+    ]) },
+    { key: 'nut-adv', label: 'Nut Adv', score: tpv2ScoreFromThresholds(nutAdvantagePct, [
+      { min: 8, score: 10 }, { min: 5, score: 9 }, { min: 3, score: 8 },
+      { min: 1.5, score: 7 }, { min: 0, score: 6 }, { min: -1.5, score: 5 },
+      { min: -3, score: 4 }, { min: -5, score: 3 }, { min: -8, score: 2 }
+    ]) }
+  ];
+}
+
+function resetThoughtV2ScoreGuesses() {
+  thoughtV2ScoreRevealToken++;
+  thoughtV2ScoreInputKey = null;
+  thoughtV2ScoreRevealState = {};
+  thoughtV2ScoreGuessState = {};
+  thoughtV2ScoreFeedbackState = {};
+  TPV2_SCORE_KEYS.forEach(key => {
+    thoughtV2ScoreRevealState[key] = false;
+    thoughtV2ScoreGuessState[key] = null;
+    thoughtV2ScoreFeedbackState[key] = null;
+  });
+}
+
+function tpv2VisibleScores(row) {
+  return tpv2CalculateScores(row)
+    .filter(item => TPV2_SCORE_KEYS.includes(item.key));
+}
+
+function tpv2ScoreItemForKey(scoreKey) {
+  if (!currentThoughtProcessV2Hand) return null;
+  return tpv2VisibleScores(currentThoughtProcessV2Hand)
+    .find(item => item.key === scoreKey) || null;
+}
+
+function handleThoughtV2ScoreClick(scoreKey) {
+  if (!currentThoughtProcessV2Hand || thoughtV2ScoreRevealState[scoreKey]) return;
+  thoughtV2ScoreInputKey = scoreKey;
+  tpv2RenderScores(currentThoughtProcessV2Hand);
+  window.setTimeout(() => {
+    const input = document.querySelector(`.thought-v2-score-input[data-score-key="${scoreKey}"]`);
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  }, 0);
+}
+
+function submitThoughtV2ScoreGuess(scoreKey, guessedValue) {
+  const scoreItem = tpv2ScoreItemForKey(scoreKey);
+  if (!scoreItem || scoreItem.score == null || thoughtV2ScoreRevealState[scoreKey]) return;
+  const guess = Number(guessedValue);
+  if (!Number.isInteger(guess) || guess < 1 || guess > 10) {
+    thoughtV2ScoreInputKey = scoreKey;
+    tpv2RenderScores(currentThoughtProcessV2Hand);
+    return;
+  }
+  const token = thoughtV2ScoreRevealToken;
+  thoughtV2ScoreGuessState[scoreKey] = guess;
+  thoughtV2ScoreInputKey = null;
+  thoughtV2ScoreFeedbackState[scoreKey] = guess === scoreItem.score ? 'correct' : 'wrong';
+  tpv2RenderScores(currentThoughtProcessV2Hand);
+  window.setTimeout(() => {
+    if (token !== thoughtV2ScoreRevealToken) return;
+    thoughtV2ScoreFeedbackState[scoreKey] = null;
+    thoughtV2ScoreRevealState[scoreKey] = true;
+    tpv2RenderScores(currentThoughtProcessV2Hand);
+  }, 750);
+}
+
+function tpv2RenderScores(row) {
+  const grid = document.getElementById('tpv2-score-grid');
+  if (!grid) return;
+  if (!row) {
+    grid.classList.remove('show');
+    grid.innerHTML = '';
+    return;
+  }
+  grid.innerHTML = '';
+  tpv2VisibleScores(row)
+    .forEach(item => {
+    const score = item.score == null ? 'N/A' : item.score;
+    const isRevealed = thoughtV2ScoreRevealState[item.key];
+    const isGuessing = thoughtV2ScoreInputKey === item.key;
+    const feedback = thoughtV2ScoreFeedbackState[item.key];
+    const haloSrc = isRevealed && item.score != null ? `Halo${item.score}.png` : 'Halo grey.png';
+    const scoreClass = isRevealed && item.score != null ? ` score-color-${item.score}` : '';
+    const haloContent = isRevealed
+      ? `<div class="thought-v2-score-number${item.score == null ? ' na' : ''}">${score}</div>`
+      : (isGuessing
+        ? `<input class="thought-v2-score-input" data-score-key="${item.key}" type="number" min="1" max="10" inputmode="numeric" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){submitThoughtV2ScoreGuess('${item.key}', this.value)}" onblur="submitThoughtV2ScoreGuess('${item.key}', this.value)">`
+        : '<div class="thought-v2-score-question">?</div>');
+    const feedbackMarkup = feedback
+      ? `<div class="thought-v2-score-ring-feedback ${feedback}"><span></span><span></span><span></span></div>`
+      : '';
+    const node = document.createElement('div');
+    node.className = `thought-v2-score-item${scoreClass}`;
+    node.innerHTML = `
+      <div class="thought-v2-score-label">${item.label}</div>
+      <button class="thought-v2-score-halo" type="button" onclick="handleThoughtV2ScoreClick('${item.key}')">
+        <img src="${haloSrc}" alt="">
+        ${haloContent}
+        ${feedbackMarkup}
+      </button>
+    `;
+    grid.appendChild(node);
+  });
+  grid.classList.add('show');
+}
+
+function showThoughtProcessTrainer2() {
+  thoughtProcessV2Stats = { correct: 0, wrong: 0 };
+  tpv2UpdateStats();
+  showScreen('screen-thought-process-v2');
+  showThoughtProcessSizingSelection();
+}
+
+function showThoughtProcessSizingSelection() {
+  thoughtProcessV2Street = 'flop';
+  thoughtProcessV2SelectedSizing = null;
+  thoughtProcessV2SelectedFlopSizing = null;
+  thoughtProcessV2SelectedTurnSizing = null;
+  currentThoughtProcessV2Hand = null;
+  thoughtProcessV2CurrentFlopRow = null;
+  thoughtProcessV2CurrentTurnRow = null;
+  thoughtProcessV2CurrentHandCombo = null;
+  thoughtProcessV2FlopUserAction = null;
+  thoughtProcessV2FlopActionBranch = null;
+  thoughtProcessV2RangeRows = [];
+  thoughtProcessV2RangeRowsSizing = null;
+  thoughtProcessV2Answered = false;
+  thoughtProcessV2Loading = false;
+  resetThoughtV2ScoreGuesses();
+  tpv2RenderSizingPanel('flop');
+  document.getElementById('tpv2-sizing-panel').classList.add('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
+  tpv2UpdateBetButton();
+  tpv2RenderScores(null);
+  tpv2RenderRangeGrid();
+  tpv2RenderTable(tpv2ParseBoard(TPV2_FLOP_BOARD), false);
+  document.getElementById('tpv2-ib-stage').textContent = 'FLOP SIZING';
+  document.getElementById('tpv2-ib-sizing').textContent = 'Sizing not selected';
+  const note = document.querySelector('#screen-thought-process-v2 .pft-choice-note');
+  if (note) note.textContent = 'What bet sizing do you want to use for your range?';
+  tpv2SetStatus('', 'revealed');
+  tpv2ShowDebugError('');
+}
+
+function tpv2RenderSizingPanel(street) {
+  const inner = document.querySelector('#tpv2-sizing-panel .tpv2-sizing-inner');
+  if (!inner) return;
+  if (street === 'turn') {
+    inner.innerHTML = `
+      <div class="tpv2-sizing-title">What turn bet sizing do you want to use for your range?</div>
+      <div class="tpv2-sizing-buttons">
+        <button class="tpv2-sizing-btn size-50" onclick="selectThoughtProcessSizing(0.50)">50%</button>
+        <button class="tpv2-sizing-btn size-100" onclick="selectThoughtProcessSizing(1.00)">100%</button>
+      </div>
+    `;
+    return;
+  }
+  inner.innerHTML = `
+    <div class="tpv2-sizing-title">What flop bet sizing do you want to use for your range?</div>
+    <div class="tpv2-sizing-buttons">
+      <button class="tpv2-sizing-btn size-33" onclick="selectThoughtProcessSizing(0.33)">33%</button>
+      <button class="tpv2-sizing-btn size-75" onclick="selectThoughtProcessSizing(0.75)">75%</button>
+      <button class="tpv2-sizing-btn size-125" onclick="selectThoughtProcessSizing(1.25)">125%</button>
+    </div>
+  `;
+}
+
+function showThoughtProcessTurnSizingSelection() {
+  if (!thoughtProcessV2CurrentFlopRow || !thoughtProcessV2CurrentHandCombo) {
+    showThoughtProcessSizingSelection();
+    return;
+  }
+  thoughtProcessV2Street = 'turn';
+  thoughtProcessV2SelectedSizing = null;
+  thoughtProcessV2SelectedTurnSizing = null;
+  currentThoughtProcessV2Hand = thoughtProcessV2CurrentFlopRow;
+  thoughtProcessV2CurrentTurnRow = null;
+  thoughtProcessV2Answered = false;
+  thoughtProcessV2Loading = false;
+  resetThoughtV2ScoreGuesses();
+  tpv2RenderSizingPanel('turn');
+  document.getElementById('tpv2-sizing-panel').classList.add('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
+  tpv2RenderScores(null);
+  tpv2RenderRangeGrid();
+  tpv2RenderTable(tpv2ParseBoard(TPV2_TURN_BOARD), true);
+  document.getElementById('tpv2-ib-stage').textContent = 'TURN SIZING';
+  document.getElementById('tpv2-ib-sizing').textContent = `${tpv2SizingLabel(thoughtProcessV2SelectedFlopSizing)} flop`;
+  const note = document.querySelector('#screen-thought-process-v2 .pft-choice-note');
+  if (note) note.textContent = 'What turn sizing do you want to use for your range?';
+  tpv2ShowDebugError('');
+}
+
+async function selectThoughtProcessSizing(size) {
+  if (tpv2IsTurnStreet()) {
+    thoughtProcessV2SelectedTurnSizing = Number(size);
+    thoughtProcessV2SelectedSizing = thoughtProcessV2SelectedTurnSizing;
+    document.getElementById('tpv2-sizing-panel').classList.remove('show');
+    document.getElementById('tpv2-ib-sizing').textContent = `Turn ${tpv2SizingLabel()}`;
+    tpv2UpdateBetButton();
+    await loadThoughtProcessTurnHandV2();
+    return;
+  }
+  thoughtProcessV2SelectedFlopSizing = Number(size);
+  thoughtProcessV2SelectedSizing = thoughtProcessV2SelectedFlopSizing;
+  document.getElementById('tpv2-sizing-panel').classList.remove('show');
+  document.getElementById('tpv2-ib-sizing').textContent = `Flop ${tpv2SizingLabel()}`;
+  tpv2UpdateBetButton();
+  await loadThoughtProcessHandV2();
+}
+
+async function loadThoughtProcessHandV2() {
+  if (!supabaseClient) {
+    tpv2SetStatus('Supabase client not initialised', 'error');
+    return;
+  }
+  if (!Number.isFinite(Number(thoughtProcessV2SelectedFlopSizing))) {
+    showThoughtProcessSizingSelection();
+    return;
+  }
+
+  thoughtProcessV2Street = 'flop';
+  thoughtProcessV2SelectedSizing = thoughtProcessV2SelectedFlopSizing;
+  thoughtProcessV2Answered = false;
+  thoughtProcessV2Loading = true;
+  currentThoughtProcessV2Hand = null;
+  thoughtProcessV2CurrentFlopRow = null;
+  thoughtProcessV2CurrentTurnRow = null;
+  thoughtProcessV2CurrentHandCombo = null;
+  thoughtProcessV2FlopUserAction = null;
+  thoughtProcessV2FlopActionBranch = null;
+  resetThoughtV2ScoreGuesses();
+  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
+  tpv2RenderScores(null);
+  tpv2RenderRangeGrid();
+  document.getElementById('tpv2-ib-stage').textContent = 'LOADING FLOP';
+  const note = document.querySelector('#screen-thought-process-v2 .pft-choice-note');
+  if (note) note.textContent = `Bet ${tpv2SizingShortLabel()} or check?`;
+  tpv2SetStatus(`Loading ${tpv2SizingLabel()} flop spot...`, 'ready');
+  tpv2ShowDebugError('');
+  tpv2UpdateBetButton();
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(TPV2_TURN_TABLE)
+      .select('*')
+      .eq('street', 'flop')
+      .eq('player_type', 'ip')
+      .eq('pot_type', 'srp')
+      .eq('board', TPV2_FLOP_BOARD)
+      .limit(5000);
+
+    if (error) {
+      throw new Error(`Supabase error: ${error.message || JSON.stringify(error)}${error.details ? ` | ${error.details}` : ''}${error.code ? ` | code ${error.code}` : ''}`);
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    const selectedFlopSizing = Number(thoughtProcessV2SelectedFlopSizing);
+    const matchingRows = rows.filter(row => {
+      const flopSize = Number(row.flop_bet_size);
+      const turnSize = row.turn_bet_size;
+      const turnIsEmpty =
+        turnSize === null ||
+        turnSize === undefined ||
+        turnSize === '' ||
+        String(turnSize).toLowerCase() === 'null';
+
+      return (
+        row.street === 'flop' &&
+        row.board === TPV2_FLOP_BOARD &&
+        row.player_type === 'ip' &&
+        row.pot_type === 'srp' &&
+        Number.isFinite(flopSize) &&
+        Math.abs(flopSize - selectedFlopSizing) < 0.001 &&
+        turnIsEmpty
+      );
+    });
+
+    if (!matchingRows.length) {
+      console.log('Thought V2 flop fetch raw row count:', rows.length);
+      console.log('Selected flop sizing:', selectedFlopSizing);
+      console.log('Available flop rows:', rows.slice(0, 20).map(row => ({
+        street: row.street,
+        board: row.board,
+        player_type: row.player_type,
+        pot_type: row.pot_type,
+        flop_bet_size: row.flop_bet_size,
+        flop_bet_size_number: Number(row.flop_bet_size),
+        turn_bet_size: row.turn_bet_size,
+        hand: row.hand
+      })));
+      console.log('Distinct flop_bet_size values:', [...new Set(rows.map(row => String(row.flop_bet_size)))]);
+      console.log('Distinct turn_bet_size values:', [...new Set(rows.map(row => String(row.turn_bet_size)))]);
+      throw new Error(`No ${TPV2_TURN_TABLE} flop rows found for ${tpv2SizingLabel(thoughtProcessV2SelectedFlopSizing)} on ${TPV2_FLOP_BOARD}`);
+    }
+
+    thoughtProcessV2RangeRows = matchingRows;
+    thoughtProcessV2RangeRowsSizing = thoughtProcessV2SelectedFlopSizing;
+    const row = matchingRows[Math.floor(Math.random() * matchingRows.length)];
+    renderThoughtProcessHandV2(row, 'flop');
+  } catch (error) {
+    console.error('Failed to load Thought Process Trainer 2.0 flop hand:', error);
+    thoughtProcessV2Loading = false;
+    tpv2SetStatus('Unable to load a Thought Process flop hand', 'error');
+    tpv2ShowDebugError(error && error.message ? error.message : String(error));
+    document.getElementById('tpv2-ib-stage').textContent = 'ERROR';
+  }
+}
+
+function tpv2DeriveFlopBranch(userAction) {
+  if (userAction === 'check') {
+    return { action: 'xx', flopBetSize: null };
+  }
+  const size = Number(thoughtProcessV2SelectedFlopSizing);
+  if (Math.abs(size - 0.33) < 0.001) return { action: 'b33c', flopBetSize: 0.33 };
+  if (Math.abs(size - 0.75) < 0.001) return { action: 'b75c', flopBetSize: 0.75 };
+  if (Math.abs(size - 1.25) < 0.001) return { action: 'b125c', flopBetSize: 1.25 };
+  return { action: null, flopBetSize: size };
+}
+
+async function loadThoughtProcessTurnHandV2() {
+  if (!supabaseClient) {
+    tpv2SetStatus('Supabase client not initialised', 'error');
+    return;
+  }
+  if (!thoughtProcessV2CurrentHandCombo || !thoughtProcessV2FlopActionBranch) {
+    showThoughtProcessSizingSelection();
+    return;
+  }
+  if (!Number.isFinite(Number(thoughtProcessV2SelectedTurnSizing))) {
+    showThoughtProcessTurnSizingSelection();
+    return;
+  }
+
+  thoughtProcessV2Answered = false;
+  thoughtProcessV2Loading = true;
+  currentThoughtProcessV2Hand = null;
+  thoughtProcessV2CurrentTurnRow = null;
+  resetThoughtV2ScoreGuesses();
+  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
+  tpv2RenderScores(null);
+  document.getElementById('tpv2-ib-stage').textContent = 'LOADING TURN';
+  const note = document.querySelector('#screen-thought-process-v2 .pft-choice-note');
+  if (note) note.textContent = `Bet ${tpv2SizingShortLabel()} or check?`;
+  tpv2SetStatus(`Loading ${tpv2SizingLabel()} turn spot...`, 'ready');
+  tpv2ShowDebugError('');
+  tpv2UpdateBetButton();
+  tpv2RenderTable(tpv2ParseBoard(TPV2_TURN_BOARD), true);
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(TPV2_TURN_TABLE)
+      .select('*')
+      .eq('street', 'turn')
+      .eq('player_type', 'ip')
+      .eq('pot_type', 'srp')
+      .eq('board', TPV2_TURN_BOARD)
+      .eq('turn_card', TPV2_TURN_CARD)
+      .eq('flop_action', thoughtProcessV2FlopActionBranch)
+      .limit(5000);
+
+    if (error) {
+      throw new Error(`Supabase error: ${error.message || JSON.stringify(error)}${error.details ? ` | ${error.details}` : ''}${error.code ? ` | code ${error.code}` : ''}`);
+    }
+
+    const turnRows = Array.isArray(data) ? data : [];
+    const matchingRows = turnRows.filter(row => {
+      const baseMatch =
+        row.street === 'turn' &&
+        row.board === TPV2_TURN_BOARD &&
+        row.turn_card === TPV2_TURN_CARD &&
+        row.player_type === 'ip' &&
+        row.pot_type === 'srp' &&
+        row.flop_action === thoughtProcessV2FlopActionBranch &&
+        tpv2SizingMatches(row.turn_bet_size, thoughtProcessV2SelectedTurnSizing);
+      if (!baseMatch) return false;
+      if (thoughtProcessV2FlopActionBranch === 'xx') {
+        return tpv2IsNullish(row.flop_bet_size);
+      }
+      return tpv2SizingMatches(row.flop_bet_size, thoughtProcessV2SelectedFlopSizing);
+    });
+
+    thoughtProcessV2RangeRows = matchingRows;
+    thoughtProcessV2RangeRowsSizing = thoughtProcessV2SelectedTurnSizing;
+    tpv2RenderRangeGrid();
+
+    const row = matchingRows.find(item => String(item.hand || '') === String(thoughtProcessV2CurrentHandCombo || '')) || null;
+    if (!row) {
+      showThoughtProcessMissingTurnV2();
+      return;
+    }
+
+    renderThoughtProcessHandV2(row, 'turn');
+  } catch (error) {
+    console.error('Failed to load Thought Process Trainer 2.0 turn hand:', error);
+    thoughtProcessV2Loading = false;
+    tpv2SetStatus('Unable to load a Thought Process turn hand', 'error');
+    tpv2ShowDebugError(error && error.message ? error.message : String(error));
+    document.getElementById('tpv2-ib-stage').textContent = 'ERROR';
+  }
+}
+
+function renderThoughtProcessHandV2(row, street = thoughtProcessV2Street) {
+  const cards = pftParseHand(row.hand);
+  const boardCards = tpv2ParseBoard(street === 'turn' ? TPV2_TURN_BOARD : TPV2_FLOP_BOARD);
+  if (!cards) throw new Error(`Invalid hand value: ${row.hand}`);
+  if (!boardCards) throw new Error(`Invalid board value: ${street === 'turn' ? TPV2_TURN_BOARD : TPV2_FLOP_BOARD}`);
+
+  thoughtProcessV2Street = street;
+  currentThoughtProcessV2Hand = row;
+  if (street === 'turn') thoughtProcessV2CurrentTurnRow = row;
+  else thoughtProcessV2CurrentFlopRow = row;
+  thoughtProcessV2CurrentHandCombo = row.hand;
+  [thoughtProcessV2CardCode1, thoughtProcessV2CardCode2] = pftChunkHand(row.hand);
+
+  tpv2RenderScores(row);
+  tpv2RenderRangeGrid();
+  tpv2RenderTable(boardCards);
+  document.getElementById('tpv2-ib-stage').textContent = street === 'turn' ? 'TURN DECISION' : 'FLOP DECISION';
+  document.getElementById('tpv2-ib-sizing').textContent = `${street === 'turn' ? 'Turn' : 'Flop'} ${tpv2SizingLabel()}`;
+  tpv2UpdateBetButton();
+  document.getElementById('tpv2-action-bar').classList.remove('ht-hidden');
+  tpv2SetStatus('', 'revealed');
+  thoughtProcessV2Loading = false;
+}
+
+function showThoughtProcessMissingTurnV2() {
+  thoughtProcessV2Loading = false;
+  currentThoughtProcessV2Hand = thoughtProcessV2CurrentFlopRow;
+  tpv2RenderScores(null);
+  tpv2RenderTable(tpv2ParseBoard(TPV2_TURN_BOARD), true);
+  document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
+  document.getElementById('tpv2-ib-stage').textContent = 'TURN BRANCH MISSING';
+  document.getElementById('tpv2-result-icon').textContent = 'NO';
+  const verdict = document.getElementById('tpv2-result-verdict');
+  verdict.textContent = 'TURN UNAVAILABLE';
+  verdict.className = 'ht-result-verdict wrong';
+  const actionEl = document.getElementById('tpv2-result-action');
+  actionEl.textContent = 'Branch filtered out';
+  actionEl.className = 'ht-result-action call';
+  const handEl = document.getElementById('tpv2-result-hand');
+  handEl.innerHTML = '';
+  if (thoughtProcessV2CardCode1) handEl.appendChild(pftMakeCardNode(thoughtProcessV2CardCode1));
+  if (thoughtProcessV2CardCode2) handEl.appendChild(pftMakeCardNode(thoughtProcessV2CardCode2));
+  document.getElementById('tpv2-result-detail').textContent = `Board ${TPV2_TURN_BOARD} - ${thoughtProcessV2FlopActionBranch || 'unknown branch'} - Turn ${tpv2SizingLabel(thoughtProcessV2SelectedTurnSizing)}`;
+  document.getElementById('tpv2-result-correct').innerHTML = 'This hand does not reach this turn branch in the simplified strategy.';
+  document.getElementById('tpv2-result-frequencies').innerHTML = '';
+  document.getElementById('tpv2-result-meta').innerHTML = `<strong>Hero hand:</strong> ${thoughtProcessV2CurrentHandCombo || '--'} &nbsp; <strong>Branch:</strong> ${thoughtProcessV2FlopActionBranch || '--'}`;
+  tpv2ConfigureResultPrimary('NEXT HAND', 'next');
+  document.getElementById('tpv2-result-overlay').classList.add('show');
+}
+
+function tpv2GetSrpVisualState() {
+  const scenario = { opener: 'BTN', caller: 'BB', kind: 'srp' };
+  const initialState = pftGetInitialVisualState();
+  const bets = { ...(initialState && initialState.bets ? initialState.bets : {}) };
+  const folded = new Set(initialState && initialState.folded ? initialState.folded : []);
+  pftGetActionSequence(scenario).forEach(action => {
+    if (action.action === 'fold') folded.add(action.pos);
+    const amount = Number(action.amount);
+    if (Number.isFinite(amount)) bets[action.pos] = amount;
+  });
+  return { bets, folded };
+}
+
+function tpv2RenderTable(boardCards, showHeroHand = true) {
+  const seatsLayer = document.getElementById('tpv2-seats-layer');
+  const chipsLayer = document.getElementById('tpv2-chips-layer');
+  const community = document.getElementById('tpv2-community');
+  const visualState = tpv2GetSrpVisualState();
+  seatsLayer.innerHTML = '';
+  chipsLayer.innerHTML = '';
+  community.innerHTML = '';
+  community.className = 'ht-community pft-board-deal';
+  boardCards.forEach(card => community.appendChild(pftMakeCardNode(`${card.rank}${card.suit}`)));
+
+  HT_ACTION_ORDER.forEach(pos => {
+    const seat = document.createElement('div');
+    seat.className = 'ht-seat' + (visualState.folded.has(pos) ? ' ht-folded' : '');
+    seat.dataset.pos = pos;
+    seat.style.left = HT_SEAT_POS[pos].x + '%';
+    seat.style.top = HT_SEAT_POS[pos].y + '%';
+
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'ht-seat-cards ' + (pos === 'BTN' ? 'ht-hero-cards ' : '') + HT_CARD_DIR[pos];
+    if (pos === 'BTN' && showHeroHand) {
+      cardsWrap.appendChild(pftMakeCardNode(thoughtProcessV2CardCode1));
+      cardsWrap.appendChild(pftMakeCardNode(thoughtProcessV2CardCode2));
+    } else if (pos !== 'BTN') {
+      cardsWrap.appendChild(htMakeBack());
+      cardsWrap.appendChild(htMakeBack());
+    }
+    seat.appendChild(cardsWrap);
+
+    const chip = document.createElement('div');
+    chip.className = 'ht-pos-chip' + (pos === 'BTN' ? ' ht-hero' : '');
+    const chipImg = document.createElement('img');
+    chipImg.src = 'positionlabelblack.png';
+    chip.appendChild(chipImg);
+    const label = document.createElement('div');
+    label.className = 'ht-pos-chip-label';
+    label.textContent = pos;
+    chip.appendChild(label);
+    seat.appendChild(chip);
+    seatsLayer.appendChild(seat);
+
+    if (visualState.bets[pos] !== undefined) tpv2SetDisplayedBet(pos, visualState.bets[pos]);
+  });
+
+  tpv2SyncPotFromDisplayedChips();
+}
+
+function tpv2SetDisplayedBet(pos, amount) {
+  const chipsLayer = document.getElementById('tpv2-chips-layer');
+  if (!chipsLayer) return;
+  const chip = document.createElement('div');
+  chip.className = 'ht-bet-chip';
+  chip.dataset.pos = pos;
+  chip.style.left = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].x : 50) + '%';
+  chip.style.top = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].y : 50) + '%';
+  const img = document.createElement('img');
+  img.src = 'chip2.png';
+  chip.appendChild(img);
+  const val = document.createElement('div');
+  val.className = 'ht-chip-val';
+  val.textContent = pftFormatChipAmount(amount);
+  chip.appendChild(val);
+  chipsLayer.appendChild(chip);
+}
+
+function tpv2SyncPotFromDisplayedChips() {
+  const pot = [...document.querySelectorAll('#tpv2-chips-layer .ht-chip-val')]
+    .reduce((sum, chip) => sum + (parseFloat(chip.textContent) || 0), 0);
+  document.getElementById('tpv2-pot-amount').textContent = pftFormatChipAmount(pot);
+}
+
+function answerThoughtProcessV2(action) {
+  if (thoughtProcessV2Answered || thoughtProcessV2Loading || !currentThoughtProcessV2Hand) return;
+  thoughtProcessV2Answered = true;
+  const userAction = action === 'check' ? 'check' : 'bet';
+  const isCorrect = userAction === tpv2BestBinaryAction(currentThoughtProcessV2Hand);
+  if (isCorrect) thoughtProcessV2Stats.correct++;
+  else thoughtProcessV2Stats.wrong++;
+  tpv2UpdateStats();
+
+  if (!tpv2IsTurnStreet()) {
+    thoughtProcessV2FlopUserAction = userAction;
+    const branch = tpv2DeriveFlopBranch(userAction);
+    thoughtProcessV2FlopActionBranch = branch.action;
+  }
+
+  showThoughtProcessFeedbackV2(isCorrect, currentThoughtProcessV2Hand, userAction);
+}
+
+function tpv2ConfigureResultPrimary(label, mode) {
+  const labelEl = document.getElementById('tpv2-primary-next-label');
+  const btn = document.getElementById('tpv2-primary-next-btn');
+  if (labelEl) labelEl.textContent = label;
+  if (btn) btn.dataset.mode = mode;
+}
+
+function tpv2PrimaryResultAction() {
+  const btn = document.getElementById('tpv2-primary-next-btn');
+  const mode = btn ? btn.dataset.mode : 'next';
+  if (mode === 'turn') {
+    showThoughtProcessTurnSizingSelection();
+    return;
+  }
+  tpv2NextHandV2();
+}
+
+function tpv2NextHandV2() {
+  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  if (!Number.isFinite(Number(thoughtProcessV2SelectedFlopSizing))) {
+    showThoughtProcessSizingSelection();
+    return;
+  }
+  thoughtProcessV2Street = 'flop';
+  thoughtProcessV2SelectedSizing = thoughtProcessV2SelectedFlopSizing;
+  thoughtProcessV2SelectedTurnSizing = null;
+  loadThoughtProcessHandV2();
+}
+
+function showThoughtProcessFeedbackV2(isCorrect, row, userAction) {
+  const streetLabel = tpv2IsTurnStreet() ? 'TURN' : 'FLOP';
+  tpv2RenderRangeGrid();
+  document.getElementById('tpv2-result-icon').textContent = isCorrect ? 'OK' : 'NO';
+  const verdict = document.getElementById('tpv2-result-verdict');
+  verdict.textContent = `${streetLabel} ${isCorrect ? 'CORRECT' : 'WRONG'}`;
+  verdict.className = `ht-result-verdict ${isCorrect ? 'correct' : 'wrong'}`;
+
+  const actionEl = document.getElementById('tpv2-result-action');
+  actionEl.textContent = `You chose ${userAction === 'bet' ? 'Bet' : 'Check'}`;
+  actionEl.className = `ht-result-action ${userAction === 'bet' ? 'raise' : 'call'}`;
+
+  const handEl = document.getElementById('tpv2-result-hand');
+  handEl.innerHTML = '';
+  handEl.appendChild(pftMakeCardNode(thoughtProcessV2CardCode1));
+  handEl.appendChild(pftMakeCardNode(thoughtProcessV2CardCode2));
+
+  const boardLabel = tpv2IsTurnStreet() ? TPV2_TURN_BOARD : TPV2_FLOP_BOARD;
+  const branchMeta = tpv2IsTurnStreet() ? ` - ${thoughtProcessV2FlopActionBranch || 'unknown branch'}` : '';
+  document.getElementById('tpv2-result-detail').textContent = `${streetLabel} board ${boardLabel} - ${tpv2SizingLabel()}${branchMeta} - ${pftFormatEv(row.ev)}`;
+  document.getElementById('tpv2-result-correct').innerHTML = isCorrect
+    ? `<strong>Correct.</strong> Solver best action: ${tpv2SolverBestActionLabel(row)}.`
+    : `<strong>Incorrect.</strong> Solver best action: <strong>${tpv2SolverBestActionLabel(row)}</strong>.`;
+
+  const frequencies = [
+    { key: 'check', label: 'Check', value: row.check_freq ?? 0, ev: row.check_ev ?? null, binary: 'check' },
+    { key: 'bet_1', label: tpv2SizingShortLabel(), value: row.bet_1_freq ?? 0, ev: row.bet_1_ev ?? null, binary: 'bet' }
+  ];
+  if (pftIsSolverValuePresent(row.allin_freq) || pftIsSolverValuePresent(row.allin_ev) || pftNormalizeAction(row.best_action) === 'allin') {
+    frequencies.push({ key: 'allin', label: 'All In', value: row.allin_freq ?? 0, ev: row.allin_ev ?? null, binary: 'bet' });
+  }
+
+  const exactBest = pftNormalizeAction(row.best_action);
+  const list = document.getElementById('tpv2-result-frequencies');
+  list.innerHTML = '';
+  frequencies.forEach((freq, index) => {
+    const style = freq.key === 'bet_1'
+      ? PFT_ANALYSIS_BET_STYLES[index]
+      : pftAnalysisStyle(freq.key === 'bet_1' ? 'bet_33' : freq.key);
+    const isBest = exactBest === freq.key || (freq.key === 'bet_1' && String(row.best_action || '').toLowerCase() === 'bet_1');
+    const isChosen = userAction === freq.binary;
+    const isWrongChoice = isChosen && !isCorrect && !isBest;
+    const optionTop = isWrongChoice ? '#C14F4F' : (isBest ? style.top : '#3D3B4B');
+    const optionBottom = isWrongChoice ? '#DA9696' : (isBest ? style.bottom : '#757090');
+    const optionBorder = isWrongChoice ? '#9c1020' : (isBest ? style.border : '#5f5b76');
+    const frequencyTop = isWrongChoice ? '#C14F4F' : (isBest ? style.top : '#B5B2C2');
+    const frequencyBottom = isWrongChoice ? '#DA9696' : (isBest ? style.bottom : '#DAD8E0');
+    const pct = pftFrequencyPercentValue(freq.value);
+    const el = document.createElement('div');
+    el.className = `pft-analysis-row${isBest ? ' best' : ''}${isChosen ? ' chosen' : ''}`;
+    el.style.setProperty('--pft-option-top', optionTop);
+    el.style.setProperty('--pft-option-bottom', optionBottom);
+    el.style.setProperty('--pft-option-border', optionBorder);
+    el.style.setProperty('--pft-action-top', style.top);
+    el.style.setProperty('--pft-action-bottom', style.bottom);
+    el.style.setProperty('--pft-action-border', style.border);
+    el.style.setProperty('--pft-frequency-top', frequencyTop);
+    el.style.setProperty('--pft-frequency-bottom', frequencyBottom);
+    el.style.setProperty('--pft-frequency-width', `${pct}%`);
+    el.innerHTML = `
+      <div class="pft-option-cell"><span class="pft-button-text">${freq.label}</span></div>
+      <div class="pft-frequency-cell">
+        <div class="pft-frequency-fill"></div>
+        <span class="pft-frequency-percent">${pct}%</span>
+      </div>
+      <div class="pft-ev-cell${isBest ? ' best' : ''}${isWrongChoice ? ' wrong' : ''}"><span class="pft-ev-text">${pftFormatAnalysisEv(freq.ev)}</span></div>
+    `;
+    list.appendChild(el);
+  });
+
+  tpv2ConfigureResultPrimary(tpv2IsTurnStreet() ? 'NEXT HAND' : 'GO TO TURN', tpv2IsTurnStreet() ? 'next' : 'turn');
+  document.getElementById('tpv2-result-meta').innerHTML = `<strong>Hero hand:</strong> ${row.hand} &nbsp; <strong>Street:</strong> ${streetLabel} &nbsp; <strong>Chosen sizing:</strong> ${tpv2SizingLabel()} &nbsp; <strong>Row EV:</strong> ${pftFormatAnalysisEv(row.ev)}`;
+  document.getElementById('tpv2-result-overlay').classList.add('show');
+}
+
 </script>
 <!-- ══════════════════════════════════════ HAND TRAINER SCREEN ══════════════════════════════════════ -->
 <div id="screen-trainer" class="screen">
@@ -4019,18 +5517,23 @@ function pftAction(action) {
     <div class="ht-info-seg"><span class="value">100BB STACKS</span></div>
   </div>
   <button class="ht-back-btn" onclick="showScreen('screen-home')">← Menu</button>
+  <div class="ht-filter-panel" id="ht-filter-panel"></div>
+  <div class="preflop-trainer-content" id="preflop-trainer-content">
   <div class="ht-stats">
     <div class="ht-stat-pill"><span class="sl">✓</span><span id="ht-stat-correct">0</span></div>
     <div class="ht-stat-pill"><span class="sl">✗</span><span id="ht-stat-wrong">0</span></div>
     <div class="ht-stat-pill"><span class="sl">%</span><span id="ht-stat-pct">—</span></div>
   </div>
+  <button class="ht-change-filters" id="ht-change-filters" onclick="openPreflopFilterPopup('change')">CHANGE FILTERS</button>
+  <div class="ht-no-match" id="ht-no-match">No hands match these filters. Turn more filters on.</div>
+  <div class="ht-best-streak" id="ht-best-streak">BEST STREAK: 0</div>
   <div class="ht-table-area">
     <div class="ht-table-wrap" id="ht-table-wrap">
       <img src="Table2.png" alt="" class="ht-table-bg">
       <div class="ht-community" id="ht-community"></div>
       <div class="ht-pot-display" id="ht-pot-display">
         <div class="ht-pot-img-wrap">
-          <img src="Pot.png" alt="">
+          <img src="Pot red.png" alt="">
           <div class="ht-pot-overlay"><span class="ht-pot-amount" id="ht-pot-amount">1.5</span></div>
         </div>
       </div>
@@ -4044,18 +5547,27 @@ function pftAction(action) {
     <button class="ht-action-btn ht-btn-raise" id="ht-btn-raise" onclick="htAction('raise')">RAISE</button>
     <button class="ht-action-btn ht-btn-allin hidden" id="ht-btn-allin" onclick="htAction('shove')">ALL-IN</button>
   </div>
+  </div>
 </div>
 
 <!-- HAND TRAINER RESULT OVERLAY -->
 <div class="ht-result-overlay" id="ht-result-overlay">
   <div class="ht-result-card">
+    <div class="pft-analysis-header">
+      <div class="ht-result-hand" id="ht-result-hand"></div>
+      <div class="pft-analysis-title">HAND ANALYSIS</div>
+    </div>
+    <div class="ht-preflop-result-summary">
+      <div class="ht-panel-verdict correct" id="ht-panel-verdict">CORRECT</div>
+      <div class="ht-panel-streak" id="ht-panel-streak">0 IN A ROW</div>
+    </div>
     <div class="ht-result-icon" id="ht-result-icon">✓</div>
     <div class="ht-result-verdict" id="ht-result-verdict">CORRECT</div>
     <div class="ht-result-action" id="ht-result-action"></div>
-    <div class="ht-result-hand" id="ht-result-hand"></div>
     <div class="ht-result-detail" id="ht-result-detail"></div>
     <div class="ht-result-correct" id="ht-result-correct"></div>
-    <button class="ht-result-next" onclick="htNextHand()">Next Hand →</button>
+    <div class="preflop-range-grid hidden" id="preflop-range-grid"></div>
+    <button class="ht-result-next" onclick="htNextHand()"><span class="pft-button-text">NEXT HAND</span></button>
   </div>
 </div>
 
@@ -4081,7 +5593,7 @@ function pftAction(action) {
       <div class="ht-community" id="pft-community"></div>
       <div class="ht-pot-display">
         <div class="ht-pot-img-wrap">
-          <img src="Pot.png" alt="">
+          <img src="Pot red.png" alt="">
           <div class="ht-pot-overlay"><span class="ht-pot-amount" id="pft-pot-amount">1.5</span></div>
         </div>
       </div>
@@ -4117,6 +5629,88 @@ function pftAction(action) {
     <div class="ht-result-detail" id="pft-result-detail"></div>
     <div class="pft-result-meta" id="pft-result-meta"></div>
     <div class="ht-result-correct" id="pft-result-correct"></div>
+  </div>
+</div>
+
+<!-- THOUGHT PROCESS TRAINER 2.0 SCREEN -->
+<div id="screen-thought-process-v2" class="screen">
+  <div class="ht-info-bar" id="tpv2-info-bar">
+    <div class="ht-info-seg"><span class="value">THOUGHT PROCESS TRAINER 2.0</span></div>
+    <div class="ht-info-seg"><span class="value" id="tpv2-ib-stage">CHOOSE SIZING</span></div>
+    <div class="ht-info-seg"><span class="value">BTN vs BB SRP</span></div>
+    <div class="ht-info-seg"><span class="value" id="tpv2-ib-sizing">Sizing not selected</span></div>
+  </div>
+  <button class="ht-back-btn" onclick="showScreen('screen-home')">&larr; Menu</button>
+  <div class="ht-stats">
+    <div class="ht-stat-pill"><span class="sl">OK</span><span id="tpv2-stat-correct">0</span></div>
+    <div class="ht-stat-pill"><span class="sl">NO</span><span id="tpv2-stat-wrong">0</span></div>
+    <div class="ht-stat-pill"><span class="sl">%</span><span id="tpv2-stat-pct">--</span></div>
+  </div>
+  <div class="pft-debug" id="tpv2-debug"></div>
+  <div class="thought-v2-main-layout">
+    <div class="thought-v2-score-grid" id="tpv2-score-grid"></div>
+    <div class="ht-table-area">
+      <div class="ht-table-wrap" id="tpv2-table-wrap">
+        <img src="Table2.png" alt="" class="ht-table-bg">
+        <div class="ht-community" id="tpv2-community"></div>
+        <div class="ht-pot-display">
+          <div class="ht-pot-img-wrap">
+            <img src="Pot red.png" alt="">
+            <div class="ht-pot-overlay"><span class="ht-pot-amount" id="tpv2-pot-amount">1.5</span></div>
+          </div>
+        </div>
+        <div id="tpv2-seats-layer"></div>
+        <div id="tpv2-chips-layer"></div>
+      </div>
+    </div>
+  </div>
+  <div class="tpv2-sizing-panel" id="tpv2-sizing-panel">
+    <div class="tpv2-sizing-inner">
+      <div class="tpv2-sizing-title">What bet sizing do you want to use for your range?</div>
+      <div class="tpv2-sizing-buttons">
+        <button class="tpv2-sizing-btn size-33" onclick="selectThoughtProcessSizing(0.33)">33%</button>
+        <button class="tpv2-sizing-btn size-75" onclick="selectThoughtProcessSizing(0.75)">75%</button>
+        <button class="tpv2-sizing-btn size-125" onclick="selectThoughtProcessSizing(1.25)">125%</button>
+      </div>
+    </div>
+  </div>
+  <div class="ht-action-bar ht-hidden pft-action-bar" id="tpv2-action-bar">
+    <button class="ht-action-btn ht-btn-raise tpv2-bet-btn" id="tpv2-bet-btn" onclick="answerThoughtProcessV2('bet')">BET</button>
+    <button class="ht-action-btn ht-btn-call" onclick="answerThoughtProcessV2('check')">CHECK</button>
+  </div>
+</div>
+
+<!-- THOUGHT PROCESS TRAINER 2.0 RESULT OVERLAY -->
+<div class="ht-result-overlay" id="tpv2-result-overlay">
+  <div class="ht-result-card">
+    <div class="pft-analysis-header">
+      <div class="ht-result-hand" id="tpv2-result-hand"></div>
+      <div class="pft-analysis-title">HAND ANALYSIS</div>
+    </div>
+    <div class="pft-analysis-table-head">
+      <div>OPTION</div>
+      <div>FREQUENCY</div>
+      <div>EV (BB)</div>
+    </div>
+    <div class="pft-frequency-list" id="tpv2-result-frequencies"></div>
+    <div class="tpv2-result-buttons">
+      <button class="ht-result-next" id="tpv2-primary-next-btn" onclick="tpv2PrimaryResultAction()"><span class="pft-button-text" id="tpv2-primary-next-label">NEXT HAND</span></button>
+      <button class="ht-result-next" onclick="showThoughtProcessSizingSelection()"><span class="pft-button-text">CHANGE SIZING</span></button>
+    </div>
+    <div class="thought-v2-range-section">
+      <div class="thought-v2-range-toggle" id="tpv2-range-toggle">
+        <button class="thought-v2-range-toggle-btn active" data-mode="action" onclick="tpv2SetRangeGridMode('action')">Action</button>
+        <button class="thought-v2-range-toggle-btn" data-mode="strength" onclick="tpv2SetRangeGridMode('strength')">Strength</button>
+        <button class="thought-v2-range-toggle-btn" data-mode="improvability" onclick="tpv2SetRangeGridMode('improvability')">Improvability</button>
+      </div>
+      <div class="thought-v2-range-grid" id="tpv2-range-grid"></div>
+    </div>
+    <div class="ht-result-icon" id="tpv2-result-icon">OK</div>
+    <div class="ht-result-verdict" id="tpv2-result-verdict">CORRECT</div>
+    <div class="ht-result-action" id="tpv2-result-action"></div>
+    <div class="ht-result-detail" id="tpv2-result-detail"></div>
+    <div class="pft-result-meta" id="tpv2-result-meta"></div>
+    <div class="ht-result-correct" id="tpv2-result-correct"></div>
   </div>
 </div>
 

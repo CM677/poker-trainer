@@ -545,6 +545,217 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   .home-fan-card { flex:0 0 auto; }
   .home-fan-card img { height:clamp(170px, 58vw, 240px); }
 }
+@media (max-width: 768px) and (orientation: portrait) {
+  #screen-trainer,
+  #screen-postflop-trainer,
+  #screen-thought-process-v2 { min-height:100svh; overflow:hidden; }
+
+  #screen-trainer .ht-info-bar,
+  #screen-postflop-trainer .ht-info-bar,
+  #screen-thought-process-v2 .ht-info-bar { height:36px; }
+
+  #screen-trainer .ht-info-seg,
+  #screen-postflop-trainer .ht-info-seg,
+  #screen-thought-process-v2 .ht-info-seg { padding:0 0.7rem; font-size:0.78rem; letter-spacing:0.09em; }
+
+  #screen-trainer .ht-back-btn,
+  #screen-postflop-trainer .ht-back-btn,
+  #screen-thought-process-v2 .ht-back-btn { top:40px; left:0.5rem; font-size:0.72rem; padding:0.22rem 0.58rem; }
+
+  #screen-trainer .ht-stats,
+  #screen-postflop-trainer .ht-stats,
+  #screen-thought-process-v2 .ht-stats { top:40px; right:0.45rem; gap:0.35rem; }
+
+  #screen-trainer .ht-stat-pill,
+  #screen-postflop-trainer .ht-stat-pill,
+  #screen-thought-process-v2 .ht-stat-pill { padding:0.18rem 0.46rem; font-size:0.62rem; }
+
+  #screen-trainer .ht-table-area,
+  #screen-postflop-trainer .ht-table-area,
+  #screen-thought-process-v2 .ht-table-area,
+  .thought-v2-main-layout .ht-table-area { flex:0 1 auto; width:100%; padding:0.05rem 0.2rem 0.12rem; }
+
+  #screen-trainer .ht-table-wrap,
+  #screen-postflop-trainer .ht-table-wrap,
+  #screen-thought-process-v2 .ht-table-wrap {
+    width:min(96vw, 430px);
+    height:min(67svh, 640px);
+    max-height:640px;
+    aspect-ratio:auto;
+  }
+
+  #screen-trainer .ht-table-bg,
+  #screen-postflop-trainer .ht-table-bg,
+  #screen-thought-process-v2 .ht-table-bg { content:url("tablemobile.png"); object-fit:contain; }
+
+  #screen-trainer .ht-pos-chip,
+  #screen-postflop-trainer .ht-pos-chip,
+  #screen-thought-process-v2 .ht-pos-chip { width:64px; height:34px; }
+
+  #screen-trainer .ht-pos-chip img,
+  #screen-postflop-trainer .ht-pos-chip img,
+  #screen-thought-process-v2 .ht-pos-chip img { content:url("positionlabelmobile.png"); object-fit:contain; }
+
+  #screen-trainer .ht-pos-chip-label,
+  #screen-postflop-trainer .ht-pos-chip-label,
+  #screen-thought-process-v2 .ht-pos-chip-label { align-items:center; padding-top:0.08rem; font-size:0.96rem; line-height:1; }
+
+  #screen-trainer .ht-card,
+  #screen-postflop-trainer .ht-card,
+  #screen-thought-process-v2 .ht-card { overflow:visible; border-radius:0; }
+
+  #screen-trainer .ht-card img.ht-card-bg,
+  #screen-postflop-trainer .ht-card img.ht-card-bg,
+  #screen-thought-process-v2 .ht-card img.ht-card-bg { object-fit:contain; }
+
+  #screen-trainer .ht-seat-cards,
+  #screen-postflop-trainer .ht-seat-cards,
+  #screen-thought-process-v2 .ht-seat-cards {
+    left:50% !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:calc(100% - 3px) !important;
+    transform:translateX(-50%) !important;
+    gap:0;
+    z-index:2;
+  }
+
+  #screen-trainer .ht-seat-cards .ht-card,
+  #screen-postflop-trainer .ht-seat-cards .ht-card,
+  #screen-thought-process-v2 .ht-seat-cards .ht-card { width:23px; height:33px; margin:0 -2px; }
+
+  #screen-trainer .ht-hero-cards .ht-card,
+  #screen-postflop-trainer .ht-hero-cards .ht-card,
+  #screen-thought-process-v2 .ht-hero-cards .ht-card { width:31px; height:44px; }
+
+  #screen-trainer .ht-seat-cards .ht-card:nth-child(1),
+  #screen-postflop-trainer .ht-seat-cards .ht-card:nth-child(1),
+  #screen-thought-process-v2 .ht-seat-cards .ht-card:nth-child(1) {
+    transform:rotate(-7deg) translateY(1px);
+    transform-origin:70% 100%;
+  }
+
+  #screen-trainer .ht-seat-cards .ht-card:nth-child(2),
+  #screen-postflop-trainer .ht-seat-cards .ht-card:nth-child(2),
+  #screen-thought-process-v2 .ht-seat-cards .ht-card:nth-child(2) {
+    transform:rotate(7deg) translateY(1px);
+    transform-origin:30% 100%;
+  }
+
+  #screen-trainer .ht-seat-cards .ht-card .ht-card-rank,
+  #screen-postflop-trainer .ht-seat-cards .ht-card .ht-card-rank,
+  #screen-thought-process-v2 .ht-seat-cards .ht-card .ht-card-rank { font-size:0.76rem; }
+
+  #screen-trainer .ht-hero-cards .ht-card .ht-card-rank,
+  #screen-postflop-trainer .ht-hero-cards .ht-card .ht-card-rank,
+  #screen-thought-process-v2 .ht-hero-cards .ht-card .ht-card-rank { font-size:1.25rem; }
+
+  #screen-trainer .ht-seat[data-pos="HJ"],
+  #screen-postflop-trainer .ht-seat[data-pos="HJ"],
+  #screen-thought-process-v2 .ht-seat[data-pos="HJ"] {
+    left:50% !important;
+    top:12% !important;
+    transform:translate(-50%,-50%) scale(0.84) !important;
+  }
+
+  #screen-trainer .ht-seat[data-pos="UTG"],
+  #screen-postflop-trainer .ht-seat[data-pos="UTG"],
+  #screen-thought-process-v2 .ht-seat[data-pos="UTG"] {
+    left:20% !important;
+    top:26% !important;
+    transform:translate(-50%,-50%) scale(0.88) !important;
+  }
+
+  #screen-trainer .ht-seat[data-pos="CO"],
+  #screen-postflop-trainer .ht-seat[data-pos="CO"],
+  #screen-thought-process-v2 .ht-seat[data-pos="CO"] {
+    left:80% !important;
+    top:26% !important;
+    transform:translate(-50%,-50%) scale(0.9) !important;
+  }
+
+  #screen-trainer .ht-seat[data-pos="BB"],
+  #screen-postflop-trainer .ht-seat[data-pos="BB"],
+  #screen-thought-process-v2 .ht-seat[data-pos="BB"] {
+    left:23% !important;
+    top:76% !important;
+    transform:translate(-50%,-50%) scale(0.98) !important;
+  }
+
+  #screen-trainer .ht-seat[data-pos="BTN"],
+  #screen-postflop-trainer .ht-seat[data-pos="BTN"],
+  #screen-thought-process-v2 .ht-seat[data-pos="BTN"] {
+    left:77% !important;
+    top:76% !important;
+    transform:translate(-50%,-50%) scale(0.98) !important;
+  }
+
+  #screen-trainer .ht-seat[data-pos="SB"],
+  #screen-postflop-trainer .ht-seat[data-pos="SB"],
+  #screen-thought-process-v2 .ht-seat[data-pos="SB"] {
+    left:50% !important;
+    top:91% !important;
+    transform:translate(-50%,-50%) scale(1.06) !important;
+  }
+
+  #screen-trainer .ht-community,
+  #screen-postflop-trainer .ht-community,
+  #screen-thought-process-v2 .ht-community { top:47%; gap:3px; }
+
+  #screen-trainer .ht-community .ht-card,
+  #screen-postflop-trainer .ht-community .ht-card,
+  #screen-thought-process-v2 .ht-community .ht-card { width:28px; height:40px; aspect-ratio:auto; }
+
+  #screen-trainer .ht-pot-display,
+  #screen-postflop-trainer .ht-pot-display,
+  #screen-thought-process-v2 .ht-pot-display { top:37%; }
+
+  #screen-trainer .ht-pot-display img,
+  #screen-postflop-trainer .ht-pot-display img,
+  #screen-thought-process-v2 .ht-pot-display img { width:34px; }
+
+  #screen-trainer .ht-bet-chip,
+  #screen-trainer .ht-flying-chip,
+  #screen-postflop-trainer .ht-bet-chip,
+  #screen-postflop-trainer .ht-flying-chip,
+  #screen-thought-process-v2 .ht-bet-chip { width:34px; height:34px; }
+
+  #screen-trainer .ht-bet-chip .ht-chip-val,
+  #screen-trainer .ht-flying-chip .ht-chip-val,
+  #screen-postflop-trainer .ht-bet-chip .ht-chip-val,
+  #screen-postflop-trainer .ht-flying-chip .ht-chip-val,
+  #screen-thought-process-v2 .ht-bet-chip .ht-chip-val { font-size:0.78rem; }
+
+  #screen-trainer .ht-action-bar,
+  #screen-postflop-trainer .ht-action-bar,
+  #screen-thought-process-v2 .ht-action-bar {
+    gap:0.42rem;
+    padding:0.45rem 0.45rem calc(0.45rem + env(safe-area-inset-bottom));
+    border-top-width:1px;
+  }
+
+  #screen-trainer .ht-action-btn,
+  #screen-postflop-trainer .ht-action-btn,
+  #screen-thought-process-v2 .ht-action-btn {
+    flex:1 1 0;
+    min-width:0;
+    padding:0.58rem 0.16rem;
+    font-size:clamp(0.92rem, 4.3vw, 1.18rem);
+    letter-spacing:0.06em;
+  }
+
+  #screen-trainer .ht-change-filters { margin-top:0.32rem; padding:0.25rem 0.72rem 0.22rem; font-size:0.64rem; }
+  #screen-trainer .ht-best-streak { margin-bottom:0.16rem; padding:0.18rem 0.55rem; font-size:0.62rem; }
+
+  #screen-postflop-trainer .pft-status,
+  #screen-thought-process-v2 .pft-status { top:42px; padding:0.36rem 0.7rem; font-size:0.58rem; }
+
+  #screen-postflop-trainer .pft-debug,
+  #screen-thought-process-v2 .pft-debug { top:82px; font-size:0.58rem; }
+
+  .thought-v2-main-layout { gap:0.4rem; width:100%; }
+  .thought-v2-score-grid { transform:scale(0.68); transform-origin:left center; margin-right:-1.9rem; }
+}
 </style>
 </head>
 <body>

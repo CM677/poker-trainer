@@ -247,6 +247,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .ht-result-overlay.show { pointer-events:none; }
 .ht-result-card { position:absolute; top:0; bottom:0; left:0; width:min(420px, 92vw); max-width:420px; overflow-y:auto; background:#2d2f3a; border:none; border-radius:0; padding:1.35rem 1.5rem 1.5rem; text-align:left; box-shadow:18px 0 48px rgba(0,0,0,0.45); transform:translateX(-100%); transition:transform 0.26s ease; pointer-events:auto; }
 .ht-result-overlay.show .ht-result-card { transform:translateX(0); }
+.mobile-sheet-handle { display:none; }
 .ht-result-icon,.ht-result-verdict,.ht-result-action,.ht-result-detail,.pft-result-meta,.ht-result-correct { display:none; }
 .ht-result-verdict { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.08em; margin-bottom:0.4rem; }
 .ht-result-verdict.correct { color:#27ae60; } .ht-result-verdict.wrong { color:#e74c3c; }
@@ -726,7 +727,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-pot-display,
   #screen-postflop-trainer .ht-pot-display,
-  #screen-thought-process-v2 .ht-pot-display { top:37%; }
+  #screen-thought-process-v2 .ht-pot-display { top:33%; }
 
   #screen-trainer .ht-pot-display img,
   #screen-postflop-trainer .ht-pot-display img,
@@ -735,7 +736,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-pot-overlay,
   #screen-postflop-trainer .ht-pot-overlay,
   #screen-thought-process-v2 .ht-pot-overlay {
-    transform:translateY(0.72em);
+    transform:translateY(0.64em);
   }
 
   #screen-trainer .ht-pot-amount,
@@ -839,6 +840,31 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     box-shadow:0 -18px 46px rgba(0,0,0,0.56);
   }
 
+  .mobile-sheet-handle {
+    appearance:none;
+    -webkit-appearance:none;
+    display:block;
+    width:64px;
+    height:26px;
+    margin:0 auto 0.58rem;
+    padding:0;
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    cursor:pointer;
+    touch-action:manipulation;
+  }
+
+  .mobile-sheet-handle::before {
+    content:'';
+    display:block;
+    width:48px;
+    height:5px;
+    border-radius:999px;
+    margin:10px auto;
+    background:rgba(218,216,224,0.48);
+  }
+
   .ht-result-overlay.show .ht-result-card,
   #pft-result-overlay.show .ht-result-card,
   #tpv2-result-overlay.show .ht-result-card,
@@ -846,17 +872,19 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     transform:translateY(0);
   }
 
+  .ht-result-overlay.show.sheet-collapsed .ht-result-card,
+  #pft-result-overlay.show.sheet-collapsed .ht-result-card,
+  #tpv2-result-overlay.show.sheet-collapsed .ht-result-card,
+  #ht-result-overlay.show.sheet-collapsed .ht-result-card {
+    transform:translateY(calc(100% - 86px));
+  }
+
   .ht-result-card::before,
   #pft-result-overlay .ht-result-card::before,
   #tpv2-result-overlay .ht-result-card::before,
   #ht-result-overlay .ht-result-card::before {
-    content:'';
-    display:block;
-    width:48px;
-    height:5px;
-    border-radius:999px;
-    margin:0 auto 0.68rem;
-    background:rgba(218,216,224,0.42);
+    content:none;
+    display:none;
   }
 
   .pft-analysis-header {
@@ -934,7 +962,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-community .ht-card,
   #screen-postflop-trainer .ht-community .ht-card,
   #screen-thought-process-v2 .ht-community .ht-card {
-    width:min(54px, calc((74vw - 16px) / 5));
+    width:min(38px, calc((52vw - 16px) / 5));
   }
 
   #screen-trainer .ht-seat[data-mobile-slot="bottom"],
@@ -3403,6 +3431,26 @@ function applyMobileSeatSlot(el, pos, heroPosition) {
   if(slot) el.dataset.mobileSlot = slot;
 }
 
+function applyMobileChipSlot(el, pos, heroPosition) {
+  if(!el) return;
+  const slot = getMobileSeatDisplaySlot(pos, heroPosition);
+  const slotIndex = MOBILE_SEAT_SLOTS.indexOf(slot);
+  if(slotIndex >= 0) {
+    el.dataset.mobileSlot = MOBILE_SEAT_SLOTS[(slotIndex + MOBILE_SEAT_SLOTS.length - 1) % MOBILE_SEAT_SLOTS.length];
+  }
+}
+
+function toggleMobileSheet(event) {
+  if(event) event.stopPropagation();
+  const overlay = event && event.currentTarget ? event.currentTarget.closest('.ht-result-overlay') : null;
+  if(overlay) overlay.classList.toggle('sheet-collapsed');
+}
+
+function resetMobileSheet(id) {
+  const overlay = document.getElementById(id);
+  if(overlay) overlay.classList.remove('sheet-collapsed');
+}
+
 function renderPreflopFilterPanel() {
   const panel=document.getElementById('ht-filter-panel');
   if(!panel) return;
@@ -3536,7 +3584,7 @@ function htSetDisplayedBet(pos, amount) {
     chip=document.createElement('div');
     chip.className='ht-bet-chip';
     chip.dataset.pos=pos;
-    applyMobileSeatSlot(chip,pos,htSc&&htSc.hero);
+    applyMobileChipSlot(chip,pos,htSc&&htSc.hero);
     chip.style.left=HT_CHIP_OFF[pos].x+'%';
     chip.style.top=HT_CHIP_OFF[pos].y+'%';
     const img=document.createElement('img');img.src='chip2.png';chip.appendChild(img);
@@ -3611,7 +3659,7 @@ function htNextHand() {
   htIntroRunning=false;
   htVisualState=htGetInitialVisualState();
   document.querySelectorAll('.ht-flying-chip').forEach(el=>el.remove());
-  document.getElementById('ht-result-overlay').classList.remove('show');
+  document.getElementById('ht-result-overlay').classList.remove('show','sheet-collapsed');
   htSetActionBarVisible(false);
   const spotPool=getFilteredPreflopSpotPool();
   if(!spotPool.length){
@@ -3884,7 +3932,7 @@ function htRenderTable() {
     if(bet!==undefined){
       const bc=document.createElement('div');bc.className='ht-bet-chip';
       bc.dataset.pos=pos;
-      applyMobileSeatSlot(bc,pos,htSc.hero);
+      applyMobileChipSlot(bc,pos,htSc.hero);
       bc.style.left=cp.x+'%';bc.style.top=cp.y+'%';
       const bi=document.createElement('img');bi.src='chip2.png';bc.appendChild(bi);
       const bv=document.createElement('div');bv.className='ht-chip-val';bv.textContent=bet;bc.appendChild(bv);
@@ -3944,6 +3992,7 @@ function htShowResult(action,ok) {
   document.getElementById('ht-result-detail').textContent=detail;
   const cv={fold:'fold',call:'call',raise:'raise',shove:'all-in'}[htCorrect[0]]||htCorrect[0];
   document.getElementById('ht-result-correct').innerHTML=ok?'':`Correct action: <strong>${cv}</strong>`;
+  resetMobileSheet('ht-result-overlay');
   document.getElementById('ht-result-overlay').classList.add('show');
 }
 
@@ -4601,7 +4650,7 @@ function pftEnsureBetChip(pos) {
   chip = document.createElement('div');
   chip.className = 'ht-bet-chip';
   chip.dataset.pos = pos;
-  applyMobileSeatSlot(chip,pos,pftCurrentScenario&&pftCurrentScenario.hero);
+  applyMobileChipSlot(chip,pos,pftCurrentScenario&&pftCurrentScenario.hero);
   chip.style.left = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].x : 50) + '%';
   chip.style.top = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].y : 50) + '%';
   const img = document.createElement('img');
@@ -4938,6 +4987,7 @@ function pftShowResult(action, ok) {
   });
 
   document.getElementById('pft-result-meta').innerHTML = `<strong>${ok ? 'Correct.' : 'Incorrect.'}</strong> Green highlight marks the solver's best action.`;
+  resetMobileSheet('pft-result-overlay');
   document.getElementById('pft-result-overlay').classList.add('show');
 }
 
@@ -4957,7 +5007,7 @@ async function pftNextHand() {
   pftAnswered = false;
   pftHandLoading = true;
   pftIntroRunning = false;
-  document.getElementById('pft-result-overlay').classList.remove('show');
+  document.getElementById('pft-result-overlay').classList.remove('show','sheet-collapsed');
   document.getElementById('pft-ib-stage').textContent = 'BUILDING PREFLOP';
   pftSetStatus('Loading random hand...', 'ready');
   pftShowDebugError('');
@@ -5494,7 +5544,7 @@ function showThoughtProcessSizingSelection() {
   resetThoughtV2ScoreGuesses();
   tpv2RenderSizingPanel('flop');
   document.getElementById('tpv2-sizing-panel').classList.add('show');
-  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show','sheet-collapsed');
   document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
   tpv2UpdateBetButton();
   tpv2RenderScores(null);
@@ -5546,7 +5596,7 @@ function showThoughtProcessTurnSizingSelection() {
   resetThoughtV2ScoreGuesses();
   tpv2RenderSizingPanel('turn');
   document.getElementById('tpv2-sizing-panel').classList.add('show');
-  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show','sheet-collapsed');
   document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
   tpv2RenderScores(null);
   tpv2RenderRangeGrid();
@@ -5597,7 +5647,7 @@ async function loadThoughtProcessHandV2() {
   thoughtProcessV2FlopUserAction = null;
   thoughtProcessV2FlopActionBranch = null;
   resetThoughtV2ScoreGuesses();
-  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show','sheet-collapsed');
   document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
   tpv2RenderScores(null);
   tpv2RenderRangeGrid();
@@ -5705,7 +5755,7 @@ async function loadThoughtProcessTurnHandV2() {
   currentThoughtProcessV2Hand = null;
   thoughtProcessV2CurrentTurnRow = null;
   resetThoughtV2ScoreGuesses();
-  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show','sheet-collapsed');
   document.getElementById('tpv2-action-bar').classList.add('ht-hidden');
   tpv2RenderScores(null);
   document.getElementById('tpv2-ib-stage').textContent = 'LOADING TURN';
@@ -5816,6 +5866,7 @@ function showThoughtProcessMissingTurnV2() {
   document.getElementById('tpv2-result-frequencies').innerHTML = '';
   document.getElementById('tpv2-result-meta').innerHTML = `<strong>Hero hand:</strong> ${thoughtProcessV2CurrentHandCombo || '--'} &nbsp; <strong>Branch:</strong> ${thoughtProcessV2FlopActionBranch || '--'}`;
   tpv2ConfigureResultPrimary('NEXT HAND', 'next');
+  resetMobileSheet('tpv2-result-overlay');
   document.getElementById('tpv2-result-overlay').classList.add('show');
 }
 
@@ -5886,7 +5937,7 @@ function tpv2SetDisplayedBet(pos, amount) {
   const chip = document.createElement('div');
   chip.className = 'ht-bet-chip';
   chip.dataset.pos = pos;
-  applyMobileSeatSlot(chip,pos,'BTN');
+  applyMobileChipSlot(chip,pos,'BTN');
   chip.style.left = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].x : 50) + '%';
   chip.style.top = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].y : 50) + '%';
   const img = document.createElement('img');
@@ -5941,7 +5992,7 @@ function tpv2PrimaryResultAction() {
 }
 
 function tpv2NextHandV2() {
-  document.getElementById('tpv2-result-overlay').classList.remove('show');
+  document.getElementById('tpv2-result-overlay').classList.remove('show','sheet-collapsed');
   if (!Number.isFinite(Number(thoughtProcessV2SelectedFlopSizing))) {
     showThoughtProcessSizingSelection();
     return;
@@ -6024,6 +6075,7 @@ function showThoughtProcessFeedbackV2(isCorrect, row, userAction) {
 
   tpv2ConfigureResultPrimary(tpv2IsTurnStreet() ? 'NEXT HAND' : 'GO TO TURN', tpv2IsTurnStreet() ? 'next' : 'turn');
   document.getElementById('tpv2-result-meta').innerHTML = `<strong>Hero hand:</strong> ${row.hand} &nbsp; <strong>Street:</strong> ${streetLabel} &nbsp; <strong>Chosen sizing:</strong> ${tpv2SizingLabel()} &nbsp; <strong>Row EV:</strong> ${pftFormatAnalysisEv(row.ev)}`;
+  resetMobileSheet('tpv2-result-overlay');
   document.getElementById('tpv2-result-overlay').classList.add('show');
 }
 
@@ -6073,6 +6125,7 @@ function showThoughtProcessFeedbackV2(isCorrect, row, userAction) {
 <!-- HAND TRAINER RESULT OVERLAY -->
 <div class="ht-result-overlay" id="ht-result-overlay">
   <div class="ht-result-card">
+    <button class="mobile-sheet-handle" type="button" onclick="toggleMobileSheet(event)" aria-label="Toggle hand analysis panel"></button>
     <div class="pft-analysis-header">
       <div class="ht-result-hand" id="ht-result-hand"></div>
       <div class="pft-analysis-title">HAND ANALYSIS</div>
@@ -6132,6 +6185,7 @@ function showThoughtProcessFeedbackV2(isCorrect, row, userAction) {
 <!-- POSTFLOP TRAINER RESULT OVERLAY -->
 <div class="ht-result-overlay" id="pft-result-overlay">
   <div class="ht-result-card">
+    <button class="mobile-sheet-handle" type="button" onclick="toggleMobileSheet(event)" aria-label="Toggle hand analysis panel"></button>
     <div class="pft-analysis-header">
       <div class="ht-result-hand" id="pft-result-hand"></div>
       <div class="pft-analysis-title">HAND ANALYSIS</div>
@@ -6203,6 +6257,7 @@ function showThoughtProcessFeedbackV2(isCorrect, row, userAction) {
 <!-- THOUGHT PROCESS TRAINER 2.0 RESULT OVERLAY -->
 <div class="ht-result-overlay" id="tpv2-result-overlay">
   <div class="ht-result-card">
+    <button class="mobile-sheet-handle" type="button" onclick="toggleMobileSheet(event)" aria-label="Toggle hand analysis panel"></button>
     <div class="pft-analysis-header">
       <div class="ht-result-hand" id="tpv2-result-hand"></div>
       <div class="pft-analysis-title">HAND ANALYSIS</div>

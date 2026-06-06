@@ -579,8 +579,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-postflop-trainer .ht-table-wrap,
   #screen-thought-process-v2 .ht-table-wrap {
     width:min(96vw, 430px);
-    height:min(67svh, 640px);
-    max-height:640px;
+    height:min(62svh, 610px);
+    max-height:610px;
     aspect-ratio:auto;
   }
 
@@ -590,7 +590,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-pos-chip,
   #screen-postflop-trainer .ht-pos-chip,
-  #screen-thought-process-v2 .ht-pos-chip { width:64px; height:34px; }
+  #screen-thought-process-v2 .ht-pos-chip { width:96px; height:51px; }
 
   #screen-trainer .ht-pos-chip img,
   #screen-postflop-trainer .ht-pos-chip img,
@@ -598,15 +598,27 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-pos-chip-label,
   #screen-postflop-trainer .ht-pos-chip-label,
-  #screen-thought-process-v2 .ht-pos-chip-label { align-items:center; padding-top:0.08rem; font-size:0.96rem; line-height:1; }
+  #screen-thought-process-v2 .ht-pos-chip-label { align-items:center; padding-top:0.1rem; font-size:1.42rem; line-height:1; }
 
   #screen-trainer .ht-card,
   #screen-postflop-trainer .ht-card,
-  #screen-thought-process-v2 .ht-card { overflow:visible; border-radius:0; }
+  #screen-thought-process-v2 .ht-card {
+    overflow:visible !important;
+    border-radius:0 !important;
+    clip-path:none !important;
+    -webkit-mask:none !important;
+    mask:none !important;
+  }
 
   #screen-trainer .ht-card img.ht-card-bg,
   #screen-postflop-trainer .ht-card img.ht-card-bg,
-  #screen-thought-process-v2 .ht-card img.ht-card-bg { object-fit:contain; }
+  #screen-thought-process-v2 .ht-card img.ht-card-bg {
+    object-fit:contain;
+    border-radius:0 !important;
+    clip-path:none !important;
+    -webkit-mask:none !important;
+    mask:none !important;
+  }
 
   #screen-trainer .ht-seat-cards,
   #screen-postflop-trainer .ht-seat-cards,
@@ -622,11 +634,11 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-seat-cards .ht-card,
   #screen-postflop-trainer .ht-seat-cards .ht-card,
-  #screen-thought-process-v2 .ht-seat-cards .ht-card { width:23px; height:33px; margin:0 -2px; }
+  #screen-thought-process-v2 .ht-seat-cards .ht-card { width:35px; height:50px; margin:0 -3px; }
 
   #screen-trainer .ht-hero-cards .ht-card,
   #screen-postflop-trainer .ht-hero-cards .ht-card,
-  #screen-thought-process-v2 .ht-hero-cards .ht-card { width:31px; height:44px; }
+  #screen-thought-process-v2 .ht-hero-cards .ht-card { width:46px; height:66px; }
 
   #screen-trainer .ht-seat-cards .ht-card:nth-child(1),
   #screen-postflop-trainer .ht-seat-cards .ht-card:nth-child(1),
@@ -644,11 +656,11 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-seat-cards .ht-card .ht-card-rank,
   #screen-postflop-trainer .ht-seat-cards .ht-card .ht-card-rank,
-  #screen-thought-process-v2 .ht-seat-cards .ht-card .ht-card-rank { font-size:0.76rem; }
+  #screen-thought-process-v2 .ht-seat-cards .ht-card .ht-card-rank { font-size:1.08rem; }
 
   #screen-trainer .ht-hero-cards .ht-card .ht-card-rank,
   #screen-postflop-trainer .ht-hero-cards .ht-card .ht-card-rank,
-  #screen-thought-process-v2 .ht-hero-cards .ht-card .ht-card-rank { font-size:1.25rem; }
+  #screen-thought-process-v2 .ht-hero-cards .ht-card .ht-card-rank { font-size:1.72rem; }
 
   #screen-trainer .ht-seat[data-pos="HJ"],
   #screen-postflop-trainer .ht-seat[data-pos="HJ"],
@@ -700,11 +712,17 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-community,
   #screen-postflop-trainer .ht-community,
-  #screen-thought-process-v2 .ht-community { top:47%; gap:3px; }
+  #screen-thought-process-v2 .ht-community { top:47%; gap:4px; }
 
   #screen-trainer .ht-community .ht-card,
   #screen-postflop-trainer .ht-community .ht-card,
-  #screen-thought-process-v2 .ht-community .ht-card { width:28px; height:40px; aspect-ratio:auto; }
+  #screen-thought-process-v2 .ht-community .ht-card {
+    width:min(64px, calc((90vw - 16px) / 5));
+    height:auto;
+    aspect-ratio:54 / 76;
+    overflow:visible !important;
+    border-radius:0 !important;
+  }
 
   #screen-trainer .ht-pot-display,
   #screen-postflop-trainer .ht-pot-display,
@@ -713,6 +731,18 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-pot-display img,
   #screen-postflop-trainer .ht-pot-display img,
   #screen-thought-process-v2 .ht-pot-display img { width:34px; }
+
+  #screen-trainer .ht-pot-overlay,
+  #screen-postflop-trainer .ht-pot-overlay,
+  #screen-thought-process-v2 .ht-pot-overlay {
+    transform:translateY(0.72em);
+  }
+
+  #screen-trainer .ht-pot-amount,
+  #screen-postflop-trainer .ht-pot-amount,
+  #screen-thought-process-v2 .ht-pot-amount {
+    font-size:1.08rem;
+  }
 
   #screen-trainer .ht-bet-chip,
   #screen-trainer .ht-flying-chip,
@@ -725,6 +755,48 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-postflop-trainer .ht-bet-chip .ht-chip-val,
   #screen-postflop-trainer .ht-flying-chip .ht-chip-val,
   #screen-thought-process-v2 .ht-bet-chip .ht-chip-val { font-size:0.78rem; }
+
+  #screen-trainer .ht-bet-chip[data-pos="UTG"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="UTG"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="UTG"] {
+    left:36% !important;
+    top:17% !important;
+  }
+
+  #screen-trainer .ht-bet-chip[data-pos="BB"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="BB"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="BB"] {
+    left:39% !important;
+    top:66% !important;
+  }
+
+  #screen-trainer .ht-bet-chip[data-pos="CO"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="CO"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="CO"] {
+    left:64% !important;
+    top:17% !important;
+  }
+
+  #screen-trainer .ht-bet-chip[data-pos="BTN"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="BTN"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="BTN"] {
+    left:61% !important;
+    top:66% !important;
+  }
+
+  #screen-trainer .ht-bet-chip[data-pos="SB"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="SB"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="SB"] {
+    left:50% !important;
+    top:75% !important;
+  }
+
+  #screen-trainer .ht-bet-chip[data-pos="HJ"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="HJ"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="HJ"] {
+    left:50% !important;
+    top:7% !important;
+  }
 
   #screen-trainer .ht-action-bar,
   #screen-postflop-trainer .ht-action-bar,
@@ -742,6 +814,58 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     padding:0.58rem 0.16rem;
     font-size:clamp(0.92rem, 4.3vw, 1.18rem);
     letter-spacing:0.06em;
+  }
+
+  .ht-result-card,
+  #pft-result-overlay .ht-result-card,
+  #tpv2-result-overlay .ht-result-card,
+  #ht-result-overlay .ht-result-card {
+    position:fixed;
+    left:0;
+    right:0;
+    top:auto;
+    bottom:0;
+    width:100%;
+    max-width:none;
+    max-height:65svh;
+    min-height:34svh;
+    padding:0.72rem 1rem calc(1rem + env(safe-area-inset-bottom));
+    border-radius:22px 22px 0 0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
+    transform:translateY(105%);
+    box-shadow:0 -18px 46px rgba(0,0,0,0.56);
+  }
+
+  .ht-result-overlay.show .ht-result-card,
+  #pft-result-overlay.show .ht-result-card,
+  #tpv2-result-overlay.show .ht-result-card,
+  #ht-result-overlay.show .ht-result-card {
+    transform:translateY(0);
+  }
+
+  .ht-result-card::before,
+  #pft-result-overlay .ht-result-card::before,
+  #tpv2-result-overlay .ht-result-card::before,
+  #ht-result-overlay .ht-result-card::before {
+    content:'';
+    display:block;
+    width:48px;
+    height:5px;
+    border-radius:999px;
+    margin:0 auto 0.68rem;
+    background:rgba(218,216,224,0.42);
+  }
+
+  .pft-analysis-header {
+    margin:0 -1rem 0;
+    padding:0.95rem 1rem 0.82rem;
+  }
+
+  .pft-analysis-title {
+    font-size:clamp(2.15rem, 10vw, 3.05rem);
   }
 
   #screen-trainer .ht-change-filters { margin-top:0.32rem; padding:0.25rem 0.72rem 0.22rem; font-size:0.64rem; }

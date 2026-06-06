@@ -879,6 +879,168 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   .thought-v2-main-layout { gap:0.4rem; width:100%; }
   .thought-v2-score-grid { transform:scale(0.68); transform-origin:left center; margin-right:-1.9rem; }
+
+  #screen-trainer .ht-pos-chip,
+  #screen-postflop-trainer .ht-pos-chip,
+  #screen-thought-process-v2 .ht-pos-chip {
+    width:80px;
+    height:43px;
+    z-index:3;
+  }
+
+  #screen-trainer .ht-pos-chip img,
+  #screen-postflop-trainer .ht-pos-chip img,
+  #screen-thought-process-v2 .ht-pos-chip img {
+    position:relative;
+    z-index:3;
+  }
+
+  #screen-trainer .ht-pos-chip-label,
+  #screen-postflop-trainer .ht-pos-chip-label,
+  #screen-thought-process-v2 .ht-pos-chip-label {
+    z-index:4;
+    font-size:1.18rem;
+  }
+
+  #screen-trainer .ht-seat-cards,
+  #screen-postflop-trainer .ht-seat-cards,
+  #screen-thought-process-v2 .ht-seat-cards {
+    bottom:calc(100% - 13px) !important;
+    z-index:2;
+  }
+
+  #screen-trainer .ht-seat-cards .ht-card,
+  #screen-postflop-trainer .ht-seat-cards .ht-card,
+  #screen-thought-process-v2 .ht-seat-cards .ht-card {
+    width:29px;
+    height:42px;
+  }
+
+  #screen-trainer .ht-hero-cards .ht-card,
+  #screen-postflop-trainer .ht-hero-cards .ht-card,
+  #screen-thought-process-v2 .ht-hero-cards .ht-card {
+    width:39px;
+    height:55px;
+  }
+
+  #screen-trainer .ht-seat-cards .ht-card .ht-card-rank,
+  #screen-postflop-trainer .ht-seat-cards .ht-card .ht-card-rank,
+  #screen-thought-process-v2 .ht-seat-cards .ht-card .ht-card-rank { font-size:0.92rem; }
+
+  #screen-trainer .ht-hero-cards .ht-card .ht-card-rank,
+  #screen-postflop-trainer .ht-hero-cards .ht-card .ht-card-rank,
+  #screen-thought-process-v2 .ht-hero-cards .ht-card .ht-card-rank { font-size:1.48rem; }
+
+  #screen-trainer .ht-community .ht-card,
+  #screen-postflop-trainer .ht-community .ht-card,
+  #screen-thought-process-v2 .ht-community .ht-card {
+    width:min(54px, calc((74vw - 16px) / 5));
+  }
+
+  #screen-trainer .ht-seat[data-mobile-slot="bottom"],
+  #screen-postflop-trainer .ht-seat[data-mobile-slot="bottom"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-slot="bottom"] {
+    left:50% !important;
+    top:91% !important;
+    transform:translate(-50%,-50%) scale(1.04) !important;
+  }
+
+  #screen-trainer .ht-seat[data-mobile-slot="lower-right"],
+  #screen-postflop-trainer .ht-seat[data-mobile-slot="lower-right"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-slot="lower-right"] {
+    left:77% !important;
+    top:76% !important;
+    transform:translate(-50%,-50%) scale(0.98) !important;
+  }
+
+  #screen-trainer .ht-seat[data-mobile-slot="upper-right"],
+  #screen-postflop-trainer .ht-seat[data-mobile-slot="upper-right"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-slot="upper-right"] {
+    left:80% !important;
+    top:26% !important;
+    transform:translate(-50%,-50%) scale(0.91) !important;
+  }
+
+  #screen-trainer .ht-seat[data-mobile-slot="top"],
+  #screen-postflop-trainer .ht-seat[data-mobile-slot="top"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-slot="top"] {
+    left:50% !important;
+    top:12% !important;
+    transform:translate(-50%,-50%) scale(0.86) !important;
+  }
+
+  #screen-trainer .ht-seat[data-mobile-slot="upper-left"],
+  #screen-postflop-trainer .ht-seat[data-mobile-slot="upper-left"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-slot="upper-left"] {
+    left:20% !important;
+    top:26% !important;
+    transform:translate(-50%,-50%) scale(0.9) !important;
+  }
+
+  #screen-trainer .ht-seat[data-mobile-slot="lower-left"],
+  #screen-postflop-trainer .ht-seat[data-mobile-slot="lower-left"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-slot="lower-left"] {
+    left:23% !important;
+    top:76% !important;
+    transform:translate(-50%,-50%) scale(0.98) !important;
+  }
+
+  #screen-trainer .ht-bet-chip,
+  #screen-postflop-trainer .ht-bet-chip,
+  #screen-thought-process-v2 .ht-bet-chip {
+    --slot-x:50%;
+    --slot-y:50%;
+    --chip-dx:0%;
+    --chip-dy:0%;
+    left:calc(var(--slot-x) + var(--chip-dx)) !important;
+    top:calc(var(--slot-y) + var(--chip-dy)) !important;
+  }
+
+  #screen-trainer .ht-bet-chip[data-mobile-slot="bottom"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="bottom"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="bottom"] { --slot-x:50%; --slot-y:81%; }
+
+  #screen-trainer .ht-bet-chip[data-mobile-slot="lower-right"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="lower-right"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="lower-right"] { --slot-x:77%; --slot-y:66%; }
+
+  #screen-trainer .ht-bet-chip[data-mobile-slot="upper-right"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="upper-right"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="upper-right"] { --slot-x:80%; --slot-y:17%; }
+
+  #screen-trainer .ht-bet-chip[data-mobile-slot="top"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="top"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="top"] { --slot-x:50%; --slot-y:7%; }
+
+  #screen-trainer .ht-bet-chip[data-mobile-slot="upper-left"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="upper-left"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="upper-left"] { --slot-x:20%; --slot-y:17%; }
+
+  #screen-trainer .ht-bet-chip[data-mobile-slot="lower-left"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="lower-left"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="lower-left"] { --slot-x:23%; --slot-y:66%; }
+
+  #screen-trainer .ht-bet-chip[data-pos="BB"],
+  #screen-trainer .ht-bet-chip[data-pos="UTG"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="BB"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="UTG"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="BB"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="UTG"] { --chip-dx:14%; --chip-dy:-4%; }
+
+  #screen-trainer .ht-bet-chip[data-pos="BTN"],
+  #screen-trainer .ht-bet-chip[data-pos="CO"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="BTN"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="CO"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="BTN"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="CO"] { --chip-dx:-14%; --chip-dy:-4%; }
+
+  #screen-trainer .ht-bet-chip[data-pos="SB"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="SB"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="SB"] { --chip-dx:0%; --chip-dy:-14%; }
+
+  #screen-trainer .ht-bet-chip[data-pos="HJ"],
+  #screen-postflop-trainer .ht-bet-chip[data-pos="HJ"],
+  #screen-thought-process-v2 .ht-bet-chip[data-pos="HJ"] { --chip-dx:0%; --chip-dy:7%; }
 }
 </style>
 </head>
@@ -3225,6 +3387,22 @@ function htSetActionBarVisible(isVisible) {
   document.getElementById('ht-action-bar').classList.toggle('ht-hidden', !isVisible);
 }
 
+const MOBILE_SEAT_RING = ['SB','BTN','CO','HJ','UTG','BB'];
+const MOBILE_SEAT_SLOTS = ['bottom','lower-right','upper-right','top','upper-left','lower-left'];
+
+function getMobileSeatDisplaySlot(pos, heroPosition) {
+  const heroIndex = MOBILE_SEAT_RING.indexOf(heroPosition);
+  const posIndex = MOBILE_SEAT_RING.indexOf(pos);
+  if(heroIndex < 0 || posIndex < 0) return '';
+  return MOBILE_SEAT_SLOTS[(posIndex - heroIndex + MOBILE_SEAT_RING.length) % MOBILE_SEAT_RING.length];
+}
+
+function applyMobileSeatSlot(el, pos, heroPosition) {
+  if(!el) return;
+  const slot = getMobileSeatDisplaySlot(pos, heroPosition);
+  if(slot) el.dataset.mobileSlot = slot;
+}
+
 function renderPreflopFilterPanel() {
   const panel=document.getElementById('ht-filter-panel');
   if(!panel) return;
@@ -3358,6 +3536,7 @@ function htSetDisplayedBet(pos, amount) {
     chip=document.createElement('div');
     chip.className='ht-bet-chip';
     chip.dataset.pos=pos;
+    applyMobileSeatSlot(chip,pos,htSc&&htSc.hero);
     chip.style.left=HT_CHIP_OFF[pos].x+'%';
     chip.style.top=HT_CHIP_OFF[pos].y+'%';
     const img=document.createElement('img');img.src='chip2.png';chip.appendChild(img);
@@ -3658,6 +3837,7 @@ function htRenderTable() {
     const seat=document.createElement('div');
     seat.className='ht-seat'+(folded?' ht-folded':'');
     seat.dataset.pos=pos;
+    applyMobileSeatSlot(seat,pos,htSc.hero);
     seat.style.left=HT_SEAT_POS[pos].x+'%';seat.style.top=HT_SEAT_POS[pos].y+'%';
 
     const cw=document.createElement('div');
@@ -3704,6 +3884,7 @@ function htRenderTable() {
     if(bet!==undefined){
       const bc=document.createElement('div');bc.className='ht-bet-chip';
       bc.dataset.pos=pos;
+      applyMobileSeatSlot(bc,pos,htSc.hero);
       bc.style.left=cp.x+'%';bc.style.top=cp.y+'%';
       const bi=document.createElement('img');bi.src='chip2.png';bc.appendChild(bi);
       const bv=document.createElement('div');bv.className='ht-chip-val';bv.textContent=bet;bc.appendChild(bv);
@@ -4420,6 +4601,7 @@ function pftEnsureBetChip(pos) {
   chip = document.createElement('div');
   chip.className = 'ht-bet-chip';
   chip.dataset.pos = pos;
+  applyMobileSeatSlot(chip,pos,pftCurrentScenario&&pftCurrentScenario.hero);
   chip.style.left = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].x : 50) + '%';
   chip.style.top = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].y : 50) + '%';
   const img = document.createElement('img');
@@ -4521,6 +4703,7 @@ function pftRenderTable() {
     const seat = document.createElement('div');
     seat.className = 'ht-seat' + (visualState.folded.has(pos) ? ' ht-folded' : '');
     seat.dataset.pos = pos;
+    applyMobileSeatSlot(seat,pos,pftCurrentScenario.hero);
     seat.style.left = HT_SEAT_POS[pos].x + '%';
     seat.style.top = HT_SEAT_POS[pos].y + '%';
 
@@ -5664,6 +5847,7 @@ function tpv2RenderTable(boardCards, showHeroHand = true) {
     const seat = document.createElement('div');
     seat.className = 'ht-seat' + (visualState.folded.has(pos) ? ' ht-folded' : '');
     seat.dataset.pos = pos;
+    applyMobileSeatSlot(seat,pos,'BTN');
     seat.style.left = HT_SEAT_POS[pos].x + '%';
     seat.style.top = HT_SEAT_POS[pos].y + '%';
 
@@ -5702,6 +5886,7 @@ function tpv2SetDisplayedBet(pos, amount) {
   const chip = document.createElement('div');
   chip.className = 'ht-bet-chip';
   chip.dataset.pos = pos;
+  applyMobileSeatSlot(chip,pos,'BTN');
   chip.style.left = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].x : 50) + '%';
   chip.style.top = (HT_CHIP_OFF[pos] ? HT_CHIP_OFF[pos].y : 50) + '%';
   const img = document.createElement('img');

@@ -1026,7 +1026,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-bet-chip[data-mobile-slot="bottom"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="bottom"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="bottom"] { --slot-x:50%; --slot-y:81%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="bottom"] { --slot-x:50%; --slot-y:72%; }
 
   #screen-trainer .ht-bet-chip[data-mobile-slot="lower-right"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="lower-right"],
@@ -1038,7 +1038,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
   #screen-trainer .ht-bet-chip[data-mobile-slot="top"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="top"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="top"] { --slot-x:50%; --slot-y:7%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-slot="top"] { --slot-x:50%; --slot-y:13%; }
 
   #screen-trainer .ht-bet-chip[data-mobile-slot="upper-left"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-slot="upper-left"],
@@ -3434,10 +3434,11 @@ function applyMobileSeatSlot(el, pos, heroPosition) {
 function applyMobileChipSlot(el, pos, heroPosition) {
   if(!el) return;
   const slot = getMobileSeatDisplaySlot(pos, heroPosition);
-  const slotIndex = MOBILE_SEAT_SLOTS.indexOf(slot);
-  if(slotIndex >= 0) {
-    el.dataset.mobileSlot = MOBILE_SEAT_SLOTS[(slotIndex + MOBILE_SEAT_SLOTS.length - 1) % MOBILE_SEAT_SLOTS.length];
-  }
+  if(slot) el.dataset.mobileSlot = slot;
+}
+
+function isMobilePortraitTable() {
+  return window.matchMedia && window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches;
 }
 
 function toggleMobileSheet(event) {
@@ -3596,6 +3597,12 @@ function htSetDisplayedBet(pos, amount) {
 }
 
 async function htAnimateBetAction(action, token) {
+  if(isMobilePortraitTable()){
+    htVisualState.bets[action.pos]=action.amount;
+    htSetDisplayedBet(action.pos, action.amount);
+    await htWait(120);
+    return;
+  }
   const wrap=document.getElementById('ht-table-wrap');
   const flying=document.createElement('div');
   flying.className='ht-flying-chip';
@@ -4786,6 +4793,12 @@ function pftRenderTable() {
 }
 
 async function pftAnimateBetAction(action, token) {
+  if (isMobilePortraitTable()) {
+    pftVisualState.bets[action.pos] = action.amount;
+    pftSetDisplayedBet(action.pos, action.amount);
+    await htWait(120);
+    return;
+  }
   const wrap = document.getElementById('pft-table-wrap');
   const flying = document.createElement('div');
   flying.className = 'ht-flying-chip';

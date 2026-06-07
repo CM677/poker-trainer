@@ -24,6 +24,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--cream); min-height:100vh; overflow-x:hidden; }
 body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+.codex-test-marker { position:fixed; top:8px; right:10px; z-index:999999; color:white; background:rgba(255,0,0,0.75); padding:4px 8px; border-radius:6px; font-size:14px; font-weight:700; pointer-events:none; }
 .screen { display:none; min-height:100vh; position:relative; z-index:1; }
 .screen.active { display:flex; flex-direction:column; }
 #screen-position { align-items:center; justify-content:center; padding:3rem 1rem; }
@@ -1024,7 +1025,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     top:calc(var(--slot-y) + var(--chip-dy)) !important;
   }
 
-  /* Mobile chip anchors: chip-anchor-hero through chip-anchor-hero-plus-5. */
+  /* MOBILE_CHIP_ANCHORS_V1: chip-anchor-hero through chip-anchor-hero-plus-5. */
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero"],
   #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero"] { --slot-x:50%; --slot-y:68%; }
@@ -1052,6 +1053,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 </style>
 </head>
 <body>
+<div class="codex-test-marker">test 1</div>
 
 <!-- SCREEN 0: QUIZ PATH CHOOSER -->
 <div id="screen-home" class="screen active">
@@ -3395,8 +3397,8 @@ function htSetActionBarVisible(isVisible) {
 }
 
 const POSITION_ORDER = ['SB','BB','UTG','HJ','CO','BTN'];
-// Mobile relative seats: hero, hero-plus-1, hero-plus-2, hero-plus-3, hero-plus-4, hero-plus-5.
-// SB chip follows actual SB position. BB chip follows actual BB position. Dealer/Button chip follows actual BTN position.
+// MOBILE_RELATIVE_SEATS_V1: hero, hero-plus-1, hero-plus-2, hero-plus-3, hero-plus-4, hero-plus-5.
+// SB_BB_CHIPS_FOLLOW_ACTUAL_POSITIONS_V1: SB chip follows actual SB position. BB chip follows actual BB position. Dealer/Button chip follows actual BTN position.
 const MOBILE_RELATIVE_SEATS = ['hero','hero-plus-1','hero-plus-2','hero-plus-3','hero-plus-4','hero-plus-5'];
 
 function getMobileRelativeSeat(pos, heroPosition) {

@@ -822,63 +822,61 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #pft-result-overlay .ht-result-card,
   #tpv2-result-overlay .ht-result-card,
   #ht-result-overlay .ht-result-card {
-    /* TEST_TWO_BOTTOM_SHEET_MOVES_ITSELF_NOT_INNER_SCROLL */
+    /* TEST_FOUR_SIMPLE_CENTERED_HAND_ANALYSIS_MODAL */
+    /* TEST_FOUR_BOTTOM_SHEET_DISABLED */
     position:fixed;
-    left:0;
-    right:0;
-    top:auto;
-    bottom:0;
-    width:100%;
+    left:50%;
+    right:auto;
+    top:50%;
+    bottom:auto;
+    width:min(92vw, 420px);
     max-width:none;
-    max-height:65svh;
-    min-height:34svh;
-    padding:0.72rem 1rem calc(1rem + env(safe-area-inset-bottom));
-    border-radius:22px 22px 0 0;
-    overflow-y:hidden;
+    max-height:82vh;
+    min-height:0;
+    padding:0.82rem 1rem calc(0.95rem + env(safe-area-inset-bottom));
+    border-radius:18px;
+    overflow-y:auto;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior:contain;
-    touch-action:pan-y;
-    transform:translateY(105%);
-    box-shadow:0 -18px 46px rgba(0,0,0,0.56);
+    touch-action:auto;
+    transform:translate(-50%, -50%) scale(0.96);
+    opacity:0;
+    pointer-events:none;
+    box-shadow:0 22px 58px rgba(0,0,0,0.62);
   }
 
   .mobile-sheet-handle {
-    appearance:none;
-    -webkit-appearance:none;
-    display:block;
-    width:64px;
-    height:26px;
-    margin:0 auto 0.58rem;
-    padding:0;
-    border:0;
-    background:transparent;
-    box-shadow:none;
-    cursor:pointer;
-    touch-action:manipulation;
+    display:none;
   }
 
   .mobile-sheet-handle::before {
-    content:'';
-    display:block;
-    width:48px;
-    height:5px;
-    border-radius:999px;
-    margin:10px auto;
-    background:rgba(218,216,224,0.48);
+    content:none;
+    display:none;
+  }
+
+  .ht-result-overlay.show,
+  #pft-result-overlay.show,
+  #tpv2-result-overlay.show,
+  #ht-result-overlay.show {
+    pointer-events:auto;
+    background:rgba(0,0,0,0.34);
   }
 
   .ht-result-overlay.show .ht-result-card,
   #pft-result-overlay.show .ht-result-card,
   #tpv2-result-overlay.show .ht-result-card,
   #ht-result-overlay.show .ht-result-card {
-    transform:translateY(0);
+    transform:translate(-50%, -50%) scale(1);
+    opacity:1;
+    pointer-events:auto;
   }
 
   .ht-result-overlay.show.sheet-collapsed .ht-result-card,
   #pft-result-overlay.show.sheet-collapsed .ht-result-card,
   #tpv2-result-overlay.show.sheet-collapsed .ht-result-card,
   #ht-result-overlay.show.sheet-collapsed .ht-result-card {
-    transform:translateY(calc(100% - 54px));
+    transform:translate(-50%, -50%) scale(1);
+    opacity:1;
   }
 
   .ht-result-card::before,
@@ -1054,8 +1052,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 </style>
 </head>
 <body>
-<!-- CODEX_TEST_THREE_MARKER -->
-<div class="codex-test-marker">test 3</div>
+<!-- CODEX_TEST_FOUR_MARKER -->
+<div class="codex-test-marker">test 4</div>
 
 <!-- SCREEN 0: QUIZ PATH CHOOSER -->
 <div id="screen-home" class="screen active">
@@ -3429,7 +3427,8 @@ function isMobilePortraitTable() {
 }
 
 function toggleMobileSheet(event) {
-  // TEST_TWO_BOTTOM_SHEET_MOVES_ITSELF_NOT_INNER_SCROLL
+  // TEST_FOUR_SIMPLE_CENTERED_HAND_ANALYSIS_MODAL
+  // TEST_FOUR_BOTTOM_SHEET_DISABLED
   if(event) event.stopPropagation();
   const overlay = event && event.currentTarget ? event.currentTarget.closest('.ht-result-overlay') : null;
   if(overlay) overlay.classList.toggle('sheet-collapsed');

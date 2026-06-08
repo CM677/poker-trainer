@@ -822,6 +822,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #pft-result-overlay .ht-result-card,
   #tpv2-result-overlay .ht-result-card,
   #ht-result-overlay .ht-result-card {
+    /* TEST_TWO_BOTTOM_SHEET_MOVES_ITSELF_NOT_INNER_SCROLL */
     position:fixed;
     left:0;
     right:0;
@@ -833,7 +834,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     min-height:34svh;
     padding:0.72rem 1rem calc(1rem + env(safe-area-inset-bottom));
     border-radius:22px 22px 0 0;
-    overflow-y:auto;
+    overflow-y:hidden;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior:contain;
     touch-action:pan-y;
@@ -877,7 +878,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #pft-result-overlay.show.sheet-collapsed .ht-result-card,
   #tpv2-result-overlay.show.sheet-collapsed .ht-result-card,
   #ht-result-overlay.show.sheet-collapsed .ht-result-card {
-    transform:translateY(calc(100% - 86px));
+    transform:translateY(calc(100% - 54px));
   }
 
   .ht-result-card::before,
@@ -977,7 +978,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-seat[data-mobile-seat="hero-plus-1"],
   #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-1"],
   #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-1"] {
-    left:77% !important;
+    left:23% !important;
     top:76% !important;
     transform:translate(-50%,-50%) scale(0.98) !important;
   }
@@ -985,7 +986,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-seat[data-mobile-seat="hero-plus-2"],
   #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-2"],
   #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-2"] {
-    left:80% !important;
+    left:20% !important;
     top:26% !important;
     transform:translate(-50%,-50%) scale(0.91) !important;
   }
@@ -1001,7 +1002,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-seat[data-mobile-seat="hero-plus-4"],
   #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-4"],
   #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-4"] {
-    left:20% !important;
+    left:80% !important;
     top:26% !important;
     transform:translate(-50%,-50%) scale(0.9) !important;
   }
@@ -1009,7 +1010,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-seat[data-mobile-seat="hero-plus-5"],
   #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-5"],
   #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-5"] {
-    left:23% !important;
+    left:77% !important;
     top:76% !important;
     transform:translate(-50%,-50%) scale(0.98) !important;
   }
@@ -1025,35 +1026,36 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     top:calc(var(--slot-y) + var(--chip-dy)) !important;
   }
 
-  /* MOBILE_CHIP_ANCHORS_V1: chip-anchor-hero through chip-anchor-hero-plus-5. */
+  /* MOBILE_CHIP_ANCHORS_V1: chip-anchor-hero through chip-anchor-hero-plus-5. TEST_TWO_MOBILE_CHIPS_ONLY_USE_ANCHORS */
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero"] { --slot-x:50%; --slot-y:68%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero"] { --slot-x:50%; --slot-y:62%; } /* TEST_TWO_HERO_CHIP_MOVED_UP */
 
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-1"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-1"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-1"] { --slot-x:77%; --slot-y:66%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-1"] { --slot-x:23%; --slot-y:66%; }
 
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-2"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-2"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-2"] { --slot-x:80%; --slot-y:31%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-2"] { --slot-x:20%; --slot-y:39%; }
 
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-3"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-3"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-3"] { --slot-x:50%; --slot-y:27%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-3"] { --slot-x:50%; --slot-y:35%; } /* TEST_TWO_HERO_PLUS_THREE_CHIP_MOVED_DOWN */
 
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-4"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-4"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-4"] { --slot-x:20%; --slot-y:31%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-4"] { --slot-x:80%; --slot-y:39%; }
 
   #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-5"],
   #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-5"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-5"] { --slot-x:23%; --slot-y:66%; }
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-5"] { --slot-x:77%; --slot-y:66%; }
 }
 </style>
 </head>
 <body>
-<div class="codex-test-marker">test 1</div>
+<!-- CODEX_TEST_TWO_MARKER -->
+<div class="codex-test-marker">test 2</div>
 
 <!-- SCREEN 0: QUIZ PATH CHOOSER -->
 <div id="screen-home" class="screen active">
@@ -3397,10 +3399,13 @@ function htSetActionBarVisible(isVisible) {
 }
 
 const POSITION_ORDER = ['SB','BB','UTG','HJ','CO','BTN'];
+// MOBILE_CLOCKWISE_SEAT_ORDER_TEST_TWO
 // MOBILE_RELATIVE_SEATS_V1: hero, hero-plus-1, hero-plus-2, hero-plus-3, hero-plus-4, hero-plus-5.
 // SB_BB_CHIPS_FOLLOW_ACTUAL_POSITIONS_V1: SB chip follows actual SB position. BB chip follows actual BB position. Dealer/Button chip follows actual BTN position.
+// TEST_TWO_SB_BB_CHIPS_ATTACH_TO_POSITION_LABELS
 const MOBILE_RELATIVE_SEATS = ['hero','hero-plus-1','hero-plus-2','hero-plus-3','hero-plus-4','hero-plus-5'];
 
+// TEST_TWO_SINGLE_SHARED_MOBILE_SEAT_MAPPING
 function getMobileRelativeSeat(pos, heroPosition) {
   const heroIndex = POSITION_ORDER.indexOf(heroPosition);
   const posIndex = POSITION_ORDER.indexOf(pos);
@@ -3425,6 +3430,7 @@ function isMobilePortraitTable() {
 }
 
 function toggleMobileSheet(event) {
+  // TEST_TWO_BOTTOM_SHEET_MOVES_ITSELF_NOT_INNER_SCROLL
   if(event) event.stopPropagation();
   const overlay = event && event.currentTarget ? event.currentTarget.closest('.ht-result-overlay') : null;
   if(overlay) overlay.classList.toggle('sheet-collapsed');
@@ -3580,6 +3586,7 @@ function htSetDisplayedBet(pos, amount) {
 }
 
 async function htAnimateBetAction(action, token) {
+  // TEST_TWO_MOBILE_CHIPS_ONLY_USE_ANCHORS
   if(isMobilePortraitTable()){
     htVisualState.bets[action.pos]=action.amount;
     htSetDisplayedBet(action.pos, action.amount);
@@ -4776,6 +4783,7 @@ function pftRenderTable() {
 }
 
 async function pftAnimateBetAction(action, token) {
+  // TEST_TWO_MOBILE_CHIPS_ONLY_USE_ANCHORS
   if (isMobilePortraitTable()) {
     pftVisualState.bets[action.pos] = action.amount;
     pftSetDisplayedBet(action.pos, action.amount);

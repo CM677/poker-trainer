@@ -1052,8 +1052,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 </style>
 </head>
 <body>
-<!-- CODEX_TEST_FOUR_MARKER -->
-<div class="codex-test-marker">test 4</div>
+<!-- CODEX_TEST_FIVE_MARKER -->
+<div class="codex-test-marker">test 5</div>
 
 <!-- SCREEN 0: QUIZ PATH CHOOSER -->
 <div id="screen-home" class="screen active">
@@ -3418,6 +3418,17 @@ function applyMobileSeatSlot(el, pos, heroPosition) {
 
 function applyMobileChipSlot(el, pos, heroPosition) {
   if(!el) return;
+  // TEST_FIVE_FIXED_SB_BB_BLIND_CHIPS
+  const mobileSmallBlindSeat = 'SB';
+  const mobileBigBlindSeat = 'BB';
+  if(isMobilePortraitTable() && pos === 'SB') {
+    el.dataset.mobileSeat = mobileSmallBlindSeat;
+    return;
+  }
+  if(isMobilePortraitTable() && pos === 'BB') {
+    el.dataset.mobileSeat = mobileBigBlindSeat;
+    return;
+  }
   const fixedSeat = getMobileFixedSeat(pos);
   if(fixedSeat) el.dataset.mobileSeat = fixedSeat;
 }

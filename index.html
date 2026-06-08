@@ -967,49 +967,49 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     width:min(38px, calc((52vw - 16px) / 5));
   }
 
-  #screen-trainer .ht-seat[data-mobile-seat="hero"],
-  #screen-postflop-trainer .ht-seat[data-mobile-seat="hero"],
-  #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero"] {
+  #screen-trainer .ht-seat[data-mobile-seat="BTN"],
+  #screen-postflop-trainer .ht-seat[data-mobile-seat="BTN"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-seat="BTN"] {
     left:50% !important;
     top:91% !important;
     transform:translate(-50%,-50%) scale(1.04) !important;
   }
 
-  #screen-trainer .ht-seat[data-mobile-seat="hero-plus-1"],
-  #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-1"],
-  #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-1"] {
+  #screen-trainer .ht-seat[data-mobile-seat="SB"],
+  #screen-postflop-trainer .ht-seat[data-mobile-seat="SB"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-seat="SB"] {
     left:23% !important;
     top:76% !important;
     transform:translate(-50%,-50%) scale(0.98) !important;
   }
 
-  #screen-trainer .ht-seat[data-mobile-seat="hero-plus-2"],
-  #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-2"],
-  #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-2"] {
+  #screen-trainer .ht-seat[data-mobile-seat="BB"],
+  #screen-postflop-trainer .ht-seat[data-mobile-seat="BB"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-seat="BB"] {
     left:20% !important;
     top:26% !important;
     transform:translate(-50%,-50%) scale(0.91) !important;
   }
 
-  #screen-trainer .ht-seat[data-mobile-seat="hero-plus-3"],
-  #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-3"],
-  #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-3"] {
+  #screen-trainer .ht-seat[data-mobile-seat="UTG"],
+  #screen-postflop-trainer .ht-seat[data-mobile-seat="UTG"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-seat="UTG"] {
     left:50% !important;
     top:12% !important;
     transform:translate(-50%,-50%) scale(0.86) !important;
   }
 
-  #screen-trainer .ht-seat[data-mobile-seat="hero-plus-4"],
-  #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-4"],
-  #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-4"] {
+  #screen-trainer .ht-seat[data-mobile-seat="HJ"],
+  #screen-postflop-trainer .ht-seat[data-mobile-seat="HJ"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-seat="HJ"] {
     left:80% !important;
     top:26% !important;
     transform:translate(-50%,-50%) scale(0.9) !important;
   }
 
-  #screen-trainer .ht-seat[data-mobile-seat="hero-plus-5"],
-  #screen-postflop-trainer .ht-seat[data-mobile-seat="hero-plus-5"],
-  #screen-thought-process-v2 .ht-seat[data-mobile-seat="hero-plus-5"] {
+  #screen-trainer .ht-seat[data-mobile-seat="CO"],
+  #screen-postflop-trainer .ht-seat[data-mobile-seat="CO"],
+  #screen-thought-process-v2 .ht-seat[data-mobile-seat="CO"] {
     left:77% !important;
     top:76% !important;
     transform:translate(-50%,-50%) scale(0.98) !important;
@@ -1026,36 +1026,36 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     top:calc(var(--slot-y) + var(--chip-dy)) !important;
   }
 
-  /* MOBILE_CHIP_ANCHORS_V1: chip-anchor-hero through chip-anchor-hero-plus-5. TEST_TWO_MOBILE_CHIPS_ONLY_USE_ANCHORS */
-  #screen-trainer .ht-bet-chip[data-mobile-seat="hero"],
-  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero"] { --slot-x:50%; --slot-y:62%; } /* TEST_TWO_HERO_CHIP_MOVED_UP */
+  /* TEST_THREE_CHIPS_ATTACH_TO_FIXED_POSITION_LABELS */
+  #screen-trainer .ht-bet-chip[data-mobile-seat="BTN"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="BTN"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="BTN"] { --slot-x:50%; --slot-y:62%; }
 
-  #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-1"],
-  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-1"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-1"] { --slot-x:23%; --slot-y:66%; }
+  #screen-trainer .ht-bet-chip[data-mobile-seat="SB"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="SB"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="SB"] { --slot-x:23%; --slot-y:66%; }
 
-  #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-2"],
-  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-2"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-2"] { --slot-x:20%; --slot-y:39%; }
+  #screen-trainer .ht-bet-chip[data-mobile-seat="BB"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="BB"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="BB"] { --slot-x:20%; --slot-y:39%; }
 
-  #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-3"],
-  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-3"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-3"] { --slot-x:50%; --slot-y:35%; } /* TEST_TWO_HERO_PLUS_THREE_CHIP_MOVED_DOWN */
+  #screen-trainer .ht-bet-chip[data-mobile-seat="UTG"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="UTG"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="UTG"] { --slot-x:50%; --slot-y:35%; }
 
-  #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-4"],
-  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-4"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-4"] { --slot-x:80%; --slot-y:39%; }
+  #screen-trainer .ht-bet-chip[data-mobile-seat="HJ"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="HJ"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="HJ"] { --slot-x:80%; --slot-y:39%; }
 
-  #screen-trainer .ht-bet-chip[data-mobile-seat="hero-plus-5"],
-  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="hero-plus-5"],
-  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="hero-plus-5"] { --slot-x:77%; --slot-y:66%; }
+  #screen-trainer .ht-bet-chip[data-mobile-seat="CO"],
+  #screen-postflop-trainer .ht-bet-chip[data-mobile-seat="CO"],
+  #screen-thought-process-v2 .ht-bet-chip[data-mobile-seat="CO"] { --slot-x:77%; --slot-y:66%; }
 }
 </style>
 </head>
 <body>
-<!-- CODEX_TEST_TWO_MARKER -->
-<div class="codex-test-marker">test 2</div>
+<!-- CODEX_TEST_THREE_MARKER -->
+<div class="codex-test-marker">test 3</div>
 
 <!-- SCREEN 0: QUIZ PATH CHOOSER -->
 <div id="screen-home" class="screen active">
@@ -3398,31 +3398,30 @@ function htSetActionBarVisible(isVisible) {
   document.getElementById('ht-action-bar').classList.toggle('ht-hidden', !isVisible);
 }
 
-const POSITION_ORDER = ['SB','BB','UTG','HJ','CO','BTN'];
-// MOBILE_CLOCKWISE_SEAT_ORDER_TEST_TWO
-// MOBILE_RELATIVE_SEATS_V1: hero, hero-plus-1, hero-plus-2, hero-plus-3, hero-plus-4, hero-plus-5.
-// SB_BB_CHIPS_FOLLOW_ACTUAL_POSITIONS_V1: SB chip follows actual SB position. BB chip follows actual BB position. Dealer/Button chip follows actual BTN position.
-// TEST_TWO_SB_BB_CHIPS_ATTACH_TO_POSITION_LABELS
-const MOBILE_RELATIVE_SEATS = ['hero','hero-plus-1','hero-plus-2','hero-plus-3','hero-plus-4','hero-plus-5'];
+// TEST_THREE_FIXED_MOBILE_SEATS_BTN_BOTTOM
+const MOBILE_FIXED_SEATS = {
+  BTN: 'BTN',
+  SB: 'SB',
+  BB: 'BB',
+  UTG: 'UTG',
+  HJ: 'HJ',
+  CO: 'CO'
+};
 
-// TEST_TWO_SINGLE_SHARED_MOBILE_SEAT_MAPPING
-function getMobileRelativeSeat(pos, heroPosition) {
-  const heroIndex = POSITION_ORDER.indexOf(heroPosition);
-  const posIndex = POSITION_ORDER.indexOf(pos);
-  if(heroIndex < 0 || posIndex < 0) return '';
-  return MOBILE_RELATIVE_SEATS[(posIndex - heroIndex + POSITION_ORDER.length) % POSITION_ORDER.length];
+function getMobileFixedSeat(pos) {
+  return MOBILE_FIXED_SEATS[pos] || '';
 }
 
 function applyMobileSeatSlot(el, pos, heroPosition) {
   if(!el) return;
-  const relativeSeat = getMobileRelativeSeat(pos, heroPosition);
-  if(relativeSeat) el.dataset.mobileSeat = relativeSeat;
+  const fixedSeat = getMobileFixedSeat(pos);
+  if(fixedSeat) el.dataset.mobileSeat = fixedSeat;
 }
 
 function applyMobileChipSlot(el, pos, heroPosition) {
   if(!el) return;
-  const relativeSeat = getMobileRelativeSeat(pos, heroPosition);
-  if(relativeSeat) el.dataset.mobileSeat = relativeSeat;
+  const fixedSeat = getMobileFixedSeat(pos);
+  if(fixedSeat) el.dataset.mobileSeat = fixedSeat;
 }
 
 function isMobilePortraitTable() {

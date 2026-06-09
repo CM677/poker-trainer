@@ -200,6 +200,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .ht-pos-chip img { width:100%; height:100%; object-fit:contain; }
 .ht-pos-chip-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1.05rem; letter-spacing:0.05em; color:#f5f0e8; text-shadow:0 1px 4px rgba(0,0,0,0.9); }
 .ht-pos-chip.ht-hero .ht-pos-chip-label { color:#d4af37; }
+.mobile-blind-chip { display:none; }
 .ht-card { border-radius:5px; position:relative; overflow:hidden; flex-shrink:0; box-shadow:0 3px 10px rgba(0,0,0,0.6); }
 .ht-card img.ht-card-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 .ht-card .ht-card-face { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:2; }
@@ -926,8 +927,41 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   #screen-trainer .ht-pos-chip-label,
   #screen-postflop-trainer .ht-pos-chip-label,
   #screen-thought-process-v2 .ht-pos-chip-label {
+    overflow:visible;
     z-index:4;
     font-size:1.18rem;
+  }
+
+  /* TEST_SIX_BLIND_CHIPS_LEFT_OF_SB_BB_TEXT */
+  #screen-trainer .mobile-blind-chip,
+  #screen-postflop-trainer .mobile-blind-chip,
+  #screen-thought-process-v2 .mobile-blind-chip {
+    position:absolute;
+    right:100%;
+    top:50%;
+    transform:translateY(-50%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;
+    height:30px;
+    margin-right:4px;
+    border-radius:50%;
+    background:radial-gradient(circle at 34% 28%, #f4d975 0%, #b8860b 44%, #4a2d04 100%);
+    color:#1a1000;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:0.78rem;
+    line-height:1;
+    letter-spacing:0;
+    text-shadow:none;
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,0.55));
+    pointer-events:none;
+  }
+
+  #screen-trainer .ht-bet-chip.ht-mobile-initial-blind,
+  #screen-postflop-trainer .ht-bet-chip.ht-mobile-initial-blind,
+  #screen-thought-process-v2 .ht-bet-chip.ht-mobile-initial-blind {
+    display:none !important;
   }
 
   #screen-trainer .ht-seat-cards,
@@ -1052,8 +1086,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 </style>
 </head>
 <body>
-<!-- CODEX_TEST_FIVE_MARKER -->
-<div class="codex-test-marker">test 5</div>
+<!-- CODEX_TEST_SIX_MARKER -->
+<div class="codex-test-marker">test 6</div>
 
 <!-- SCREEN 0: QUIZ PATH CHOOSER -->
 <div id="screen-home" class="screen active">
@@ -3392,6 +3426,23 @@ function htSyncPotFromDisplayedChips() {
   document.getElementById('ht-pot-amount').textContent=String(pot);
 }
 
+function appendMobileBlindChipToLabel(labelEl, pos) {
+  if(!labelEl || (pos !== 'SB' && pos !== 'BB')) return;
+  const blind=document.createElement('span');
+  blind.className='mobile-blind-chip';
+  blind.textContent=pos === 'SB' ? '0.5' : '1';
+  labelEl.appendChild(blind);
+}
+
+function markMobileInitialBlindChip(chip, pos, amount) {
+  if(!chip) return;
+  const numericAmount=Number(amount);
+  chip.classList.toggle('ht-mobile-initial-blind',
+    (pos === 'SB' && Math.abs(numericAmount - 0.5) < 0.001) ||
+    (pos === 'BB' && Math.abs(numericAmount - 1) < 0.001)
+  );
+}
+
 function htSetActionBarVisible(isVisible) {
   document.getElementById('ht-action-bar').classList.toggle('ht-hidden', !isVisible);
 }
@@ -3591,6 +3642,7 @@ function htSetDisplayedBet(pos, amount) {
     cL.appendChild(chip);
   }
   chip.querySelector('.ht-chip-val').textContent=amount;
+  markMobileInitialBlindChip(chip,pos,amount);
   htSyncPotFromDisplayedChips();
 }
 
@@ -3902,7 +3954,7 @@ function htRenderTable() {
 
     const pw=document.createElement('div');pw.className='ht-pos-chip'+(isHero?' ht-hero':'');
     const pi=document.createElement('img');pi.src='positionlabelblack.png';pw.appendChild(pi);
-    const pl=document.createElement('div');pl.className='ht-pos-chip-label';pl.textContent=pos;pw.appendChild(pl);
+    const pl=document.createElement('div');pl.className='ht-pos-chip-label';pl.textContent=pos;appendMobileBlindChipToLabel(pl,pos);pw.appendChild(pl);
     seat.appendChild(pw);
     sL.appendChild(seat);
 
@@ -3942,6 +3994,7 @@ function htRenderTable() {
       bc.style.left=cp.x+'%';bc.style.top=cp.y+'%';
       const bi=document.createElement('img');bi.src='chip2.png';bc.appendChild(bi);
       const bv=document.createElement('div');bv.className='ht-chip-val';bv.textContent=bet;bc.appendChild(bv);
+      markMobileInitialBlindChip(bc,pos,bet);
       cL.appendChild(bc);
     }
   });
@@ -4679,6 +4732,7 @@ function pftSetDisplayedBet(pos, amount) {
   chip = pftEnsureBetChip(pos);
   if (!chip) return;
   chip.querySelector('.ht-chip-val').textContent = pftFormatChipAmount(amount);
+  markMobileInitialBlindChip(chip,pos,amount);
   pftSyncPotFromDisplayedChips();
 }
 
@@ -4781,6 +4835,7 @@ function pftRenderTable() {
     const label = document.createElement('div');
     label.className = 'ht-pos-chip-label';
     label.textContent = pos;
+    appendMobileBlindChipToLabel(label,pos);
     chip.appendChild(label);
     seat.appendChild(chip);
     seatsLayer.appendChild(seat);
@@ -5934,6 +5989,7 @@ function tpv2RenderTable(boardCards, showHeroHand = true) {
     const label = document.createElement('div');
     label.className = 'ht-pos-chip-label';
     label.textContent = pos;
+    appendMobileBlindChipToLabel(label,pos);
     chip.appendChild(label);
     seat.appendChild(chip);
     seatsLayer.appendChild(seat);
@@ -5960,6 +6016,7 @@ function tpv2SetDisplayedBet(pos, amount) {
   val.className = 'ht-chip-val';
   val.textContent = pftFormatChipAmount(amount);
   chip.appendChild(val);
+  markMobileInitialBlindChip(chip,pos,amount);
   chipsLayer.appendChild(chip);
 }
 
